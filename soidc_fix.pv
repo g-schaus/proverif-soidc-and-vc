@@ -1,0 +1,470 @@
+(* --------------------------------------------------------------------------------------------------------- *)
+(* Solid Open ID Connect *)
+(* --------------------------------------------------------------------------------------------------------- *)
+
+(* --------------------------------------------------------------------------------------------------------- *)
+(* Start Definitions *)
+(* --------------------------------------------------------------------------------------------------------- *)
+
+(* START keys *)
+type SymmetricKey.
+type SecretKey.
+type PublicKey.
+fun pk(SecretKey):PublicKey.
+(* END keys *)
+
+(* START hash *)
+fun hash(bitstring): bitstring.
+fun hash_pk(PublicKey): bitstring.
+(* End hash *)
+
+(* START symmetric encryption *)
+fun enc(bitstring(*the message*), SymmetricKey):bitstring (*symmetric encrypt input msg*).
+reduc forall msg:bitstring,symk:SymmetricKey; dec(enc(msg,symk),symk)=msg (*symmetric decrypt*).
+(* END symmetric encryption *)
+
+(* START asymmetric encryption *)
+fun aenc(bitstring(*the message*), PublicKey):bitstring (*asymmetric encrypt input msg*).
+reduc forall msg:bitstring,sk:SecretKey; adec(aenc(msg,pk(sk)),sk)=msg (*asymmetric decrypt*).
+(* END Asymmetric encryption *)
+
+(* START digital signature *)
+fun sign(bitstring(*the message*), SecretKey):bitstring (*sign the input msg*).
+reduc forall msg:bitstring,sk:SecretKey; check(sign(msg,sk),pk(sk))=msg (*check signature, and get msg*).
+reduc forall msg:bitstring,sk:SecretKey; getMsg(sign(msg,sk))=msg (*just get msg*).
+(* END digital signature *)
+
+(*DEFS*)
+fun ch(bitstring): channel.
+
+(* SECRECY *)
+
+const tag1:bitstring.
+const tag2:bitstring.
+const tag3:bitstring.
+const tag4:bitstring.
+const tag5:bitstring.
+const tag6:bitstring.
+const tag7:bitstring.
+const tag8:bitstring.
+const tag9:bitstring.
+const tag10:bitstring.
+const tag11:bitstring.
+const tag12:bitstring.
+
+free check_reach_app:bitstring [private].
+free check_reach_user:bitstring [private].
+free check_reach_issuer:bitstring [private].
+
+free free_code: bitstring [private].
+free free_password: bitstring [private].
+
+(* AUTHENTICATION *)
+
+(* App *)
+event appSendsLastMessageToIssuer(bitstring, bitstring, bitstring).
+event appSendsLastMessageToUser(bitstring, bitstring, bitstring).
+event appCompletesProtocol(bitstring, bitstring, bitstring, bitstring, bitstring, bitstring, bitstring, bitstring).
+
+(* User *)
+event userSendsLastMessageToIssuer(bitstring, bitstring, bitstring).
+event userSendsLastMessageToApp(bitstring, bitstring, bitstring, bitstring).
+event userCompletesProtocol(bitstring, bitstring, bitstring, bitstring, bitstring, bitstring, bitstring).
+
+(* Issuer *)
+event issuerSendsLastMessageToApp(bitstring, bitstring, bitstring, bitstring).
+event issuerSendsLastMessageToUser(bitstring, bitstring, bitstring, bitstring).
+event issuerCompletesProtocol(bitstring, bitstring, bitstring, bitstring, bitstring, bitstring).
+
+(* --------------------------------------------------------------------------------------------------------- *)
+(* End Definitions *)
+(* Start Agent Macros *)
+(* --------------------------------------------------------------------------------------------------------- *)
+
+let app(talksOnlyToHonest:bool, c:channel, a:bitstring, ska:SecretKey, u:bitstring, pku:PublicKey, i:bitstring, pki:PublicKey) =
+
+    (* !Connecting to User *)
+
+    (* Message 1 *)
+    in(c, m_1:bitstring);
+    let (tag1':bitstring, n:bitstring, spkI:PublicKey) = adec(m_1, ska) in
+    if (tag1 = tag1') then
+
+    (* Message 2 *)
+    new k1: SymmetricKey;
+    let m_2 = aenc((tag2, n, k1), spkI) in
+    out(c, m_2);
+
+    (* !Talking to User*)
+
+    (* Message 3 *)
+    new pkce:bitstring;
+    new scope:bitstring;
+    let m_3 = enc((tag3, a, hash(pkce), scope), k1) in
+    event appSendsLastMessageToUser(m_1, m_2, m_3);
+    out(c, m_3);
+
+    (* ... Waiting For Issuer Response While It Talks To The User ... *)
+
+    (* Message 8 *)
+    in(c, m_8:bitstring);
+    let (tag8':bitstring, code:bitstring, i':bitstring) = dec(m_8, k1) in
+    if (tag8 = tag8') then
+    if (i = i') then
+
+    (* !Connecting to Issuer *)
+ 
+    (* Message 9 *)
+    new n2:bitstring;
+    new sskI2:SecretKey;
+    let m_9 = aenc((tag9, n2, pk(sskI2)), pki) in
+    out(c, m_9);
+
+    (* Message 10 *)
+    in(c, m_10:bitstring);
+    let (tag10':bitstring, n2':bitstring, k3:SymmetricKey) = adec(m_10, sskI2) in
+    if (tag10 = tag10') then
+    if (n2 = n2') then
+
+    (* !Talking to Issuer*)
+
+    (* Message 11 *)
+    new sks:SecretKey;
+    new jti:bitstring;
+    let T2 = (a, jti, code, pkce) in
+    let m_11 = enc((tag11, pk(sks), sign(T2, sks)), k3) in
+    event appSendsLastMessageToIssuer(m_9, m_10, m_11);
+    out(c, m_11);
+
+    (* Message 12 *)
+    in(c, m_12:bitstring);
+    out(c, check_reach_app);
+    let (tag12':bitstring, signed_M:bitstring) = dec(m_12, k3) in
+    if (tag12 = tag12') then
+    let M = check(signed_M, pki) in
+    let (jtk:bitstring, jti':bitstring, scope':bitstring, a':bitstring, i':bitstring, u':bitstring) = M in
+
+    if (jtk = hash_pk(pk(sks))) then
+    if (jti = jti') then
+    if (scope = scope') then
+    if (a = a') then
+    if (i = i') then
+    if (u = u') then
+
+    (* --------------------------------------------------------------------------------------- *)
+    (* Query Preparations *)
+
+    if talksOnlyToHonest then
+
+    out(c, check_reach_app);
+
+    event appCompletesProtocol(m_1, m_2, m_3, m_8, m_9, m_10, m_11, m_12);
+
+    out(ch(code), free_code);
+
+    0.
+
+let user(talksOnlyToHonest:bool, c:channel, u:bitstring, sku:SecretKey, a:bitstring, pka:PublicKey, i:bitstring, pki:PublicKey, password:bitstring) =
+
+    (* !Connecting to App *)
+
+    (* Message 1 *)
+    new n:bitstring;
+    new sskI:SecretKey;
+    let m_1 = aenc((tag1, n, pk(sskI)), pka) in
+    out(c, m_1);
+
+    (* Message 2 *)
+    in(c, m_2:bitstring);
+    let (tag2':bitstring, n':bitstring, k1:SymmetricKey) = adec(m_2, sskI) in
+    if (tag2 = tag2') then
+    if (n = n') then
+
+    (* !Talking to App *)
+
+    (* Message 3 *)
+    in(c, m_3:bitstring);
+    let (tag3':bitstring, a':bitstring, h_pkce:bitstring, scope:bitstring) = dec(m_3, k1) in
+    if (tag3 = tag3') then
+    if (a = a') then
+
+    (* !Connecting to Issuer *)
+
+    (* Message 4 *)
+    new n2:bitstring;
+    new sskI:SecretKey;
+    let m_4 = aenc((tag4, n2, pk(sskI)), pki) in
+    out(c, m_4);
+
+    (* Message 5 *)
+    in(c, m_5:bitstring);
+    let (tag5':bitstring, n2':bitstring, k2:SymmetricKey) = adec(m_5, sskI) in
+    if (tag5 = tag5') then
+    if (n2 = n2') then
+
+    (* !Talking to Issuer *)
+
+    (* Message 6 *)
+    let m_6 = enc((tag6, a, h_pkce, scope, u, password), k2) in
+    event userSendsLastMessageToIssuer(m_4, m_5, m_6);
+    out(c, m_6);
+
+    (* Message 7 *)
+    in(c, m_7:bitstring);
+    let (tag7':bitstring, code:bitstring, i':bitstring) = dec(m_7, k2) in
+    if (tag7 = tag7') then
+    if (i = i') then
+
+    (* !Talking to App *)
+
+    (* Message 8 *)
+    let m_8 = enc((tag8, code, i), k1) in
+    event userSendsLastMessageToApp(m_1, m_2, m_3, m_8);
+    out(c, m_8);
+
+    (* --------------------------------------------------------------------------------------- *)
+    (* Query Preparations *)
+
+    if talksOnlyToHonest then
+
+    out(c, check_reach_user);
+
+    event userCompletesProtocol(m_1, m_2, m_3, m_4, m_5, m_6, m_7);
+
+    out(ch(code), free_code);
+    out(ch(password), free_password);
+
+    0.
+
+let issuer(talksOnlyToHonest:bool, c:channel, i:bitstring, ski:SecretKey, a:bitstring, pka:PublicKey, u:bitstring, pku:PublicKey, password:bitstring) =
+
+    (* !Connecting to User *)
+
+    (* Message 4 *)
+    in(c, m_4:bitstring);
+    let (tag4':bitstring, n:bitstring, spkI:PublicKey) = adec(m_4, ski) in
+    if (tag4 = tag4') then
+
+    (* Message 5 *)
+    new k2: SymmetricKey;
+    let m_5 = aenc((tag5, n, k2), spkI) in
+    out(c, m_5);
+
+    (* !Talking to User *)
+
+    (* Message 6 *)
+    in(c, m_6:bitstring);
+    let (tag6':bitstring, a':bitstring, h_pkce:bitstring, scope:bitstring, u':bitstring, password':bitstring) = dec(m_6, k2) in
+    if (tag6 = tag6') then
+
+    if (a = a') then
+    if (u = u') then
+    if (password = password') then
+
+    (* Message 7 *)
+    new code:bitstring;
+    let m_7 = enc((tag7, code, i), k2) in
+    event issuerSendsLastMessageToUser(m_4, m_5, m_6, m_7);
+    out(c, m_7);
+
+    (* Waiting for User to transfer code to App *)
+
+    (* !Connecting to App *)
+     
+    (* Message 9 *)
+    in(c, m_9:bitstring);
+    let (tag9':bitstring, n2:bitstring, spkI2:PublicKey) = adec(m_9, ski) in
+    if (tag9 = tag9') then
+
+    (* Message 10 *)
+    new k3: SymmetricKey;
+    let m_10 = aenc((tag10, n2, k3), spkI2) in
+    out(c, m_10);
+
+    (* !Talking to App*)
+
+    (* Message 11 *)
+    in(c, m_11:bitstring);
+    let (tag11':bitstring, pksks:PublicKey, signature:bitstring) = dec(m_11, k3) in
+    if (tag11 = tag11') then
+    let (a'':bitstring, jti:bitstring, code':bitstring, pkce:bitstring) = check(signature, pksks) in
+
+    if (a = a'') then
+    if (code = code') then
+    if (h_pkce = hash(pkce)) then
+
+    (* Message 12 *)
+    let jtk = hash_pk(pksks) in
+    let M = (jtk, jti, scope, a, i, u) in
+    let m_12 = enc((tag12, sign(M, ski)), k3) in
+    event issuerSendsLastMessageToApp(m_9, m_10, m_11, m_12);
+    out(c, m_12);
+
+    (* --------------------------------------------------------------------------------------- *)
+    (* Query Preparations *)
+
+    if talksOnlyToHonest then
+
+    out(c, check_reach_issuer);
+
+    event issuerCompletesProtocol(m_4, m_5, m_6, m_9, m_10, m_11);
+
+    out(ch(code), free_code);
+    out(ch(password), free_password);
+
+    0.
+
+(* --------------------------------------------------------------------------------------------------------- *)
+(* End Agent Macros *)
+(* Start Open Network *)
+(* --------------------------------------------------------------------------------------------------------- *)
+
+let open_app(c:channel, a:bitstring, ska:SecretKey, u:bitstring, pku:PublicKey, i:bitstring, pki:PublicKey) =
+  in(c, e1:bitstring);
+  in(c, e2:bitstring);
+  if (e1 = u) && (e2 = i) then
+    app(true, c, a, ska, u, pku, i, pki)
+  else
+  if (e1 <> u) && (e2 = i) then
+    in(c, pke1:PublicKey);
+    app(false, c, a, ska, e1, pke1, i, pki)
+  else
+  if (e1 = u) && (e2 <> i) then
+    in(c, pke2:PublicKey);
+    app(false, c, a, ska, u, pku, e2, pke2)
+  else
+  if (e1 <> u) && (e2 <> i) then
+    in(c, pke1:PublicKey);
+    in(c, pke2:PublicKey);
+    app(false, c, a, ska, e1, pke1, e2, pke2)
+  .
+
+let open_user(c:channel, u:bitstring, sku:SecretKey, a:bitstring, pka:PublicKey, i:bitstring, pki:PublicKey, password:bitstring) =
+  in(c, e1:bitstring);
+  in(c, e2:bitstring);
+  if (e1 = a) && (e2 = i) then
+    user(true, c, u, sku, a, pka, i, pki, password)
+  else
+  if (e1 <> a) && (e2 = i) then
+    in(c, pke1:PublicKey);
+    user(false, c, u, sku, e1, pke1, i, pki, password)
+  else
+  if (e1 = a) && (e2 <> i) then
+    in(c, pke2:PublicKey);
+    in(c, wrong_pw:bitstring);
+    user(false, c, u, sku, a, pka, e2, pke2, wrong_pw)
+  else
+  if (e1 <> a) && (e2 <> i) then
+    in(c, pke1:PublicKey);
+    in(c, pke2:PublicKey);
+    in(c, wrong_pw:bitstring);
+    user(false, c, u, sku, e1, pke1, e2, pke2, wrong_pw)
+  .
+
+let open_issuer(c:channel, i:bitstring, ski:SecretKey, a:bitstring, pka:PublicKey, u:bitstring, pku:PublicKey, password:bitstring) =
+  in(c, e1:bitstring);
+  in(c, e2:bitstring);
+  if (e1 = a) && (e2 = u) then
+    issuer(true, c, i, ski, a, pka, u, pku, password)
+  else
+  if (e1 <> a) && (e2 = u) then
+    in(c, pke1:PublicKey);
+    issuer(false, c, i, ski, e1, pke1, u, pku, password)
+  else
+  if (e1 = a) && (e2 <> u) then
+    in(c, pke2:PublicKey);
+    in(c, wrong_pw:bitstring);
+    issuer(false, c, i, ski, a, pka, e2, pke2, wrong_pw)
+  else
+  if (e1 <> a) && (e2 <> u) then
+    in(c, pke1:PublicKey);
+    in(c, pke2:PublicKey);
+    in(c, wrong_pw:bitstring);
+    issuer(false, c, i, ski, e1, pke1, e2, pke2, wrong_pw)
+  .
+
+
+(* --------------------------------------------------------------------------------------------------------- *)
+(* End Open Network *)
+(* Start Assumptions *)
+(* --------------------------------------------------------------------------------------------------------- *)
+
+(* SECRECY *)
+
+query attacker(check_reach_app).
+query attacker(check_reach_user).
+query attacker(check_reach_issuer).
+
+query attacker(free_code).
+query attacker(free_password).
+
+(* AUTHENTICATION *)
+
+(* App Completes Protocol *)
+query m_1:bitstring, m_2:bitstring, m_3:bitstring, m_8:bitstring, m_9:bitstring, m_10:bitstring, m_11:bitstring, m_12:bitstring;
+    inj-event(appCompletesProtocol(m_1, m_2, m_3, m_8, m_9, m_10, m_11, m_12))
+    ==>
+    inj-event(userSendsLastMessageToApp(m_1, m_2, m_3, m_8))
+    &&
+    inj-event(issuerSendsLastMessageToApp(m_9, m_10, m_11, m_12))
+    .
+
+(* User Completes Protocol *)
+query m_1:bitstring, m_2:bitstring, m_3:bitstring, m_4:bitstring, m_5:bitstring, m_6:bitstring, m_7:bitstring; 
+    inj-event(userCompletesProtocol(m_1, m_2, m_3, m_4, m_5, m_6, m_7))
+    ==>
+    inj-event(appSendsLastMessageToUser(m_1, m_2, m_3))
+    &&
+    inj-event(issuerSendsLastMessageToUser(m_4, m_5, m_6, m_7))
+    .
+
+(* Issuer Completes Protocol *)
+query m_4:bitstring, m_5:bitstring, m_6:bitstring, m_9:bitstring, m_10:bitstring, m_11:bitstring; 
+    inj-event(issuerCompletesProtocol(m_4, m_5, m_6, m_9, m_10, m_11))
+    ==>
+    inj-event(appSendsLastMessageToIssuer(m_9, m_10, m_11))
+    &&
+    inj-event(userSendsLastMessageToIssuer(m_4, m_5, m_6))
+    .
+
+(* --------------------------------------------------------------------------------------------------------- *)
+(* End Assumptions *)
+(* Start Main *)
+(* --------------------------------------------------------------------------------------------------------- *)
+
+free c:channel.
+process (*use root process for setup *)
+
+    (* create identities *)
+    new a:bitstring;
+    new u:bitstring;
+    new i:bitstring;
+
+    (*advertise identities*)
+    out(c,a);
+    out(c,u);
+    out(c,i);
+
+    (*declare secret keys*)
+    new ska:SecretKey;
+    new sku:SecretKey;
+    new ski:SecretKey;
+
+    (*advertise public keys*)
+    out(c,pk(ska));
+    out(c,pk(sku));
+    out(c,pk(ski));
+
+    (*generate variables*)
+    new password:bitstring;
+
+    (*let agents dance*)
+    (
+        ! open_app    (c, a, ska, u, pk(sku), i, pk(ski))
+      | ! open_user   (c, u, sku, a, pk(ska), i, pk(ski), password)
+      | ! open_issuer (c, i, ski, a, pk(ska), u, pk(sku), password)
+    )
+
+(* --------------------------------------------------------------------------------------------------------- *)
+(* End Main *)
+(* --------------------------------------------------------------------------------------------------------- *)
