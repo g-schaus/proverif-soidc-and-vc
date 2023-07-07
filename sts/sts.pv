@@ -1,0 +1,223 @@
+(* --------------------------------------------------------------------------------------------------------- *)
+(* STS Connect *)
+(* --------------------------------------------------------------------------------------------------------- *)
+
+(* --------------------------------------------------------------------------------------------------------- *)
+(* Start Definitions *)
+(* --------------------------------------------------------------------------------------------------------- *)
+
+(* START keys *)
+type SymmetricKey.
+type SecretKey.
+type PublicKey.
+fun pk(SecretKey):PublicKey.
+(* END keys *)
+
+(* START group *)
+type G.
+type exponent.
+fun exp(G, exponent): G.
+fun g(exponent): G.
+equation forall x: exponent, y: exponent; exp(g(x),y) = exp(g(y),x).
+fun GtoSymK(G): SymmetricKey.
+fun bitG(G):bitstring.
+reduc forall elem:G; unbitG(bitG(elem))=elem.
+(* END group *)
+
+(* START hash *)
+fun hash(bitstring): bitstring.
+fun hash_pk(PublicKey): bitstring.
+(* End hash *)
+
+(* START symmetric encryption *)
+fun enc(bitstring(*the message*), SymmetricKey):bitstring (*symmetric encrypt input msg*).
+reduc forall msg:bitstring,symk:SymmetricKey; dec(enc(msg,symk),symk)=msg (*symmetric decrypt*).
+
+fun symk_to_bit(SymmetricKey): bitstring.
+reduc forall symk:SymmetricKey; bit_to_symk(symk_to_bit(symk)) = symk.
+(* END symmetric encryption *)
+
+(* START asymmetric encryption *)
+fun aenc(bitstring(*the message*), PublicKey):bitstring (*asymmetric encrypt input msg*).
+reduc forall msg:bitstring,sk:SecretKey; adec(aenc(msg,pk(sk)),sk)=msg (*asymmetric decrypt*).
+(* END Asymmetric encryption *)
+
+(* START digital signature *)
+fun sign(bitstring(*the message*), SecretKey):bitstring (*sign the input msg*).
+reduc forall msg:bitstring,sk:SecretKey; check(sign(msg,sk),pk(sk))=msg (*check signature, and get msg*).
+reduc forall msg:bitstring,sk:SecretKey; getMsg(sign(msg,sk))=msg (*just get msg*).
+(* END digital signature *)
+
+(*DEFS*)
+(* free c:channel. *)
+fun ch(bitstring): channel.
+fun chSymK(SymmetricKey): channel.
+
+(* SECRECY *)
+
+free check_reach_initiator:bitstring [private].
+free check_reach_responder:bitstring [private].
+
+free free_k:bitstring [private].
+
+(* AUTHENTICATION *)
+
+(* Initiator *)
+event initiatorCompletesProtocol(bitstring, bitstring).
+event responderSendsLastMessageToInitiator(bitstring, bitstring).
+
+(* Responder *)
+event responderCompletesProtocol(bitstring, bitstring, bitstring).
+event initiatorSendsLastMessageToResponder(bitstring, bitstring, bitstring).
+
+(* --------------------------------------------------------------------------------------------------------- *)
+(* End Definitions *)
+(* Start Agent Macros *)
+(* --------------------------------------------------------------------------------------------------------- *)
+
+let initiator(talksOnlyToHonest:bool, c:channel, i:bitstring, ski:SecretKey, r:bitstring, pkr:PublicKey) =
+
+    (* Message 1 *)
+    new x:exponent;
+    let gx = g(x) in
+    let m_1 = bitG(gx) in
+    out(c, m_1);
+
+    (* Message 2 *)
+    in(c, m_2:bitstring);
+    let (bit_gy:bitstring, enc_signature:bitstring) = m_2 in
+    let gy = unbitG(bit_gy) in
+    let k = GtoSymK(exp(gy, x)) in
+    if (gy, gx) = check(dec(enc_signature, k), pkr) then
+
+    (* Message 3 *)
+    let m_3 = enc(sign((gx, gy), ski), k) in
+    event initiatorSendsLastMessageToResponder(m_1, m_2, m_3);
+    out(c, m_3);
+
+    (* --------------------------------------------------------------------------------------- *)
+    (* Query Preparations *)
+
+    if talksOnlyToHonest then
+
+    out(c, check_reach_initiator);
+
+      event initiatorCompletesProtocol(m_1, m_2)
+    | out(chSymK(k), free_k);
+
+    0.
+
+let responder(talksOnlyToHonest:bool, c:channel, r:bitstring, skr:SecretKey, i:bitstring, pki:PublicKey) =
+
+    (* Message 1 *)
+    in(c, m_1:bitstring);
+    let gx = unbitG(m_1) in
+
+    (* Message 2 *)
+    new y: exponent;
+    let gy = g(y) in
+    let k = GtoSymK(exp(gx, y)) in
+    let m_2 = (bitG(gy), enc(sign((gy, gx), skr), k)) in
+    event responderSendsLastMessageToInitiator(m_1, m_2);
+    out(c, m_2);
+
+    (* Message 3 *)
+    in(c, m_3:bitstring);
+    if (gx, gy) = check(dec(m_3, k), pki) then
+    
+    (* --------------------------------------------------------------------------------------- *)
+    (* Query Preparations *)
+
+    if talksOnlyToHonest then
+
+    out(c, check_reach_responder);
+
+      event responderCompletesProtocol(m_1, m_2, m_3)
+    | out(chSymK(k), free_k);
+
+    0.
+
+(* --------------------------------------------------------------------------------------------------------- *)
+(* End Agent Macros *)
+(* Start Open Network *)
+(* --------------------------------------------------------------------------------------------------------- *)
+
+let open_initiator(c:channel, i:bitstring, ski:SecretKey, r:bitstring, pkr:PublicKey) =
+  in(c, e:bitstring);
+  if (e = r) then
+    initiator(true, c, i, ski, r, pkr)
+  else
+    in(c, pke:PublicKey);
+    initiator(false, c, i, ski, e, pke)
+  .
+
+let open_responder(c:channel, r:bitstring, skr:SecretKey, i:bitstring, pki:PublicKey) =
+  in(c, e:bitstring);
+  if (e = i) then
+    responder(true, c, r, skr, i, pki)
+  else
+    in(c, pke:PublicKey);
+    responder(false, c, r, skr, e, pke)
+  .
+
+(* --------------------------------------------------------------------------------------------------------- *)
+(* End Open Network *)
+(* Start Assumptions *)
+(* --------------------------------------------------------------------------------------------------------- *)
+
+(* SECRECY *)
+
+query attacker(check_reach_initiator).
+query attacker(check_reach_responder).
+
+query attacker(free_k).
+
+(* AUTHENTICATION *)
+
+(* Initiator Completes Protocol *)
+query m_1:bitstring, m_2:bitstring; 
+    inj-event(initiatorCompletesProtocol(m_1, m_2))
+    ==>
+    inj-event(responderSendsLastMessageToInitiator(m_1, m_2))
+    .
+
+(* Responder Completes Protocol *)
+query m_1:bitstring, m_2:bitstring, m_3:bitstring; 
+    inj-event(responderCompletesProtocol(m_1, m_2, m_3))
+    ==>
+    inj-event(initiatorSendsLastMessageToResponder(m_1, m_2, m_3))
+    .
+
+(* --------------------------------------------------------------------------------------------------------- *)
+(* End Assumptions *)
+(* Start Main *)
+(* --------------------------------------------------------------------------------------------------------- *)
+
+free c:channel.
+process (*use root process for setup *)
+
+    (* create identities *)
+    new i:bitstring;
+    new r:bitstring;
+
+    (*advertise identities*)
+    out(c,i);
+    out(c,r);
+
+    (*declare secret keys*)
+    new ski:SecretKey;
+    new skr:SecretKey;
+
+    (*advertise public keys*)
+    out(c,pk(ski));
+    out(c,pk(skr));
+
+    (*let agents dance*)
+    (
+        ! open_initiator(c, i, ski, r, pk(skr))
+      | ! open_responder(c, r, skr, i, pk(ski))
+    )
+
+(* --------------------------------------------------------------------------------------------------------- *)
+(* End Main *)
+(* --------------------------------------------------------------------------------------------------------- *)
