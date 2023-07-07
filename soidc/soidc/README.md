@@ -6,6 +6,10 @@ The first model...
 
 ![MSC of ...](/msc/msc_soidc.png)
 
+The attack...
+
+![MSC of ...](/msc/msc_attack_issuer_auth.png)
+
 ## Results
 
 Both models have the following properties...
