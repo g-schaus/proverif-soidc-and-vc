@@ -12,3 +12,5 @@ All accessible and verified models are listed below:
 | SOIDC proposed fix  | No  | Works. |
 | STS  | No  | Works. |
 | VC based version  | No  | Works. |
+
+Further explanations for each model may be found in their respective folder.
