@@ -11,4 +11,4 @@ All accessible and verified models are listed below:
 | SOIDC with late HS  | Yes  | Attack is provided. |
 | SOIDC proposed fix  | No  | Fix is working. |
 | STS  | No  | |
-| VC Based Version  | No  | |
+| VC based version  | No  | |
