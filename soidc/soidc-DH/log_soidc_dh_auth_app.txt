@@ -1,0 +1,2317 @@
+File "soidc_dh.pv", line 132, characters 9-10:
+Warning: identifier gx rebound.
+File "soidc_dh.pv", line 140, characters 9-10:
+Warning: identifier gy rebound.
+File "soidc_dh.pv", line 211, character 9:
+Warning: identifier x rebound.
+File "soidc_dh.pv", line 212, characters 9-10:
+Warning: identifier gx rebound.
+File "soidc_dh.pv", line 218, characters 27-32:
+Warning: identifier bit_gy rebound.
+File "soidc_dh.pv", line 218, characters 45-57:
+Warning: identifier enc_signature rebound.
+File "soidc_dh.pv", line 220, characters 9-10:
+Warning: identifier gy rebound.
+File "soidc_dh.pv", line 297, characters 27-31:
+Warning: identifier bitgx rebound.
+File "soidc_dh.pv", line 299, characters 9-10:
+Warning: identifier gx rebound.
+File "soidc_dh.pv", line 302, character 9:
+Warning: identifier y rebound.
+File "soidc_dh.pv", line 303, characters 9-10:
+Warning: identifier gy rebound.
+Linear part:
+exp(g(x),y) = exp(g(y),x)
+Completing equations...
+Completed equations:
+exp(g(x),y) = exp(g(y),x)
+Convergent part: No equation.
+Process 0 (that is, the initial process):
+{1}new a: bitstring;
+{2}new u: bitstring;
+{3}new i: bitstring;
+{4}out(c, a);
+{5}out(c, u);
+{6}out(c, i);
+{7}new ska: SecretKey;
+{8}new sku: SecretKey;
+{9}new ski: SecretKey;
+{10}out(c, pk(ska));
+{11}out(c, pk(sku));
+{12}out(c, pk(ski));
+{13}new password: bitstring;
+(
+    {14}!
+    {15}let c_1: channel = c in
+    {16}let a_1: bitstring = a in
+    {17}let ska_1: SecretKey = ska in
+    {18}let u_1: bitstring = u in
+    {19}let pku: PublicKey = pk(sku) in
+    {20}let i_1: bitstring = i in
+    {21}let pki: PublicKey = pk(ski) in
+    {22}in(c_1, e1: bitstring);
+    {23}in(c_1, e2: bitstring);
+    {24}if ((e1 = u_1) && (e2 = i_1)) then
+    (
+        {25}let talksOnlyToHonest: bool = true in
+        {26}in(c_1, m_1: bitstring);
+        {27}let (tag1': bitstring,bitgx: bitstring) = m_1 in
+        {28}if (tag1 = tag1') then
+        {29}let gx: G = unbitG(bitgx) in
+        {30}new y: exponent;
+        {31}let gy: G = g(y) in
+        {32}let k1: SymmetricKey = GtoSymK(exp(gx,y)) in
+        {33}let m_2: bitstring = (tag2,bitG(gy),enc(sign((gy,gx),ska_1),k1)) in
+        {34}out(c_1, m_2);
+        {35}new pkce: bitstring;
+        {36}new scope: bitstring;
+        {37}let m_3: bitstring = enc((tag3,a_1,hash(pkce),scope),k1) in
+        {38}event appSendsLastMessageToUser(m_1,m_2,m_3);
+        {39}out(c_1, m_3);
+        {40}in(c_1, m_8: bitstring);
+        {41}let (tag8': bitstring,code: bitstring) = dec(m_8,k1) in
+        {42}if (tag8 = tag8') then
+        {43}new x: exponent;
+        {44}let gx_1: G = g(x) in
+        {45}let m_9: bitstring = (tag9,bitG(gx_1)) in
+        {46}out(c_1, m_9);
+        {47}in(c_1, m_10: bitstring);
+        {48}let (tag10': bitstring,bit_gy: bitstring,enc_signature: bitstring) = m_10 in
+        {49}if (tag10 = tag10') then
+        {50}let gy_1: G = unbitG(bit_gy) in
+        {51}let k3: SymmetricKey = GtoSymK(exp(gy_1,x)) in
+        {52}if ((gy_1,gx_1) = check(dec(enc_signature,k3),pki)) then
+        {53}new sks: SecretKey;
+        {54}new jti: bitstring;
+        {55}let T2: bitstring = (a_1,jti,code,pkce) in
+        {56}let m_11: bitstring = enc((tag11,pk(sks),sign(T2,sks)),k3) in
+        {57}event appSendsLastMessageToIssuer(m_9,m_10,m_11);
+        {58}out(c_1, m_11);
+        {59}in(c_1, m_12: bitstring);
+        {60}out(c_1, check_reach_app);
+        {61}let (tag12': bitstring,signed_M: bitstring) = dec(m_12,k3) in
+        {62}if (tag12 = tag12') then
+        {63}let M: bitstring = check(signed_M,pki) in
+        {64}let (jtk: bitstring,jti': bitstring,scope': bitstring,a': bitstring,i': bitstring,u': bitstring) = M in
+        {65}if (jtk = hash_pk(pk(sks))) then
+        {66}if (jti = jti') then
+        {67}if (scope = scope') then
+        {68}if (a_1 = a') then
+        {69}if (i_1 = i') then
+        {70}if (u_1 = u') then
+        {71}if talksOnlyToHonest then
+        {72}out(c_1, check_reach_app);
+        {73}event appCompletesProtocol(m_1,m_2,m_3,m_8,m_9,m_10,m_11,m_12);
+        {74}out(ch(code), free_code)
+    )
+    else
+        {75}if ((e1 ≠ u_1) && (e2 = i_1)) then
+        (
+            {76}in(c_1, pke1: PublicKey);
+            {77}let talksOnlyToHonest_1: bool = false in
+            {78}in(c_1, m: bitstring);
+            {79}let (tag1'_1: bitstring,bitgx_1: bitstring) = m in
+            {80}if (tag1 = tag1'_1) then
+            {81}let gx_2: G = unbitG(bitgx_1) in
+            {82}new y_1: exponent;
+            {83}let gy_2: G = g(y_1) in
+            {84}let k1_1: SymmetricKey = GtoSymK(exp(gx_2,y_1)) in
+            {85}let m_4: bitstring = (tag2,bitG(gy_2),enc(sign((gy_2,gx_2),ska_1),k1_1)) in
+            {86}out(c_1, m_4);
+            {87}new pkce_1: bitstring;
+            {88}new scope_1: bitstring;
+            {89}let m_5: bitstring = enc((tag3,a_1,hash(pkce_1),scope_1),k1_1) in
+            {90}event appSendsLastMessageToUser(m,m_4,m_5);
+            {91}out(c_1, m_5);
+            {92}in(c_1, m_6: bitstring);
+            {93}let (tag8'_1: bitstring,code_1: bitstring) = dec(m_6,k1_1) in
+            {94}if (tag8 = tag8'_1) then
+            {95}new x_1: exponent;
+            {96}let gx_3: G = g(x_1) in
+            {97}let m_7: bitstring = (tag9,bitG(gx_3)) in
+            {98}out(c_1, m_7);
+            {99}in(c_1, m_13: bitstring);
+            {100}let (tag10'_1: bitstring,bit_gy_1: bitstring,enc_signature_1: bitstring) = m_13 in
+            {101}if (tag10 = tag10'_1) then
+            {102}let gy_3: G = unbitG(bit_gy_1) in
+            {103}let k3_1: SymmetricKey = GtoSymK(exp(gy_3,x_1)) in
+            {104}if ((gy_3,gx_3) = check(dec(enc_signature_1,k3_1),pki)) then
+            {105}new sks_1: SecretKey;
+            {106}new jti_1: bitstring;
+            {107}let T2_1: bitstring = (a_1,jti_1,code_1,pkce_1) in
+            {108}let m_14: bitstring = enc((tag11,pk(sks_1),sign(T2_1,sks_1)),k3_1) in
+            {109}event appSendsLastMessageToIssuer(m_7,m_13,m_14);
+            {110}out(c_1, m_14);
+            {111}in(c_1, m_15: bitstring);
+            {112}out(c_1, check_reach_app);
+            {113}let (tag12'_1: bitstring,signed_M_1: bitstring) = dec(m_15,k3_1) in
+            {114}if (tag12 = tag12'_1) then
+            {115}let M_1: bitstring = check(signed_M_1,pki) in
+            {116}let (jtk_1: bitstring,jti'_1: bitstring,scope'_1: bitstring,a'_1: bitstring,i'_1: bitstring,u'_1: bitstring) = M_1 in
+            {117}if (jtk_1 = hash_pk(pk(sks_1))) then
+            {118}if (jti_1 = jti'_1) then
+            {119}if (scope_1 = scope'_1) then
+            {120}if (a_1 = a'_1) then
+            {121}if (i_1 = i'_1) then
+            {122}if (e1 = u'_1) then
+            {123}if talksOnlyToHonest_1 then
+            {124}out(c_1, check_reach_app);
+            {125}event appCompletesProtocol(m,m_4,m_5,m_6,m_7,m_13,m_14,m_15);
+            {126}out(ch(code_1), free_code)
+        )
+        else
+            {127}if ((e1 = u_1) && (e2 ≠ i_1)) then
+            (
+                {128}in(c_1, pke2: PublicKey);
+                {129}let talksOnlyToHonest_2: bool = false in
+                {130}in(c_1, m_16: bitstring);
+                {131}let (tag1'_2: bitstring,bitgx_2: bitstring) = m_16 in
+                {132}if (tag1 = tag1'_2) then
+                {133}let gx_4: G = unbitG(bitgx_2) in
+                {134}new y_2: exponent;
+                {135}let gy_4: G = g(y_2) in
+                {136}let k1_2: SymmetricKey = GtoSymK(exp(gx_4,y_2)) in
+                {137}let m_17: bitstring = (tag2,bitG(gy_4),enc(sign((gy_4,gx_4),ska_1),k1_2)) in
+                {138}out(c_1, m_17);
+                {139}new pkce_2: bitstring;
+                {140}new scope_2: bitstring;
+                {141}let m_18: bitstring = enc((tag3,a_1,hash(pkce_2),scope_2),k1_2) in
+                {142}event appSendsLastMessageToUser(m_16,m_17,m_18);
+                {143}out(c_1, m_18);
+                {144}in(c_1, m_19: bitstring);
+                {145}let (tag8'_2: bitstring,code_2: bitstring) = dec(m_19,k1_2) in
+                {146}if (tag8 = tag8'_2) then
+                {147}new x_2: exponent;
+                {148}let gx_5: G = g(x_2) in
+                {149}let m_20: bitstring = (tag9,bitG(gx_5)) in
+                {150}out(c_1, m_20);
+                {151}in(c_1, m_21: bitstring);
+                {152}let (tag10'_2: bitstring,bit_gy_2: bitstring,enc_signature_2: bitstring) = m_21 in
+                {153}if (tag10 = tag10'_2) then
+                {154}let gy_5: G = unbitG(bit_gy_2) in
+                {155}let k3_2: SymmetricKey = GtoSymK(exp(gy_5,x_2)) in
+                {156}if ((gy_5,gx_5) = check(dec(enc_signature_2,k3_2),pke2)) then
+                {157}new sks_2: SecretKey;
+                {158}new jti_2: bitstring;
+                {159}let T2_2: bitstring = (a_1,jti_2,code_2,pkce_2) in
+                {160}let m_22: bitstring = enc((tag11,pk(sks_2),sign(T2_2,sks_2)),k3_2) in
+                {161}event appSendsLastMessageToIssuer(m_20,m_21,m_22);
+                {162}out(c_1, m_22);
+                {163}in(c_1, m_23: bitstring);
+                {164}out(c_1, check_reach_app);
+                {165}let (tag12'_2: bitstring,signed_M_2: bitstring) = dec(m_23,k3_2) in
+                {166}if (tag12 = tag12'_2) then
+                {167}let M_2: bitstring = check(signed_M_2,pke2) in
+                {168}let (jtk_2: bitstring,jti'_2: bitstring,scope'_2: bitstring,a'_2: bitstring,i'_2: bitstring,u'_2: bitstring) = M_2 in
+                {169}if (jtk_2 = hash_pk(pk(sks_2))) then
+                {170}if (jti_2 = jti'_2) then
+                {171}if (scope_2 = scope'_2) then
+                {172}if (a_1 = a'_2) then
+                {173}if (e2 = i'_2) then
+                {174}if (u_1 = u'_2) then
+                {175}if talksOnlyToHonest_2 then
+                {176}out(c_1, check_reach_app);
+                {177}event appCompletesProtocol(m_16,m_17,m_18,m_19,m_20,m_21,m_22,m_23);
+                {178}out(ch(code_2), free_code)
+            )
+            else
+                {179}if ((e1 ≠ u_1) && (e2 ≠ i_1)) then
+                {180}in(c_1, pke1_1: PublicKey);
+                {181}in(c_1, pke2_1: PublicKey);
+                {182}let talksOnlyToHonest_3: bool = false in
+                {183}in(c_1, m_24: bitstring);
+                {184}let (tag1'_3: bitstring,bitgx_3: bitstring) = m_24 in
+                {185}if (tag1 = tag1'_3) then
+                {186}let gx_6: G = unbitG(bitgx_3) in
+                {187}new y_3: exponent;
+                {188}let gy_6: G = g(y_3) in
+                {189}let k1_3: SymmetricKey = GtoSymK(exp(gx_6,y_3)) in
+                {190}let m_25: bitstring = (tag2,bitG(gy_6),enc(sign((gy_6,gx_6),ska_1),k1_3)) in
+                {191}out(c_1, m_25);
+                {192}new pkce_3: bitstring;
+                {193}new scope_3: bitstring;
+                {194}let m_26: bitstring = enc((tag3,a_1,hash(pkce_3),scope_3),k1_3) in
+                {195}event appSendsLastMessageToUser(m_24,m_25,m_26);
+                {196}out(c_1, m_26);
+                {197}in(c_1, m_27: bitstring);
+                {198}let (tag8'_3: bitstring,code_3: bitstring) = dec(m_27,k1_3) in
+                {199}if (tag8 = tag8'_3) then
+                {200}new x_3: exponent;
+                {201}let gx_7: G = g(x_3) in
+                {202}let m_28: bitstring = (tag9,bitG(gx_7)) in
+                {203}out(c_1, m_28);
+                {204}in(c_1, m_29: bitstring);
+                {205}let (tag10'_3: bitstring,bit_gy_3: bitstring,enc_signature_3: bitstring) = m_29 in
+                {206}if (tag10 = tag10'_3) then
+                {207}let gy_7: G = unbitG(bit_gy_3) in
+                {208}let k3_3: SymmetricKey = GtoSymK(exp(gy_7,x_3)) in
+                {209}if ((gy_7,gx_7) = check(dec(enc_signature_3,k3_3),pke2_1)) then
+                {210}new sks_3: SecretKey;
+                {211}new jti_3: bitstring;
+                {212}let T2_3: bitstring = (a_1,jti_3,code_3,pkce_3) in
+                {213}let m_30: bitstring = enc((tag11,pk(sks_3),sign(T2_3,sks_3)),k3_3) in
+                {214}event appSendsLastMessageToIssuer(m_28,m_29,m_30);
+                {215}out(c_1, m_30);
+                {216}in(c_1, m_31: bitstring);
+                {217}out(c_1, check_reach_app);
+                {218}let (tag12'_3: bitstring,signed_M_3: bitstring) = dec(m_31,k3_3) in
+                {219}if (tag12 = tag12'_3) then
+                {220}let M_3: bitstring = check(signed_M_3,pke2_1) in
+                {221}let (jtk_3: bitstring,jti'_3: bitstring,scope'_3: bitstring,a'_3: bitstring,i'_3: bitstring,u'_3: bitstring) = M_3 in
+                {222}if (jtk_3 = hash_pk(pk(sks_3))) then
+                {223}if (jti_3 = jti'_3) then
+                {224}if (scope_3 = scope'_3) then
+                {225}if (a_1 = a'_3) then
+                {226}if (e2 = i'_3) then
+                {227}if (e1 = u'_3) then
+                {228}if talksOnlyToHonest_3 then
+                {229}out(c_1, check_reach_app);
+                {230}event appCompletesProtocol(m_24,m_25,m_26,m_27,m_28,m_29,m_30,m_31);
+                {231}out(ch(code_3), free_code)
+) | (
+    {232}!
+    {233}let c_2: channel = c in
+    {234}let u_2: bitstring = u in
+    {235}let sku_1: SecretKey = sku in
+    {236}let a_2: bitstring = a in
+    {237}let pka: PublicKey = pk(ska) in
+    {238}let i_2: bitstring = i in
+    {239}let pki_1: PublicKey = pk(ski) in
+    {240}let password_1: bitstring = password in
+    {241}in(c_2, e1_1: bitstring);
+    {242}in(c_2, e2_1: bitstring);
+    {243}if ((e1_1 = a_2) && (e2_1 = i_2)) then
+    (
+        {244}let talksOnlyToHonest_4: bool = true in
+        {245}new x_4: exponent;
+        {246}let gx_8: G = g(x_4) in
+        {247}let m_32: bitstring = (tag1,bitG(gx_8)) in
+        {248}out(c_2, m_32);
+        {249}in(c_2, m_33: bitstring);
+        {250}let (tag2': bitstring,bit_gy_4: bitstring,enc_signature_4: bitstring) = m_33 in
+        {251}if (tag2 = tag2') then
+        {252}let gy_8: G = unbitG(bit_gy_4) in
+        {253}let k1_4: SymmetricKey = GtoSymK(exp(gy_8,x_4)) in
+        {254}if ((gy_8,gx_8) = check(dec(enc_signature_4,k1_4),pka)) then
+        {255}in(c_2, m_34: bitstring);
+        {256}let (tag3': bitstring,a'_4: bitstring,h_pkce: bitstring,scope_4: bitstring) = dec(m_34,k1_4) in
+        {257}if (tag3 = tag3') then
+        {258}if (a_2 = a'_4) then
+        {259}new x_5: exponent;
+        {260}let gx_9: G = g(x_5) in
+        {261}let m_35: bitstring = (tag4,bitG(gx_9)) in
+        {262}out(c_2, m_35);
+        {263}in(c_2, m_36: bitstring);
+        {264}let (tag5': bitstring,bit_gy_5: bitstring,enc_signature_5: bitstring) = m_36 in
+        {265}if (tag5 = tag5') then
+        {266}let gy_9: G = unbitG(bit_gy_5) in
+        {267}let k2: SymmetricKey = GtoSymK(exp(gy_9,x_5)) in
+        {268}if ((gy_9,gx_9) = check(dec(enc_signature_5,k2),pki_1)) then
+        {269}let m_37: bitstring = enc((tag6,a_2,h_pkce,scope_4,u_2,password_1),k2) in
+        {270}event userSendsLastMessageToIssuer(m_35,m_36,m_37);
+        {271}out(c_2, m_37);
+        {272}in(c_2, m_38: bitstring);
+        {273}let (tag7': bitstring,code_4: bitstring) = dec(m_38,k2) in
+        {274}if (tag7 = tag7') then
+        {275}let m_39: bitstring = enc((tag8,code_4),k1_4) in
+        {276}event userSendsLastMessageToApp(m_32,m_33,m_34,m_39);
+        {277}out(c_2, m_39);
+        {278}if talksOnlyToHonest_4 then
+        {279}out(c_2, check_reach_user);
+        {280}event userCompletesProtocol(m_32,m_33,m_34,m_35,m_36,m_37,m_38);
+        {281}out(ch(code_4), free_code);
+        {282}out(ch(password_1), free_password)
+    )
+    else
+        {283}if ((e1_1 ≠ a_2) && (e2_1 = i_2)) then
+        (
+            {284}in(c_2, pke1_2: PublicKey);
+            {285}let talksOnlyToHonest_5: bool = false in
+            {286}new x_6: exponent;
+            {287}let gx_10: G = g(x_6) in
+            {288}let m_40: bitstring = (tag1,bitG(gx_10)) in
+            {289}out(c_2, m_40);
+            {290}in(c_2, m_41: bitstring);
+            {291}let (tag2'_1: bitstring,bit_gy_6: bitstring,enc_signature_6: bitstring) = m_41 in
+            {292}if (tag2 = tag2'_1) then
+            {293}let gy_10: G = unbitG(bit_gy_6) in
+            {294}let k1_5: SymmetricKey = GtoSymK(exp(gy_10,x_6)) in
+            {295}if ((gy_10,gx_10) = check(dec(enc_signature_6,k1_5),pke1_2)) then
+            {296}in(c_2, m_42: bitstring);
+            {297}let (tag3'_1: bitstring,a'_5: bitstring,h_pkce_1: bitstring,scope_5: bitstring) = dec(m_42,k1_5) in
+            {298}if (tag3 = tag3'_1) then
+            {299}if (e1_1 = a'_5) then
+            {300}new x_7: exponent;
+            {301}let gx_11: G = g(x_7) in
+            {302}let m_43: bitstring = (tag4,bitG(gx_11)) in
+            {303}out(c_2, m_43);
+            {304}in(c_2, m_44: bitstring);
+            {305}let (tag5'_1: bitstring,bit_gy_7: bitstring,enc_signature_7: bitstring) = m_44 in
+            {306}if (tag5 = tag5'_1) then
+            {307}let gy_11: G = unbitG(bit_gy_7) in
+            {308}let k2_1: SymmetricKey = GtoSymK(exp(gy_11,x_7)) in
+            {309}if ((gy_11,gx_11) = check(dec(enc_signature_7,k2_1),pki_1)) then
+            {310}let m_45: bitstring = enc((tag6,e1_1,h_pkce_1,scope_5,u_2,password_1),k2_1) in
+            {311}event userSendsLastMessageToIssuer(m_43,m_44,m_45);
+            {312}out(c_2, m_45);
+            {313}in(c_2, m_46: bitstring);
+            {314}let (tag7'_1: bitstring,code_5: bitstring) = dec(m_46,k2_1) in
+            {315}if (tag7 = tag7'_1) then
+            {316}let m_47: bitstring = enc((tag8,code_5),k1_5) in
+            {317}event userSendsLastMessageToApp(m_40,m_41,m_42,m_47);
+            {318}out(c_2, m_47);
+            {319}if talksOnlyToHonest_5 then
+            {320}out(c_2, check_reach_user);
+            {321}event userCompletesProtocol(m_40,m_41,m_42,m_43,m_44,m_45,m_46);
+            {322}out(ch(code_5), free_code);
+            {323}out(ch(password_1), free_password)
+        )
+        else
+            {324}if ((e1_1 = a_2) && (e2_1 ≠ i_2)) then
+            (
+                {325}in(c_2, pke2_2: PublicKey);
+                {326}in(c_2, wrong_pw: bitstring);
+                {327}let talksOnlyToHonest_6: bool = false in
+                {328}new x_8: exponent;
+                {329}let gx_12: G = g(x_8) in
+                {330}let m_48: bitstring = (tag1,bitG(gx_12)) in
+                {331}out(c_2, m_48);
+                {332}in(c_2, m_49: bitstring);
+                {333}let (tag2'_2: bitstring,bit_gy_8: bitstring,enc_signature_8: bitstring) = m_49 in
+                {334}if (tag2 = tag2'_2) then
+                {335}let gy_12: G = unbitG(bit_gy_8) in
+                {336}let k1_6: SymmetricKey = GtoSymK(exp(gy_12,x_8)) in
+                {337}if ((gy_12,gx_12) = check(dec(enc_signature_8,k1_6),pka)) then
+                {338}in(c_2, m_50: bitstring);
+                {339}let (tag3'_2: bitstring,a'_6: bitstring,h_pkce_2: bitstring,scope_6: bitstring) = dec(m_50,k1_6) in
+                {340}if (tag3 = tag3'_2) then
+                {341}if (a_2 = a'_6) then
+                {342}new x_9: exponent;
+                {343}let gx_13: G = g(x_9) in
+                {344}let m_51: bitstring = (tag4,bitG(gx_13)) in
+                {345}out(c_2, m_51);
+                {346}in(c_2, m_52: bitstring);
+                {347}let (tag5'_2: bitstring,bit_gy_9: bitstring,enc_signature_9: bitstring) = m_52 in
+                {348}if (tag5 = tag5'_2) then
+                {349}let gy_13: G = unbitG(bit_gy_9) in
+                {350}let k2_2: SymmetricKey = GtoSymK(exp(gy_13,x_9)) in
+                {351}if ((gy_13,gx_13) = check(dec(enc_signature_9,k2_2),pke2_2)) then
+                {352}let m_53: bitstring = enc((tag6,a_2,h_pkce_2,scope_6,u_2,wrong_pw),k2_2) in
+                {353}event userSendsLastMessageToIssuer(m_51,m_52,m_53);
+                {354}out(c_2, m_53);
+                {355}in(c_2, m_54: bitstring);
+                {356}let (tag7'_2: bitstring,code_6: bitstring) = dec(m_54,k2_2) in
+                {357}if (tag7 = tag7'_2) then
+                {358}let m_55: bitstring = enc((tag8,code_6),k1_6) in
+                {359}event userSendsLastMessageToApp(m_48,m_49,m_50,m_55);
+                {360}out(c_2, m_55);
+                {361}if talksOnlyToHonest_6 then
+                {362}out(c_2, check_reach_user);
+                {363}event userCompletesProtocol(m_48,m_49,m_50,m_51,m_52,m_53,m_54);
+                {364}out(ch(code_6), free_code);
+                {365}out(ch(wrong_pw), free_password)
+            )
+            else
+                {366}if ((e1_1 ≠ a_2) && (e2_1 ≠ i_2)) then
+                {367}in(c_2, pke1_3: PublicKey);
+                {368}in(c_2, pke2_3: PublicKey);
+                {369}in(c_2, wrong_pw_1: bitstring);
+                {370}let talksOnlyToHonest_7: bool = false in
+                {371}new x_10: exponent;
+                {372}let gx_14: G = g(x_10) in
+                {373}let m_56: bitstring = (tag1,bitG(gx_14)) in
+                {374}out(c_2, m_56);
+                {375}in(c_2, m_57: bitstring);
+                {376}let (tag2'_3: bitstring,bit_gy_10: bitstring,enc_signature_10: bitstring) = m_57 in
+                {377}if (tag2 = tag2'_3) then
+                {378}let gy_14: G = unbitG(bit_gy_10) in
+                {379}let k1_7: SymmetricKey = GtoSymK(exp(gy_14,x_10)) in
+                {380}if ((gy_14,gx_14) = check(dec(enc_signature_10,k1_7),pke1_3)) then
+                {381}in(c_2, m_58: bitstring);
+                {382}let (tag3'_3: bitstring,a'_7: bitstring,h_pkce_3: bitstring,scope_7: bitstring) = dec(m_58,k1_7) in
+                {383}if (tag3 = tag3'_3) then
+                {384}if (e1_1 = a'_7) then
+                {385}new x_11: exponent;
+                {386}let gx_15: G = g(x_11) in
+                {387}let m_59: bitstring = (tag4,bitG(gx_15)) in
+                {388}out(c_2, m_59);
+                {389}in(c_2, m_60: bitstring);
+                {390}let (tag5'_3: bitstring,bit_gy_11: bitstring,enc_signature_11: bitstring) = m_60 in
+                {391}if (tag5 = tag5'_3) then
+                {392}let gy_15: G = unbitG(bit_gy_11) in
+                {393}let k2_3: SymmetricKey = GtoSymK(exp(gy_15,x_11)) in
+                {394}if ((gy_15,gx_15) = check(dec(enc_signature_11,k2_3),pke2_3)) then
+                {395}let m_61: bitstring = enc((tag6,e1_1,h_pkce_3,scope_7,u_2,wrong_pw_1),k2_3) in
+                {396}event userSendsLastMessageToIssuer(m_59,m_60,m_61);
+                {397}out(c_2, m_61);
+                {398}in(c_2, m_62: bitstring);
+                {399}let (tag7'_3: bitstring,code_7: bitstring) = dec(m_62,k2_3) in
+                {400}if (tag7 = tag7'_3) then
+                {401}let m_63: bitstring = enc((tag8,code_7),k1_7) in
+                {402}event userSendsLastMessageToApp(m_56,m_57,m_58,m_63);
+                {403}out(c_2, m_63);
+                {404}if talksOnlyToHonest_7 then
+                {405}out(c_2, check_reach_user);
+                {406}event userCompletesProtocol(m_56,m_57,m_58,m_59,m_60,m_61,m_62);
+                {407}out(ch(code_7), free_code);
+                {408}out(ch(wrong_pw_1), free_password)
+) | (
+    {409}!
+    {410}let c_3: channel = c in
+    {411}let i_3: bitstring = i in
+    {412}let ski_1: SecretKey = ski in
+    {413}let a_3: bitstring = a in
+    {414}let pka_1: PublicKey = pk(ska) in
+    {415}let u_3: bitstring = u in
+    {416}let pku_1: PublicKey = pk(sku) in
+    {417}let password_2: bitstring = password in
+    {418}in(c_3, e1_2: bitstring);
+    {419}in(c_3, e2_2: bitstring);
+    {420}if ((e1_2 = a_3) && (e2_2 = u_3)) then
+    (
+        {421}let talksOnlyToHonest_8: bool = true in
+        {422}in(c_3, m_64: bitstring);
+        {423}let (tag4': bitstring,bitgx_4: bitstring) = m_64 in
+        {424}if (tag4 = tag4') then
+        {425}let gx_16: G = unbitG(bitgx_4) in
+        {426}new y_4: exponent;
+        {427}let gy_16: G = g(y_4) in
+        {428}let k2_4: SymmetricKey = GtoSymK(exp(gx_16,y_4)) in
+        {429}let m_65: bitstring = (tag5,bitG(gy_16),enc(sign((gy_16,gx_16),ski_1),k2_4)) in
+        {430}out(c_3, m_65);
+        {431}in(c_3, m_66: bitstring);
+        {432}let (tag6': bitstring,a'_8: bitstring,h_pkce_4: bitstring,scope_8: bitstring,u'_4: bitstring,password': bitstring) = dec(m_66,k2_4) in
+        {433}if (tag6 = tag6') then
+        {434}if (a_3 = a'_8) then
+        {435}if (u_3 = u'_4) then
+        {436}if (password_2 = password') then
+        {437}new code_8: bitstring;
+        {438}let m_67: bitstring = enc((tag7,code_8),k2_4) in
+        {439}event issuerSendsLastMessageToUser(m_64,m_65,m_66,m_67);
+        {440}out(c_3, m_67);
+        {441}in(c_3, m_68: bitstring);
+        {442}let (tag9': bitstring,bitgx_5: bitstring) = m_68 in
+        {443}if (tag9 = tag9') then
+        {444}let gx_17: G = unbitG(bitgx_5) in
+        {445}new y_5: exponent;
+        {446}let gy_17: G = g(y_5) in
+        {447}let k3_4: SymmetricKey = GtoSymK(exp(gx_17,y_5)) in
+        {448}let m_69: bitstring = (tag10,bitG(gy_17),enc(sign((gy_17,gx_17),ski_1),k3_4)) in
+        {449}out(c_3, m_69);
+        {450}in(c_3, m_70: bitstring);
+        {451}let (tag11': bitstring,pksks: PublicKey,signature: bitstring) = dec(m_70,k3_4) in
+        {452}if (tag11 = tag11') then
+        {453}let (a'': bitstring,jti_4: bitstring,code': bitstring,pkce_4: bitstring) = check(signature,pksks) in
+        {454}if (a_3 = a'') then
+        {455}if (code_8 = code') then
+        {456}if (h_pkce_4 = hash(pkce_4)) then
+        {457}let jtk_4: bitstring = hash_pk(pksks) in
+        {458}let M_4: bitstring = (jtk_4,jti_4,scope_8,a_3,i_3,u_3) in
+        {459}let m_71: bitstring = enc((tag12,sign(M_4,ski_1)),k3_4) in
+        {460}event issuerSendsLastMessageToApp(m_68,m_69,m_70,m_71);
+        {461}out(c_3, m_71);
+        {462}if talksOnlyToHonest_8 then
+        {463}out(c_3, check_reach_issuer);
+        {464}event issuerCompletesProtocol(m_64,m_65,m_66,m_68,m_69,m_70);
+        {465}out(ch(code_8), free_code);
+        {466}out(ch(password_2), free_password)
+    )
+    else
+        {467}if ((e1_2 ≠ a_3) && (e2_2 = u_3)) then
+        (
+            {468}in(c_3, pke1_4: PublicKey);
+            {469}let talksOnlyToHonest_9: bool = false in
+            {470}in(c_3, m_72: bitstring);
+            {471}let (tag4'_1: bitstring,bitgx_6: bitstring) = m_72 in
+            {472}if (tag4 = tag4'_1) then
+            {473}let gx_18: G = unbitG(bitgx_6) in
+            {474}new y_6: exponent;
+            {475}let gy_18: G = g(y_6) in
+            {476}let k2_5: SymmetricKey = GtoSymK(exp(gx_18,y_6)) in
+            {477}let m_73: bitstring = (tag5,bitG(gy_18),enc(sign((gy_18,gx_18),ski_1),k2_5)) in
+            {478}out(c_3, m_73);
+            {479}in(c_3, m_74: bitstring);
+            {480}let (tag6'_1: bitstring,a'_9: bitstring,h_pkce_5: bitstring,scope_9: bitstring,u'_5: bitstring,password'_1: bitstring) = dec(m_74,k2_5) in
+            {481}if (tag6 = tag6'_1) then
+            {482}if (e1_2 = a'_9) then
+            {483}if (u_3 = u'_5) then
+            {484}if (password_2 = password'_1) then
+            {485}new code_9: bitstring;
+            {486}let m_75: bitstring = enc((tag7,code_9),k2_5) in
+            {487}event issuerSendsLastMessageToUser(m_72,m_73,m_74,m_75);
+            {488}out(c_3, m_75);
+            {489}in(c_3, m_76: bitstring);
+            {490}let (tag9'_1: bitstring,bitgx_7: bitstring) = m_76 in
+            {491}if (tag9 = tag9'_1) then
+            {492}let gx_19: G = unbitG(bitgx_7) in
+            {493}new y_7: exponent;
+            {494}let gy_19: G = g(y_7) in
+            {495}let k3_5: SymmetricKey = GtoSymK(exp(gx_19,y_7)) in
+            {496}let m_77: bitstring = (tag10,bitG(gy_19),enc(sign((gy_19,gx_19),ski_1),k3_5)) in
+            {497}out(c_3, m_77);
+            {498}in(c_3, m_78: bitstring);
+            {499}let (tag11'_1: bitstring,pksks_1: PublicKey,signature_1: bitstring) = dec(m_78,k3_5) in
+            {500}if (tag11 = tag11'_1) then
+            {501}let (a''_1: bitstring,jti_5: bitstring,code'_1: bitstring,pkce_5: bitstring) = check(signature_1,pksks_1) in
+            {502}if (e1_2 = a''_1) then
+            {503}if (code_9 = code'_1) then
+            {504}if (h_pkce_5 = hash(pkce_5)) then
+            {505}let jtk_5: bitstring = hash_pk(pksks_1) in
+            {506}let M_5: bitstring = (jtk_5,jti_5,scope_9,e1_2,i_3,u_3) in
+            {507}let m_79: bitstring = enc((tag12,sign(M_5,ski_1)),k3_5) in
+            {508}event issuerSendsLastMessageToApp(m_76,m_77,m_78,m_79);
+            {509}out(c_3, m_79);
+            {510}if talksOnlyToHonest_9 then
+            {511}out(c_3, check_reach_issuer);
+            {512}event issuerCompletesProtocol(m_72,m_73,m_74,m_76,m_77,m_78);
+            {513}out(ch(code_9), free_code);
+            {514}out(ch(password_2), free_password)
+        )
+        else
+            {515}if ((e1_2 = a_3) && (e2_2 ≠ u_3)) then
+            (
+                {516}in(c_3, pke2_4: PublicKey);
+                {517}in(c_3, wrong_pw_2: bitstring);
+                {518}let talksOnlyToHonest_10: bool = false in
+                {519}in(c_3, m_80: bitstring);
+                {520}let (tag4'_2: bitstring,bitgx_8: bitstring) = m_80 in
+                {521}if (tag4 = tag4'_2) then
+                {522}let gx_20: G = unbitG(bitgx_8) in
+                {523}new y_8: exponent;
+                {524}let gy_20: G = g(y_8) in
+                {525}let k2_6: SymmetricKey = GtoSymK(exp(gx_20,y_8)) in
+                {526}let m_81: bitstring = (tag5,bitG(gy_20),enc(sign((gy_20,gx_20),ski_1),k2_6)) in
+                {527}out(c_3, m_81);
+                {528}in(c_3, m_82: bitstring);
+                {529}let (tag6'_2: bitstring,a'_10: bitstring,h_pkce_6: bitstring,scope_10: bitstring,u'_6: bitstring,password'_2: bitstring) = dec(m_82,k2_6) in
+                {530}if (tag6 = tag6'_2) then
+                {531}if (a_3 = a'_10) then
+                {532}if (e2_2 = u'_6) then
+                {533}if (wrong_pw_2 = password'_2) then
+                {534}new code_10: bitstring;
+                {535}let m_83: bitstring = enc((tag7,code_10),k2_6) in
+                {536}event issuerSendsLastMessageToUser(m_80,m_81,m_82,m_83);
+                {537}out(c_3, m_83);
+                {538}in(c_3, m_84: bitstring);
+                {539}let (tag9'_2: bitstring,bitgx_9: bitstring) = m_84 in
+                {540}if (tag9 = tag9'_2) then
+                {541}let gx_21: G = unbitG(bitgx_9) in
+                {542}new y_9: exponent;
+                {543}let gy_21: G = g(y_9) in
+                {544}let k3_6: SymmetricKey = GtoSymK(exp(gx_21,y_9)) in
+                {545}let m_85: bitstring = (tag10,bitG(gy_21),enc(sign((gy_21,gx_21),ski_1),k3_6)) in
+                {546}out(c_3, m_85);
+                {547}in(c_3, m_86: bitstring);
+                {548}let (tag11'_2: bitstring,pksks_2: PublicKey,signature_2: bitstring) = dec(m_86,k3_6) in
+                {549}if (tag11 = tag11'_2) then
+                {550}let (a''_2: bitstring,jti_6: bitstring,code'_2: bitstring,pkce_6: bitstring) = check(signature_2,pksks_2) in
+                {551}if (a_3 = a''_2) then
+                {552}if (code_10 = code'_2) then
+                {553}if (h_pkce_6 = hash(pkce_6)) then
+                {554}let jtk_6: bitstring = hash_pk(pksks_2) in
+                {555}let M_6: bitstring = (jtk_6,jti_6,scope_10,a_3,i_3,e2_2) in
+                {556}let m_87: bitstring = enc((tag12,sign(M_6,ski_1)),k3_6) in
+                {557}event issuerSendsLastMessageToApp(m_84,m_85,m_86,m_87);
+                {558}out(c_3, m_87);
+                {559}if talksOnlyToHonest_10 then
+                {560}out(c_3, check_reach_issuer);
+                {561}event issuerCompletesProtocol(m_80,m_81,m_82,m_84,m_85,m_86);
+                {562}out(ch(code_10), free_code);
+                {563}out(ch(wrong_pw_2), free_password)
+            )
+            else
+                {564}if ((e1_2 ≠ a_3) && (e2_2 ≠ u_3)) then
+                {565}in(c_3, pke1_5: PublicKey);
+                {566}in(c_3, pke2_5: PublicKey);
+                {567}in(c_3, wrong_pw_3: bitstring);
+                {568}let talksOnlyToHonest_11: bool = false in
+                {569}in(c_3, m_88: bitstring);
+                {570}let (tag4'_3: bitstring,bitgx_10: bitstring) = m_88 in
+                {571}if (tag4 = tag4'_3) then
+                {572}let gx_22: G = unbitG(bitgx_10) in
+                {573}new y_10: exponent;
+                {574}let gy_22: G = g(y_10) in
+                {575}let k2_7: SymmetricKey = GtoSymK(exp(gx_22,y_10)) in
+                {576}let m_89: bitstring = (tag5,bitG(gy_22),enc(sign((gy_22,gx_22),ski_1),k2_7)) in
+                {577}out(c_3, m_89);
+                {578}in(c_3, m_90: bitstring);
+                {579}let (tag6'_3: bitstring,a'_11: bitstring,h_pkce_7: bitstring,scope_11: bitstring,u'_7: bitstring,password'_3: bitstring) = dec(m_90,k2_7) in
+                {580}if (tag6 = tag6'_3) then
+                {581}if (e1_2 = a'_11) then
+                {582}if (e2_2 = u'_7) then
+                {583}if (wrong_pw_3 = password'_3) then
+                {584}new code_11: bitstring;
+                {585}let m_91: bitstring = enc((tag7,code_11),k2_7) in
+                {586}event issuerSendsLastMessageToUser(m_88,m_89,m_90,m_91);
+                {587}out(c_3, m_91);
+                {588}in(c_3, m_92: bitstring);
+                {589}let (tag9'_3: bitstring,bitgx_11: bitstring) = m_92 in
+                {590}if (tag9 = tag9'_3) then
+                {591}let gx_23: G = unbitG(bitgx_11) in
+                {592}new y_11: exponent;
+                {593}let gy_23: G = g(y_11) in
+                {594}let k3_7: SymmetricKey = GtoSymK(exp(gx_23,y_11)) in
+                {595}let m_93: bitstring = (tag10,bitG(gy_23),enc(sign((gy_23,gx_23),ski_1),k3_7)) in
+                {596}out(c_3, m_93);
+                {597}in(c_3, m_94: bitstring);
+                {598}let (tag11'_3: bitstring,pksks_3: PublicKey,signature_3: bitstring) = dec(m_94,k3_7) in
+                {599}if (tag11 = tag11'_3) then
+                {600}let (a''_3: bitstring,jti_7: bitstring,code'_3: bitstring,pkce_7: bitstring) = check(signature_3,pksks_3) in
+                {601}if (e1_2 = a''_3) then
+                {602}if (code_11 = code'_3) then
+                {603}if (h_pkce_7 = hash(pkce_7)) then
+                {604}let jtk_7: bitstring = hash_pk(pksks_3) in
+                {605}let M_7: bitstring = (jtk_7,jti_7,scope_11,e1_2,i_3,e2_2) in
+                {606}let m_95: bitstring = enc((tag12,sign(M_7,ski_1)),k3_7) in
+                {607}event issuerSendsLastMessageToApp(m_92,m_93,m_94,m_95);
+                {608}out(c_3, m_95);
+                {609}if talksOnlyToHonest_11 then
+                {610}out(c_3, check_reach_issuer);
+                {611}event issuerCompletesProtocol(m_88,m_89,m_90,m_92,m_93,m_94);
+                {612}out(ch(code_11), free_code);
+                {613}out(ch(wrong_pw_3), free_password)
+)
+
+--  Process 1 (that is, process 0, with let moved downwards):
+{1}new a: bitstring;
+{2}new u: bitstring;
+{3}new i: bitstring;
+{4}out(c, a);
+{5}out(c, u);
+{6}out(c, i);
+{7}new ska: SecretKey;
+{8}new sku: SecretKey;
+{9}new ski: SecretKey;
+{10}out(c, pk(ska));
+{11}out(c, pk(sku));
+{12}out(c, pk(ski));
+{13}new password: bitstring;
+(
+    {14}!
+    {15}let c_1: channel = c in
+    {22}in(c_1, e1: bitstring);
+    {23}in(c_1, e2: bitstring);
+    {21}let pki: PublicKey = pk(ski) in
+    {20}let i_1: bitstring = i in
+    {18}let u_1: bitstring = u in
+    {17}let ska_1: SecretKey = ska in
+    {16}let a_1: bitstring = a in
+    {24}if ((e1 = u_1) && (e2 = i_1)) then
+    (
+        {26}in(c_1, m_1: bitstring);
+        {27}let (tag1': bitstring,bitgx: bitstring) = m_1 in
+        {28}if (tag1 = tag1') then
+        {29}let gx: G = unbitG(bitgx) in
+        {30}new y: exponent;
+        {32}let k1: SymmetricKey = GtoSymK(exp(gx,y)) in
+        {31}let gy: G = g(y) in
+        {33}let m_2: bitstring = (tag2,bitG(gy),enc(sign((gy,gx),ska_1),k1)) in
+        {34}out(c_1, m_2);
+        {35}new pkce: bitstring;
+        {36}new scope: bitstring;
+        {37}let m_3: bitstring = enc((tag3,a_1,hash(pkce),scope),k1) in
+        {38}event appSendsLastMessageToUser(m_1,m_2,m_3);
+        {39}out(c_1, m_3);
+        {40}in(c_1, m_8: bitstring);
+        {41}let (tag8': bitstring,code: bitstring) = dec(m_8,k1) in
+        {42}if (tag8 = tag8') then
+        {43}new x: exponent;
+        {44}let gx_1: G = g(x) in
+        {45}let m_9: bitstring = (tag9,bitG(gx_1)) in
+        {46}out(c_1, m_9);
+        {47}in(c_1, m_10: bitstring);
+        {48}let (tag10': bitstring,bit_gy: bitstring,enc_signature: bitstring) = m_10 in
+        {49}if (tag10 = tag10') then
+        {50}let gy_1: G = unbitG(bit_gy) in
+        {51}let k3: SymmetricKey = GtoSymK(exp(gy_1,x)) in
+        {52}if ((gy_1,gx_1) = check(dec(enc_signature,k3),pki)) then
+        {53}new sks: SecretKey;
+        {54}new jti: bitstring;
+        {55}let T2: bitstring = (a_1,jti,code,pkce) in
+        {56}let m_11: bitstring = enc((tag11,pk(sks),sign(T2,sks)),k3) in
+        {57}event appSendsLastMessageToIssuer(m_9,m_10,m_11);
+        {58}out(c_1, m_11);
+        {59}in(c_1, m_12: bitstring);
+        {60}out(c_1, check_reach_app);
+        {61}let (tag12': bitstring,signed_M: bitstring) = dec(m_12,k3) in
+        {62}if (tag12 = tag12') then
+        {63}let M: bitstring = check(signed_M,pki) in
+        {64}let (jtk: bitstring,jti': bitstring,scope': bitstring,a': bitstring,i': bitstring,u': bitstring) = M in
+        {65}if (jtk = hash_pk(pk(sks))) then
+        {66}if (jti = jti') then
+        {67}if (scope = scope') then
+        {68}if (a_1 = a') then
+        {69}if (i_1 = i') then
+        {70}if (u_1 = u') then
+        {25}let talksOnlyToHonest: bool = true in
+        {71}if talksOnlyToHonest then
+        {72}out(c_1, check_reach_app);
+        {73}event appCompletesProtocol(m_1,m_2,m_3,m_8,m_9,m_10,m_11,m_12);
+        {74}out(ch(code), free_code)
+    )
+    else
+        {75}if ((e1 ≠ u_1) && (e2 = i_1)) then
+        (
+            {76}in(c_1, pke1: PublicKey);
+            {78}in(c_1, m: bitstring);
+            {79}let (tag1'_1: bitstring,bitgx_1: bitstring) = m in
+            {80}if (tag1 = tag1'_1) then
+            {81}let gx_2: G = unbitG(bitgx_1) in
+            {82}new y_1: exponent;
+            {84}let k1_1: SymmetricKey = GtoSymK(exp(gx_2,y_1)) in
+            {83}let gy_2: G = g(y_1) in
+            {85}let m_4: bitstring = (tag2,bitG(gy_2),enc(sign((gy_2,gx_2),ska_1),k1_1)) in
+            {86}out(c_1, m_4);
+            {87}new pkce_1: bitstring;
+            {88}new scope_1: bitstring;
+            {89}let m_5: bitstring = enc((tag3,a_1,hash(pkce_1),scope_1),k1_1) in
+            {90}event appSendsLastMessageToUser(m,m_4,m_5);
+            {91}out(c_1, m_5);
+            {92}in(c_1, m_6: bitstring);
+            {93}let (tag8'_1: bitstring,code_1: bitstring) = dec(m_6,k1_1) in
+            {94}if (tag8 = tag8'_1) then
+            {95}new x_1: exponent;
+            {96}let gx_3: G = g(x_1) in
+            {97}let m_7: bitstring = (tag9,bitG(gx_3)) in
+            {98}out(c_1, m_7);
+            {99}in(c_1, m_13: bitstring);
+            {100}let (tag10'_1: bitstring,bit_gy_1: bitstring,enc_signature_1: bitstring) = m_13 in
+            {101}if (tag10 = tag10'_1) then
+            {102}let gy_3: G = unbitG(bit_gy_1) in
+            {103}let k3_1: SymmetricKey = GtoSymK(exp(gy_3,x_1)) in
+            {104}if ((gy_3,gx_3) = check(dec(enc_signature_1,k3_1),pki)) then
+            {105}new sks_1: SecretKey;
+            {106}new jti_1: bitstring;
+            {107}let T2_1: bitstring = (a_1,jti_1,code_1,pkce_1) in
+            {108}let m_14: bitstring = enc((tag11,pk(sks_1),sign(T2_1,sks_1)),k3_1) in
+            {109}event appSendsLastMessageToIssuer(m_7,m_13,m_14);
+            {110}out(c_1, m_14);
+            {111}in(c_1, m_15: bitstring);
+            {112}out(c_1, check_reach_app);
+            {113}let (tag12'_1: bitstring,signed_M_1: bitstring) = dec(m_15,k3_1) in
+            {114}if (tag12 = tag12'_1) then
+            {115}let M_1: bitstring = check(signed_M_1,pki) in
+            {116}let (jtk_1: bitstring,jti'_1: bitstring,scope'_1: bitstring,a'_1: bitstring,i'_1: bitstring,u'_1: bitstring) = M_1 in
+            {117}if (jtk_1 = hash_pk(pk(sks_1))) then
+            {118}if (jti_1 = jti'_1) then
+            {119}if (scope_1 = scope'_1) then
+            {120}if (a_1 = a'_1) then
+            {121}if (i_1 = i'_1) then
+            {122}if (e1 = u'_1) then
+            {77}let talksOnlyToHonest_1: bool = false in
+            {123}if talksOnlyToHonest_1 then
+            {124}out(c_1, check_reach_app);
+            {125}event appCompletesProtocol(m,m_4,m_5,m_6,m_7,m_13,m_14,m_15);
+            {126}out(ch(code_1), free_code)
+        )
+        else
+            {127}if ((e1 = u_1) && (e2 ≠ i_1)) then
+            (
+                {128}in(c_1, pke2: PublicKey);
+                {130}in(c_1, m_16: bitstring);
+                {131}let (tag1'_2: bitstring,bitgx_2: bitstring) = m_16 in
+                {132}if (tag1 = tag1'_2) then
+                {133}let gx_4: G = unbitG(bitgx_2) in
+                {134}new y_2: exponent;
+                {136}let k1_2: SymmetricKey = GtoSymK(exp(gx_4,y_2)) in
+                {135}let gy_4: G = g(y_2) in
+                {137}let m_17: bitstring = (tag2,bitG(gy_4),enc(sign((gy_4,gx_4),ska_1),k1_2)) in
+                {138}out(c_1, m_17);
+                {139}new pkce_2: bitstring;
+                {140}new scope_2: bitstring;
+                {141}let m_18: bitstring = enc((tag3,a_1,hash(pkce_2),scope_2),k1_2) in
+                {142}event appSendsLastMessageToUser(m_16,m_17,m_18);
+                {143}out(c_1, m_18);
+                {144}in(c_1, m_19: bitstring);
+                {145}let (tag8'_2: bitstring,code_2: bitstring) = dec(m_19,k1_2) in
+                {146}if (tag8 = tag8'_2) then
+                {147}new x_2: exponent;
+                {148}let gx_5: G = g(x_2) in
+                {149}let m_20: bitstring = (tag9,bitG(gx_5)) in
+                {150}out(c_1, m_20);
+                {151}in(c_1, m_21: bitstring);
+                {152}let (tag10'_2: bitstring,bit_gy_2: bitstring,enc_signature_2: bitstring) = m_21 in
+                {153}if (tag10 = tag10'_2) then
+                {154}let gy_5: G = unbitG(bit_gy_2) in
+                {155}let k3_2: SymmetricKey = GtoSymK(exp(gy_5,x_2)) in
+                {156}if ((gy_5,gx_5) = check(dec(enc_signature_2,k3_2),pke2)) then
+                {157}new sks_2: SecretKey;
+                {158}new jti_2: bitstring;
+                {159}let T2_2: bitstring = (a_1,jti_2,code_2,pkce_2) in
+                {160}let m_22: bitstring = enc((tag11,pk(sks_2),sign(T2_2,sks_2)),k3_2) in
+                {161}event appSendsLastMessageToIssuer(m_20,m_21,m_22);
+                {162}out(c_1, m_22);
+                {163}in(c_1, m_23: bitstring);
+                {164}out(c_1, check_reach_app);
+                {165}let (tag12'_2: bitstring,signed_M_2: bitstring) = dec(m_23,k3_2) in
+                {166}if (tag12 = tag12'_2) then
+                {167}let M_2: bitstring = check(signed_M_2,pke2) in
+                {168}let (jtk_2: bitstring,jti'_2: bitstring,scope'_2: bitstring,a'_2: bitstring,i'_2: bitstring,u'_2: bitstring) = M_2 in
+                {169}if (jtk_2 = hash_pk(pk(sks_2))) then
+                {170}if (jti_2 = jti'_2) then
+                {171}if (scope_2 = scope'_2) then
+                {172}if (a_1 = a'_2) then
+                {173}if (e2 = i'_2) then
+                {174}if (u_1 = u'_2) then
+                {129}let talksOnlyToHonest_2: bool = false in
+                {175}if talksOnlyToHonest_2 then
+                {176}out(c_1, check_reach_app);
+                {177}event appCompletesProtocol(m_16,m_17,m_18,m_19,m_20,m_21,m_22,m_23);
+                {178}out(ch(code_2), free_code)
+            )
+            else
+                {179}if ((e1 ≠ u_1) && (e2 ≠ i_1)) then
+                {180}in(c_1, pke1_1: PublicKey);
+                {181}in(c_1, pke2_1: PublicKey);
+                {183}in(c_1, m_24: bitstring);
+                {184}let (tag1'_3: bitstring,bitgx_3: bitstring) = m_24 in
+                {185}if (tag1 = tag1'_3) then
+                {186}let gx_6: G = unbitG(bitgx_3) in
+                {187}new y_3: exponent;
+                {189}let k1_3: SymmetricKey = GtoSymK(exp(gx_6,y_3)) in
+                {188}let gy_6: G = g(y_3) in
+                {190}let m_25: bitstring = (tag2,bitG(gy_6),enc(sign((gy_6,gx_6),ska_1),k1_3)) in
+                {191}out(c_1, m_25);
+                {192}new pkce_3: bitstring;
+                {193}new scope_3: bitstring;
+                {194}let m_26: bitstring = enc((tag3,a_1,hash(pkce_3),scope_3),k1_3) in
+                {195}event appSendsLastMessageToUser(m_24,m_25,m_26);
+                {196}out(c_1, m_26);
+                {197}in(c_1, m_27: bitstring);
+                {198}let (tag8'_3: bitstring,code_3: bitstring) = dec(m_27,k1_3) in
+                {199}if (tag8 = tag8'_3) then
+                {200}new x_3: exponent;
+                {201}let gx_7: G = g(x_3) in
+                {202}let m_28: bitstring = (tag9,bitG(gx_7)) in
+                {203}out(c_1, m_28);
+                {204}in(c_1, m_29: bitstring);
+                {205}let (tag10'_3: bitstring,bit_gy_3: bitstring,enc_signature_3: bitstring) = m_29 in
+                {206}if (tag10 = tag10'_3) then
+                {207}let gy_7: G = unbitG(bit_gy_3) in
+                {208}let k3_3: SymmetricKey = GtoSymK(exp(gy_7,x_3)) in
+                {209}if ((gy_7,gx_7) = check(dec(enc_signature_3,k3_3),pke2_1)) then
+                {210}new sks_3: SecretKey;
+                {211}new jti_3: bitstring;
+                {212}let T2_3: bitstring = (a_1,jti_3,code_3,pkce_3) in
+                {213}let m_30: bitstring = enc((tag11,pk(sks_3),sign(T2_3,sks_3)),k3_3) in
+                {214}event appSendsLastMessageToIssuer(m_28,m_29,m_30);
+                {215}out(c_1, m_30);
+                {216}in(c_1, m_31: bitstring);
+                {217}out(c_1, check_reach_app);
+                {218}let (tag12'_3: bitstring,signed_M_3: bitstring) = dec(m_31,k3_3) in
+                {219}if (tag12 = tag12'_3) then
+                {220}let M_3: bitstring = check(signed_M_3,pke2_1) in
+                {221}let (jtk_3: bitstring,jti'_3: bitstring,scope'_3: bitstring,a'_3: bitstring,i'_3: bitstring,u'_3: bitstring) = M_3 in
+                {222}if (jtk_3 = hash_pk(pk(sks_3))) then
+                {223}if (jti_3 = jti'_3) then
+                {224}if (scope_3 = scope'_3) then
+                {225}if (a_1 = a'_3) then
+                {226}if (e2 = i'_3) then
+                {227}if (e1 = u'_3) then
+                {182}let talksOnlyToHonest_3: bool = false in
+                {228}if talksOnlyToHonest_3 then
+                {229}out(c_1, check_reach_app);
+                {230}event appCompletesProtocol(m_24,m_25,m_26,m_27,m_28,m_29,m_30,m_31);
+                {231}out(ch(code_3), free_code)
+) | (
+    {232}!
+    {233}let c_2: channel = c in
+    {241}in(c_2, e1_1: bitstring);
+    {242}in(c_2, e2_1: bitstring);
+    {240}let password_1: bitstring = password in
+    {239}let pki_1: PublicKey = pk(ski) in
+    {238}let i_2: bitstring = i in
+    {237}let pka: PublicKey = pk(ska) in
+    {236}let a_2: bitstring = a in
+    {234}let u_2: bitstring = u in
+    {243}if ((e1_1 = a_2) && (e2_1 = i_2)) then
+    (
+        {245}new x_4: exponent;
+        {246}let gx_8: G = g(x_4) in
+        {247}let m_32: bitstring = (tag1,bitG(gx_8)) in
+        {248}out(c_2, m_32);
+        {249}in(c_2, m_33: bitstring);
+        {250}let (tag2': bitstring,bit_gy_4: bitstring,enc_signature_4: bitstring) = m_33 in
+        {251}if (tag2 = tag2') then
+        {252}let gy_8: G = unbitG(bit_gy_4) in
+        {253}let k1_4: SymmetricKey = GtoSymK(exp(gy_8,x_4)) in
+        {254}if ((gy_8,gx_8) = check(dec(enc_signature_4,k1_4),pka)) then
+        {255}in(c_2, m_34: bitstring);
+        {256}let (tag3': bitstring,a'_4: bitstring,h_pkce: bitstring,scope_4: bitstring) = dec(m_34,k1_4) in
+        {257}if (tag3 = tag3') then
+        {258}if (a_2 = a'_4) then
+        {259}new x_5: exponent;
+        {260}let gx_9: G = g(x_5) in
+        {261}let m_35: bitstring = (tag4,bitG(gx_9)) in
+        {262}out(c_2, m_35);
+        {263}in(c_2, m_36: bitstring);
+        {264}let (tag5': bitstring,bit_gy_5: bitstring,enc_signature_5: bitstring) = m_36 in
+        {265}if (tag5 = tag5') then
+        {266}let gy_9: G = unbitG(bit_gy_5) in
+        {267}let k2: SymmetricKey = GtoSymK(exp(gy_9,x_5)) in
+        {268}if ((gy_9,gx_9) = check(dec(enc_signature_5,k2),pki_1)) then
+        {269}let m_37: bitstring = enc((tag6,a_2,h_pkce,scope_4,u_2,password_1),k2) in
+        {270}event userSendsLastMessageToIssuer(m_35,m_36,m_37);
+        {271}out(c_2, m_37);
+        {272}in(c_2, m_38: bitstring);
+        {273}let (tag7': bitstring,code_4: bitstring) = dec(m_38,k2) in
+        {274}if (tag7 = tag7') then
+        {275}let m_39: bitstring = enc((tag8,code_4),k1_4) in
+        {276}event userSendsLastMessageToApp(m_32,m_33,m_34,m_39);
+        {277}out(c_2, m_39);
+        {244}let talksOnlyToHonest_4: bool = true in
+        {278}if talksOnlyToHonest_4 then
+        {279}out(c_2, check_reach_user);
+        {280}event userCompletesProtocol(m_32,m_33,m_34,m_35,m_36,m_37,m_38);
+        {281}out(ch(code_4), free_code);
+        {282}out(ch(password_1), free_password)
+    )
+    else
+        {283}if ((e1_1 ≠ a_2) && (e2_1 = i_2)) then
+        (
+            {284}in(c_2, pke1_2: PublicKey);
+            {286}new x_6: exponent;
+            {287}let gx_10: G = g(x_6) in
+            {288}let m_40: bitstring = (tag1,bitG(gx_10)) in
+            {289}out(c_2, m_40);
+            {290}in(c_2, m_41: bitstring);
+            {291}let (tag2'_1: bitstring,bit_gy_6: bitstring,enc_signature_6: bitstring) = m_41 in
+            {292}if (tag2 = tag2'_1) then
+            {293}let gy_10: G = unbitG(bit_gy_6) in
+            {294}let k1_5: SymmetricKey = GtoSymK(exp(gy_10,x_6)) in
+            {295}if ((gy_10,gx_10) = check(dec(enc_signature_6,k1_5),pke1_2)) then
+            {296}in(c_2, m_42: bitstring);
+            {297}let (tag3'_1: bitstring,a'_5: bitstring,h_pkce_1: bitstring,scope_5: bitstring) = dec(m_42,k1_5) in
+            {298}if (tag3 = tag3'_1) then
+            {299}if (e1_1 = a'_5) then
+            {300}new x_7: exponent;
+            {301}let gx_11: G = g(x_7) in
+            {302}let m_43: bitstring = (tag4,bitG(gx_11)) in
+            {303}out(c_2, m_43);
+            {304}in(c_2, m_44: bitstring);
+            {305}let (tag5'_1: bitstring,bit_gy_7: bitstring,enc_signature_7: bitstring) = m_44 in
+            {306}if (tag5 = tag5'_1) then
+            {307}let gy_11: G = unbitG(bit_gy_7) in
+            {308}let k2_1: SymmetricKey = GtoSymK(exp(gy_11,x_7)) in
+            {309}if ((gy_11,gx_11) = check(dec(enc_signature_7,k2_1),pki_1)) then
+            {310}let m_45: bitstring = enc((tag6,e1_1,h_pkce_1,scope_5,u_2,password_1),k2_1) in
+            {311}event userSendsLastMessageToIssuer(m_43,m_44,m_45);
+            {312}out(c_2, m_45);
+            {313}in(c_2, m_46: bitstring);
+            {314}let (tag7'_1: bitstring,code_5: bitstring) = dec(m_46,k2_1) in
+            {315}if (tag7 = tag7'_1) then
+            {316}let m_47: bitstring = enc((tag8,code_5),k1_5) in
+            {317}event userSendsLastMessageToApp(m_40,m_41,m_42,m_47);
+            {318}out(c_2, m_47);
+            {285}let talksOnlyToHonest_5: bool = false in
+            {319}if talksOnlyToHonest_5 then
+            {320}out(c_2, check_reach_user);
+            {321}event userCompletesProtocol(m_40,m_41,m_42,m_43,m_44,m_45,m_46);
+            {322}out(ch(code_5), free_code);
+            {323}out(ch(password_1), free_password)
+        )
+        else
+            {324}if ((e1_1 = a_2) && (e2_1 ≠ i_2)) then
+            (
+                {325}in(c_2, pke2_2: PublicKey);
+                {326}in(c_2, wrong_pw: bitstring);
+                {328}new x_8: exponent;
+                {329}let gx_12: G = g(x_8) in
+                {330}let m_48: bitstring = (tag1,bitG(gx_12)) in
+                {331}out(c_2, m_48);
+                {332}in(c_2, m_49: bitstring);
+                {333}let (tag2'_2: bitstring,bit_gy_8: bitstring,enc_signature_8: bitstring) = m_49 in
+                {334}if (tag2 = tag2'_2) then
+                {335}let gy_12: G = unbitG(bit_gy_8) in
+                {336}let k1_6: SymmetricKey = GtoSymK(exp(gy_12,x_8)) in
+                {337}if ((gy_12,gx_12) = check(dec(enc_signature_8,k1_6),pka)) then
+                {338}in(c_2, m_50: bitstring);
+                {339}let (tag3'_2: bitstring,a'_6: bitstring,h_pkce_2: bitstring,scope_6: bitstring) = dec(m_50,k1_6) in
+                {340}if (tag3 = tag3'_2) then
+                {341}if (a_2 = a'_6) then
+                {342}new x_9: exponent;
+                {343}let gx_13: G = g(x_9) in
+                {344}let m_51: bitstring = (tag4,bitG(gx_13)) in
+                {345}out(c_2, m_51);
+                {346}in(c_2, m_52: bitstring);
+                {347}let (tag5'_2: bitstring,bit_gy_9: bitstring,enc_signature_9: bitstring) = m_52 in
+                {348}if (tag5 = tag5'_2) then
+                {349}let gy_13: G = unbitG(bit_gy_9) in
+                {350}let k2_2: SymmetricKey = GtoSymK(exp(gy_13,x_9)) in
+                {351}if ((gy_13,gx_13) = check(dec(enc_signature_9,k2_2),pke2_2)) then
+                {352}let m_53: bitstring = enc((tag6,a_2,h_pkce_2,scope_6,u_2,wrong_pw),k2_2) in
+                {353}event userSendsLastMessageToIssuer(m_51,m_52,m_53);
+                {354}out(c_2, m_53);
+                {355}in(c_2, m_54: bitstring);
+                {356}let (tag7'_2: bitstring,code_6: bitstring) = dec(m_54,k2_2) in
+                {357}if (tag7 = tag7'_2) then
+                {358}let m_55: bitstring = enc((tag8,code_6),k1_6) in
+                {359}event userSendsLastMessageToApp(m_48,m_49,m_50,m_55);
+                {360}out(c_2, m_55);
+                {327}let talksOnlyToHonest_6: bool = false in
+                {361}if talksOnlyToHonest_6 then
+                {362}out(c_2, check_reach_user);
+                {363}event userCompletesProtocol(m_48,m_49,m_50,m_51,m_52,m_53,m_54);
+                {364}out(ch(code_6), free_code);
+                {365}out(ch(wrong_pw), free_password)
+            )
+            else
+                {366}if ((e1_1 ≠ a_2) && (e2_1 ≠ i_2)) then
+                {367}in(c_2, pke1_3: PublicKey);
+                {368}in(c_2, pke2_3: PublicKey);
+                {369}in(c_2, wrong_pw_1: bitstring);
+                {371}new x_10: exponent;
+                {372}let gx_14: G = g(x_10) in
+                {373}let m_56: bitstring = (tag1,bitG(gx_14)) in
+                {374}out(c_2, m_56);
+                {375}in(c_2, m_57: bitstring);
+                {376}let (tag2'_3: bitstring,bit_gy_10: bitstring,enc_signature_10: bitstring) = m_57 in
+                {377}if (tag2 = tag2'_3) then
+                {378}let gy_14: G = unbitG(bit_gy_10) in
+                {379}let k1_7: SymmetricKey = GtoSymK(exp(gy_14,x_10)) in
+                {380}if ((gy_14,gx_14) = check(dec(enc_signature_10,k1_7),pke1_3)) then
+                {381}in(c_2, m_58: bitstring);
+                {382}let (tag3'_3: bitstring,a'_7: bitstring,h_pkce_3: bitstring,scope_7: bitstring) = dec(m_58,k1_7) in
+                {383}if (tag3 = tag3'_3) then
+                {384}if (e1_1 = a'_7) then
+                {385}new x_11: exponent;
+                {386}let gx_15: G = g(x_11) in
+                {387}let m_59: bitstring = (tag4,bitG(gx_15)) in
+                {388}out(c_2, m_59);
+                {389}in(c_2, m_60: bitstring);
+                {390}let (tag5'_3: bitstring,bit_gy_11: bitstring,enc_signature_11: bitstring) = m_60 in
+                {391}if (tag5 = tag5'_3) then
+                {392}let gy_15: G = unbitG(bit_gy_11) in
+                {393}let k2_3: SymmetricKey = GtoSymK(exp(gy_15,x_11)) in
+                {394}if ((gy_15,gx_15) = check(dec(enc_signature_11,k2_3),pke2_3)) then
+                {395}let m_61: bitstring = enc((tag6,e1_1,h_pkce_3,scope_7,u_2,wrong_pw_1),k2_3) in
+                {396}event userSendsLastMessageToIssuer(m_59,m_60,m_61);
+                {397}out(c_2, m_61);
+                {398}in(c_2, m_62: bitstring);
+                {399}let (tag7'_3: bitstring,code_7: bitstring) = dec(m_62,k2_3) in
+                {400}if (tag7 = tag7'_3) then
+                {401}let m_63: bitstring = enc((tag8,code_7),k1_7) in
+                {402}event userSendsLastMessageToApp(m_56,m_57,m_58,m_63);
+                {403}out(c_2, m_63);
+                {370}let talksOnlyToHonest_7: bool = false in
+                {404}if talksOnlyToHonest_7 then
+                {405}out(c_2, check_reach_user);
+                {406}event userCompletesProtocol(m_56,m_57,m_58,m_59,m_60,m_61,m_62);
+                {407}out(ch(code_7), free_code);
+                {408}out(ch(wrong_pw_1), free_password)
+) | (
+    {409}!
+    {410}let c_3: channel = c in
+    {418}in(c_3, e1_2: bitstring);
+    {419}in(c_3, e2_2: bitstring);
+    {417}let password_2: bitstring = password in
+    {415}let u_3: bitstring = u in
+    {413}let a_3: bitstring = a in
+    {412}let ski_1: SecretKey = ski in
+    {411}let i_3: bitstring = i in
+    {420}if ((e1_2 = a_3) && (e2_2 = u_3)) then
+    (
+        {422}in(c_3, m_64: bitstring);
+        {423}let (tag4': bitstring,bitgx_4: bitstring) = m_64 in
+        {424}if (tag4 = tag4') then
+        {425}let gx_16: G = unbitG(bitgx_4) in
+        {426}new y_4: exponent;
+        {428}let k2_4: SymmetricKey = GtoSymK(exp(gx_16,y_4)) in
+        {427}let gy_16: G = g(y_4) in
+        {429}let m_65: bitstring = (tag5,bitG(gy_16),enc(sign((gy_16,gx_16),ski_1),k2_4)) in
+        {430}out(c_3, m_65);
+        {431}in(c_3, m_66: bitstring);
+        {432}let (tag6': bitstring,a'_8: bitstring,h_pkce_4: bitstring,scope_8: bitstring,u'_4: bitstring,password': bitstring) = dec(m_66,k2_4) in
+        {433}if (tag6 = tag6') then
+        {434}if (a_3 = a'_8) then
+        {435}if (u_3 = u'_4) then
+        {436}if (password_2 = password') then
+        {437}new code_8: bitstring;
+        {438}let m_67: bitstring = enc((tag7,code_8),k2_4) in
+        {439}event issuerSendsLastMessageToUser(m_64,m_65,m_66,m_67);
+        {440}out(c_3, m_67);
+        {441}in(c_3, m_68: bitstring);
+        {442}let (tag9': bitstring,bitgx_5: bitstring) = m_68 in
+        {443}if (tag9 = tag9') then
+        {444}let gx_17: G = unbitG(bitgx_5) in
+        {445}new y_5: exponent;
+        {447}let k3_4: SymmetricKey = GtoSymK(exp(gx_17,y_5)) in
+        {446}let gy_17: G = g(y_5) in
+        {448}let m_69: bitstring = (tag10,bitG(gy_17),enc(sign((gy_17,gx_17),ski_1),k3_4)) in
+        {449}out(c_3, m_69);
+        {450}in(c_3, m_70: bitstring);
+        {451}let (tag11': bitstring,pksks: PublicKey,signature: bitstring) = dec(m_70,k3_4) in
+        {452}if (tag11 = tag11') then
+        {453}let (a'': bitstring,jti_4: bitstring,code': bitstring,pkce_4: bitstring) = check(signature,pksks) in
+        {454}if (a_3 = a'') then
+        {455}if (code_8 = code') then
+        {456}if (h_pkce_4 = hash(pkce_4)) then
+        {457}let jtk_4: bitstring = hash_pk(pksks) in
+        {458}let M_4: bitstring = (jtk_4,jti_4,scope_8,a_3,i_3,u_3) in
+        {459}let m_71: bitstring = enc((tag12,sign(M_4,ski_1)),k3_4) in
+        {460}event issuerSendsLastMessageToApp(m_68,m_69,m_70,m_71);
+        {461}out(c_3, m_71);
+        {421}let talksOnlyToHonest_8: bool = true in
+        {462}if talksOnlyToHonest_8 then
+        {463}out(c_3, check_reach_issuer);
+        {464}event issuerCompletesProtocol(m_64,m_65,m_66,m_68,m_69,m_70);
+        {465}out(ch(code_8), free_code);
+        {466}out(ch(password_2), free_password)
+    )
+    else
+        {467}if ((e1_2 ≠ a_3) && (e2_2 = u_3)) then
+        (
+            {468}in(c_3, pke1_4: PublicKey);
+            {470}in(c_3, m_72: bitstring);
+            {471}let (tag4'_1: bitstring,bitgx_6: bitstring) = m_72 in
+            {472}if (tag4 = tag4'_1) then
+            {473}let gx_18: G = unbitG(bitgx_6) in
+            {474}new y_6: exponent;
+            {476}let k2_5: SymmetricKey = GtoSymK(exp(gx_18,y_6)) in
+            {475}let gy_18: G = g(y_6) in
+            {477}let m_73: bitstring = (tag5,bitG(gy_18),enc(sign((gy_18,gx_18),ski_1),k2_5)) in
+            {478}out(c_3, m_73);
+            {479}in(c_3, m_74: bitstring);
+            {480}let (tag6'_1: bitstring,a'_9: bitstring,h_pkce_5: bitstring,scope_9: bitstring,u'_5: bitstring,password'_1: bitstring) = dec(m_74,k2_5) in
+            {481}if (tag6 = tag6'_1) then
+            {482}if (e1_2 = a'_9) then
+            {483}if (u_3 = u'_5) then
+            {484}if (password_2 = password'_1) then
+            {485}new code_9: bitstring;
+            {486}let m_75: bitstring = enc((tag7,code_9),k2_5) in
+            {487}event issuerSendsLastMessageToUser(m_72,m_73,m_74,m_75);
+            {488}out(c_3, m_75);
+            {489}in(c_3, m_76: bitstring);
+            {490}let (tag9'_1: bitstring,bitgx_7: bitstring) = m_76 in
+            {491}if (tag9 = tag9'_1) then
+            {492}let gx_19: G = unbitG(bitgx_7) in
+            {493}new y_7: exponent;
+            {495}let k3_5: SymmetricKey = GtoSymK(exp(gx_19,y_7)) in
+            {494}let gy_19: G = g(y_7) in
+            {496}let m_77: bitstring = (tag10,bitG(gy_19),enc(sign((gy_19,gx_19),ski_1),k3_5)) in
+            {497}out(c_3, m_77);
+            {498}in(c_3, m_78: bitstring);
+            {499}let (tag11'_1: bitstring,pksks_1: PublicKey,signature_1: bitstring) = dec(m_78,k3_5) in
+            {500}if (tag11 = tag11'_1) then
+            {501}let (a''_1: bitstring,jti_5: bitstring,code'_1: bitstring,pkce_5: bitstring) = check(signature_1,pksks_1) in
+            {502}if (e1_2 = a''_1) then
+            {503}if (code_9 = code'_1) then
+            {504}if (h_pkce_5 = hash(pkce_5)) then
+            {505}let jtk_5: bitstring = hash_pk(pksks_1) in
+            {506}let M_5: bitstring = (jtk_5,jti_5,scope_9,e1_2,i_3,u_3) in
+            {507}let m_79: bitstring = enc((tag12,sign(M_5,ski_1)),k3_5) in
+            {508}event issuerSendsLastMessageToApp(m_76,m_77,m_78,m_79);
+            {509}out(c_3, m_79);
+            {469}let talksOnlyToHonest_9: bool = false in
+            {510}if talksOnlyToHonest_9 then
+            {511}out(c_3, check_reach_issuer);
+            {512}event issuerCompletesProtocol(m_72,m_73,m_74,m_76,m_77,m_78);
+            {513}out(ch(code_9), free_code);
+            {514}out(ch(password_2), free_password)
+        )
+        else
+            {515}if ((e1_2 = a_3) && (e2_2 ≠ u_3)) then
+            (
+                {516}in(c_3, pke2_4: PublicKey);
+                {517}in(c_3, wrong_pw_2: bitstring);
+                {519}in(c_3, m_80: bitstring);
+                {520}let (tag4'_2: bitstring,bitgx_8: bitstring) = m_80 in
+                {521}if (tag4 = tag4'_2) then
+                {522}let gx_20: G = unbitG(bitgx_8) in
+                {523}new y_8: exponent;
+                {525}let k2_6: SymmetricKey = GtoSymK(exp(gx_20,y_8)) in
+                {524}let gy_20: G = g(y_8) in
+                {526}let m_81: bitstring = (tag5,bitG(gy_20),enc(sign((gy_20,gx_20),ski_1),k2_6)) in
+                {527}out(c_3, m_81);
+                {528}in(c_3, m_82: bitstring);
+                {529}let (tag6'_2: bitstring,a'_10: bitstring,h_pkce_6: bitstring,scope_10: bitstring,u'_6: bitstring,password'_2: bitstring) = dec(m_82,k2_6) in
+                {530}if (tag6 = tag6'_2) then
+                {531}if (a_3 = a'_10) then
+                {532}if (e2_2 = u'_6) then
+                {533}if (wrong_pw_2 = password'_2) then
+                {534}new code_10: bitstring;
+                {535}let m_83: bitstring = enc((tag7,code_10),k2_6) in
+                {536}event issuerSendsLastMessageToUser(m_80,m_81,m_82,m_83);
+                {537}out(c_3, m_83);
+                {538}in(c_3, m_84: bitstring);
+                {539}let (tag9'_2: bitstring,bitgx_9: bitstring) = m_84 in
+                {540}if (tag9 = tag9'_2) then
+                {541}let gx_21: G = unbitG(bitgx_9) in
+                {542}new y_9: exponent;
+                {544}let k3_6: SymmetricKey = GtoSymK(exp(gx_21,y_9)) in
+                {543}let gy_21: G = g(y_9) in
+                {545}let m_85: bitstring = (tag10,bitG(gy_21),enc(sign((gy_21,gx_21),ski_1),k3_6)) in
+                {546}out(c_3, m_85);
+                {547}in(c_3, m_86: bitstring);
+                {548}let (tag11'_2: bitstring,pksks_2: PublicKey,signature_2: bitstring) = dec(m_86,k3_6) in
+                {549}if (tag11 = tag11'_2) then
+                {550}let (a''_2: bitstring,jti_6: bitstring,code'_2: bitstring,pkce_6: bitstring) = check(signature_2,pksks_2) in
+                {551}if (a_3 = a''_2) then
+                {552}if (code_10 = code'_2) then
+                {553}if (h_pkce_6 = hash(pkce_6)) then
+                {554}let jtk_6: bitstring = hash_pk(pksks_2) in
+                {555}let M_6: bitstring = (jtk_6,jti_6,scope_10,a_3,i_3,e2_2) in
+                {556}let m_87: bitstring = enc((tag12,sign(M_6,ski_1)),k3_6) in
+                {557}event issuerSendsLastMessageToApp(m_84,m_85,m_86,m_87);
+                {558}out(c_3, m_87);
+                {518}let talksOnlyToHonest_10: bool = false in
+                {559}if talksOnlyToHonest_10 then
+                {560}out(c_3, check_reach_issuer);
+                {561}event issuerCompletesProtocol(m_80,m_81,m_82,m_84,m_85,m_86);
+                {562}out(ch(code_10), free_code);
+                {563}out(ch(wrong_pw_2), free_password)
+            )
+            else
+                {564}if ((e1_2 ≠ a_3) && (e2_2 ≠ u_3)) then
+                {565}in(c_3, pke1_5: PublicKey);
+                {566}in(c_3, pke2_5: PublicKey);
+                {567}in(c_3, wrong_pw_3: bitstring);
+                {569}in(c_3, m_88: bitstring);
+                {570}let (tag4'_3: bitstring,bitgx_10: bitstring) = m_88 in
+                {571}if (tag4 = tag4'_3) then
+                {572}let gx_22: G = unbitG(bitgx_10) in
+                {573}new y_10: exponent;
+                {575}let k2_7: SymmetricKey = GtoSymK(exp(gx_22,y_10)) in
+                {574}let gy_22: G = g(y_10) in
+                {576}let m_89: bitstring = (tag5,bitG(gy_22),enc(sign((gy_22,gx_22),ski_1),k2_7)) in
+                {577}out(c_3, m_89);
+                {578}in(c_3, m_90: bitstring);
+                {579}let (tag6'_3: bitstring,a'_11: bitstring,h_pkce_7: bitstring,scope_11: bitstring,u'_7: bitstring,password'_3: bitstring) = dec(m_90,k2_7) in
+                {580}if (tag6 = tag6'_3) then
+                {581}if (e1_2 = a'_11) then
+                {582}if (e2_2 = u'_7) then
+                {583}if (wrong_pw_3 = password'_3) then
+                {584}new code_11: bitstring;
+                {585}let m_91: bitstring = enc((tag7,code_11),k2_7) in
+                {586}event issuerSendsLastMessageToUser(m_88,m_89,m_90,m_91);
+                {587}out(c_3, m_91);
+                {588}in(c_3, m_92: bitstring);
+                {589}let (tag9'_3: bitstring,bitgx_11: bitstring) = m_92 in
+                {590}if (tag9 = tag9'_3) then
+                {591}let gx_23: G = unbitG(bitgx_11) in
+                {592}new y_11: exponent;
+                {594}let k3_7: SymmetricKey = GtoSymK(exp(gx_23,y_11)) in
+                {593}let gy_23: G = g(y_11) in
+                {595}let m_93: bitstring = (tag10,bitG(gy_23),enc(sign((gy_23,gx_23),ski_1),k3_7)) in
+                {596}out(c_3, m_93);
+                {597}in(c_3, m_94: bitstring);
+                {598}let (tag11'_3: bitstring,pksks_3: PublicKey,signature_3: bitstring) = dec(m_94,k3_7) in
+                {599}if (tag11 = tag11'_3) then
+                {600}let (a''_3: bitstring,jti_7: bitstring,code'_3: bitstring,pkce_7: bitstring) = check(signature_3,pksks_3) in
+                {601}if (e1_2 = a''_3) then
+                {602}if (code_11 = code'_3) then
+                {603}if (h_pkce_7 = hash(pkce_7)) then
+                {604}let jtk_7: bitstring = hash_pk(pksks_3) in
+                {605}let M_7: bitstring = (jtk_7,jti_7,scope_11,e1_2,i_3,e2_2) in
+                {606}let m_95: bitstring = enc((tag12,sign(M_7,ski_1)),k3_7) in
+                {607}event issuerSendsLastMessageToApp(m_92,m_93,m_94,m_95);
+                {608}out(c_3, m_95);
+                {568}let talksOnlyToHonest_11: bool = false in
+                {609}if talksOnlyToHonest_11 then
+                {610}out(c_3, check_reach_issuer);
+                {611}event issuerCompletesProtocol(m_88,m_89,m_90,m_92,m_93,m_94);
+                {612}out(ch(code_11), free_code);
+                {613}out(ch(wrong_pw_3), free_password)
+)
+
+-- Query inj-event(appCompletesProtocol(m_96,m_97,m_98,m_99,m_100,m_101,m_102,m_103)) ==> inj-event(userSendsLastMessageToApp(m_96,m_97,m_98,m_99)) && inj-event(issuerSendsLastMessageToApp(m_100,m_101,m_102,m_103)) in process 1.
+Translating the process into Horn clauses...
+select attacker(bitG(gx_24))/-5000
+Completing...
+Termination warning: attacker(bitG(elem)) -> attacker(elem)
+Selecting 0
+200 rules inserted. Base: 188 rules (49 with conclusion selected). Queue: 285 rules.
+400 rules inserted. Base: 353 rules (63 with conclusion selected). Queue: 381 rules.
+600 rules inserted. Base: 501 rules (82 with conclusion selected). Queue: 503 rules.
+800 rules inserted. Base: 648 rules (105 with conclusion selected). Queue: 560 rules.
+1000 rules inserted. Base: 782 rules (125 with conclusion selected). Queue: 661 rules.
+select attacker(bitG(g(y_12)))/-5000
+1200 rules inserted. Base: 953 rules (152 with conclusion selected). Queue: 960 rules.
+1400 rules inserted. Base: 1124 rules (172 with conclusion selected). Queue: 1139 rules.
+1600 rules inserted. Base: 1300 rules (190 with conclusion selected). Queue: 1302 rules.
+1800 rules inserted. Base: 1462 rules (203 with conclusion selected). Queue: 1330 rules.
+2000 rules inserted. Base: 1579 rules (213 with conclusion selected). Queue: 1269 rules.
+2200 rules inserted. Base: 1723 rules (228 with conclusion selected). Queue: 1308 rules.
+2400 rules inserted. Base: 1850 rules (234 with conclusion selected). Queue: 1299 rules.
+2600 rules inserted. Base: 1972 rules (245 with conclusion selected). Queue: 1541 rules.
+2800 rules inserted. Base: 2115 rules (252 with conclusion selected). Queue: 1524 rules.
+3000 rules inserted. Base: 2288 rules (264 with conclusion selected). Queue: 1550 rules.
+3200 rules inserted. Base: 2423 rules (281 with conclusion selected). Queue: 1722 rules.
+3400 rules inserted. Base: 2583 rules (286 with conclusion selected). Queue: 1712 rules.
+3600 rules inserted. Base: 2711 rules (289 with conclusion selected). Queue: 1659 rules.
+3800 rules inserted. Base: 2820 rules (293 with conclusion selected). Queue: 1600 rules.
+4000 rules inserted. Base: 2830 rules (294 with conclusion selected). Queue: 1567 rules.
+4200 rules inserted. Base: 3002 rules (304 with conclusion selected). Queue: 1651 rules.
+4400 rules inserted. Base: 3164 rules (308 with conclusion selected). Queue: 1695 rules.
+4600 rules inserted. Base: 3298 rules (315 with conclusion selected). Queue: 1758 rules.
+4800 rules inserted. Base: 3387 rules (327 with conclusion selected). Queue: 1782 rules.
+5000 rules inserted. Base: 3487 rules (345 with conclusion selected). Queue: 1826 rules.
+5200 rules inserted. Base: 3621 rules (346 with conclusion selected). Queue: 1761 rules.
+5400 rules inserted. Base: 3771 rules (351 with conclusion selected). Queue: 1654 rules.
+5600 rules inserted. Base: 3885 rules (359 with conclusion selected). Queue: 1733 rules.
+5800 rules inserted. Base: 4007 rules (363 with conclusion selected). Queue: 1691 rules.
+6000 rules inserted. Base: 4041 rules (367 with conclusion selected). Queue: 1625 rules.
+6200 rules inserted. Base: 4177 rules (371 with conclusion selected). Queue: 1615 rules.
+6400 rules inserted. Base: 4291 rules (374 with conclusion selected). Queue: 1631 rules.
+6600 rules inserted. Base: 4408 rules (397 with conclusion selected). Queue: 1858 rules.
+6800 rules inserted. Base: 4492 rules (422 with conclusion selected). Queue: 2082 rules.
+7000 rules inserted. Base: 4563 rules (434 with conclusion selected). Queue: 2205 rules.
+7200 rules inserted. Base: 4705 rules (437 with conclusion selected). Queue: 2159 rules.
+7400 rules inserted. Base: 4829 rules (438 with conclusion selected). Queue: 2068 rules.
+7600 rules inserted. Base: 4963 rules (445 with conclusion selected). Queue: 2183 rules.
+7800 rules inserted. Base: 5037 rules (452 with conclusion selected). Queue: 2270 rules.
+8000 rules inserted. Base: 5091 rules (458 with conclusion selected). Queue: 2134 rules.
+8200 rules inserted. Base: 5201 rules (464 with conclusion selected). Queue: 2159 rules.
+8400 rules inserted. Base: 5329 rules (482 with conclusion selected). Queue: 2451 rules.
+8600 rules inserted. Base: 5419 rules (489 with conclusion selected). Queue: 2411 rules.
+8800 rules inserted. Base: 5524 rules (515 with conclusion selected). Queue: 2662 rules.
+9000 rules inserted. Base: 5634 rules (524 with conclusion selected). Queue: 2684 rules.
+9200 rules inserted. Base: 5785 rules (532 with conclusion selected). Queue: 2751 rules.
+9400 rules inserted. Base: 5889 rules (533 with conclusion selected). Queue: 2902 rules.
+9600 rules inserted. Base: 5993 rules (536 with conclusion selected). Queue: 2811 rules.
+9800 rules inserted. Base: 6145 rules (540 with conclusion selected). Queue: 2816 rules.
+10000 rules inserted. Base: 6235 rules (543 with conclusion selected). Queue: 2723 rules.
+10200 rules inserted. Base: 6333 rules (546 with conclusion selected). Queue: 2618 rules.
+10400 rules inserted. Base: 6381 rules (546 with conclusion selected). Queue: 2498 rules.
+10600 rules inserted. Base: 6517 rules (556 with conclusion selected). Queue: 2581 rules.
+10800 rules inserted. Base: 6481 rules (556 with conclusion selected). Queue: 2364 rules.
+11000 rules inserted. Base: 6611 rules (566 with conclusion selected). Queue: 2464 rules.
+11200 rules inserted. Base: 6731 rules (569 with conclusion selected). Queue: 2574 rules.
+11400 rules inserted. Base: 6850 rules (599 with conclusion selected). Queue: 3270 rules.
+11600 rules inserted. Base: 6902 rules (616 with conclusion selected). Queue: 3413 rules.
+11800 rules inserted. Base: 6911 rules (618 with conclusion selected). Queue: 3475 rules.
+12000 rules inserted. Base: 6964 rules (618 with conclusion selected). Queue: 3529 rules.
+12200 rules inserted. Base: 7015 rules (618 with conclusion selected). Queue: 3421 rules.
+12400 rules inserted. Base: 7116 rules (619 with conclusion selected). Queue: 3362 rules.
+12600 rules inserted. Base: 7233 rules (619 with conclusion selected). Queue: 3291 rules.
+12800 rules inserted. Base: 7291 rules (631 with conclusion selected). Queue: 3294 rules.
+13000 rules inserted. Base: 7366 rules (634 with conclusion selected). Queue: 3247 rules.
+13200 rules inserted. Base: 7407 rules (634 with conclusion selected). Queue: 3208 rules.
+13400 rules inserted. Base: 7486 rules (637 with conclusion selected). Queue: 3166 rules.
+13600 rules inserted. Base: 7487 rules (637 with conclusion selected). Queue: 3003 rules.
+13800 rules inserted. Base: 7568 rules (640 with conclusion selected). Queue: 2946 rules.
+14000 rules inserted. Base: 7704 rules (651 with conclusion selected). Queue: 3035 rules.
+14200 rules inserted. Base: 7887 rules (657 with conclusion selected). Queue: 3070 rules.
+14400 rules inserted. Base: 8072 rules (658 with conclusion selected). Queue: 3159 rules.
+14600 rules inserted. Base: 8177 rules (691 with conclusion selected). Queue: 3786 rules.
+14800 rules inserted. Base: 8269 rules (695 with conclusion selected). Queue: 3799 rules.
+15000 rules inserted. Base: 8330 rules (700 with conclusion selected). Queue: 3807 rules.
+15200 rules inserted. Base: 8319 rules (700 with conclusion selected). Queue: 3611 rules.
+15400 rules inserted. Base: 8298 rules (704 with conclusion selected). Queue: 3434 rules.
+15600 rules inserted. Base: 8209 rules (704 with conclusion selected). Queue: 3553 rules.
+15800 rules inserted. Base: 8322 rules (705 with conclusion selected). Queue: 4018 rules.
+16000 rules inserted. Base: 8398 rules (712 with conclusion selected). Queue: 4078 rules.
+16200 rules inserted. Base: 8462 rules (712 with conclusion selected). Queue: 4030 rules.
+16400 rules inserted. Base: 8544 rules (720 with conclusion selected). Queue: 4016 rules.
+16600 rules inserted. Base: 8566 rules (720 with conclusion selected). Queue: 3990 rules.
+16800 rules inserted. Base: 8682 rules (723 with conclusion selected). Queue: 3936 rules.
+17000 rules inserted. Base: 8779 rules (723 with conclusion selected). Queue: 3925 rules.
+17200 rules inserted. Base: 8969 rules (726 with conclusion selected). Queue: 3919 rules.
+17400 rules inserted. Base: 9135 rules (726 with conclusion selected). Queue: 3928 rules.
+17600 rules inserted. Base: 9291 rules (729 with conclusion selected). Queue: 3919 rules.
+17800 rules inserted. Base: 9474 rules (736 with conclusion selected). Queue: 4049 rules.
+18000 rules inserted. Base: 9640 rules (751 with conclusion selected). Queue: 4307 rules.
+18200 rules inserted. Base: 9773 rules (756 with conclusion selected). Queue: 4263 rules.
+18400 rules inserted. Base: 9839 rules (757 with conclusion selected). Queue: 4242 rules.
+18600 rules inserted. Base: 9882 rules (772 with conclusion selected). Queue: 4410 rules.
+18800 rules inserted. Base: 9962 rules (782 with conclusion selected). Queue: 4363 rules.
+19000 rules inserted. Base: 9951 rules (782 with conclusion selected). Queue: 4178 rules.
+19200 rules inserted. Base: 9906 rules (782 with conclusion selected). Queue: 3975 rules.
+19400 rules inserted. Base: 9874 rules (782 with conclusion selected). Queue: 3772 rules.
+19600 rules inserted. Base: 9863 rules (782 with conclusion selected). Queue: 3630 rules.
+19800 rules inserted. Base: 9812 rules (782 with conclusion selected). Queue: 3550 rules.
+20000 rules inserted. Base: 9846 rules (787 with conclusion selected). Queue: 3649 rules.
+20200 rules inserted. Base: 9938 rules (795 with conclusion selected). Queue: 3711 rules.
+20400 rules inserted. Base: 9976 rules (795 with conclusion selected). Queue: 3658 rules.
+20600 rules inserted. Base: 10023 rules (795 with conclusion selected). Queue: 3596 rules.
+20800 rules inserted. Base: 10137 rules (795 with conclusion selected). Queue: 3664 rules.
+21000 rules inserted. Base: 10329 rules (795 with conclusion selected). Queue: 3803 rules.
+21200 rules inserted. Base: 10123 rules (795 with conclusion selected). Queue: 3789 rules.
+21400 rules inserted. Base: 10095 rules (795 with conclusion selected). Queue: 3792 rules.
+21600 rules inserted. Base: 10289 rules (798 with conclusion selected). Queue: 3806 rules.
+21800 rules inserted. Base: 10453 rules (798 with conclusion selected). Queue: 3794 rules.
+22000 rules inserted. Base: 10605 rules (804 with conclusion selected). Queue: 3807 rules.
+22200 rules inserted. Base: 10650 rules (804 with conclusion selected). Queue: 3728 rules.
+22400 rules inserted. Base: 10697 rules (816 with conclusion selected). Queue: 3737 rules.
+22600 rules inserted. Base: 10813 rules (833 with conclusion selected). Queue: 3948 rules.
+22800 rules inserted. Base: 10898 rules (836 with conclusion selected). Queue: 3819 rules.
+23000 rules inserted. Base: 10924 rules (849 with conclusion selected). Queue: 3836 rules.
+23200 rules inserted. Base: 10973 rules (853 with conclusion selected). Queue: 3715 rules.
+23400 rules inserted. Base: 11019 rules (857 with conclusion selected). Queue: 3697 rules.
+23600 rules inserted. Base: 11043 rules (868 with conclusion selected). Queue: 3598 rules.
+23800 rules inserted. Base: 11048 rules (868 with conclusion selected). Queue: 3507 rules.
+24000 rules inserted. Base: 11156 rules (885 with conclusion selected). Queue: 3557 rules.
+24200 rules inserted. Base: 11205 rules (893 with conclusion selected). Queue: 3506 rules.
+24400 rules inserted. Base: 11193 rules (893 with conclusion selected). Queue: 3496 rules.
+24600 rules inserted. Base: 11179 rules (893 with conclusion selected). Queue: 3496 rules.
+24800 rules inserted. Base: 11304 rules (893 with conclusion selected). Queue: 3578 rules.
+25000 rules inserted. Base: 11421 rules (893 with conclusion selected). Queue: 3701 rules.
+25200 rules inserted. Base: 11532 rules (893 with conclusion selected). Queue: 3805 rules.
+25400 rules inserted. Base: 11629 rules (893 with conclusion selected). Queue: 3864 rules.
+25600 rules inserted. Base: 11444 rules (893 with conclusion selected). Queue: 3867 rules.
+25800 rules inserted. Base: 11496 rules (893 with conclusion selected). Queue: 3833 rules.
+26000 rules inserted. Base: 11576 rules (893 with conclusion selected). Queue: 3792 rules.
+26200 rules inserted. Base: 11672 rules (903 with conclusion selected). Queue: 3874 rules.
+26400 rules inserted. Base: 11781 rules (906 with conclusion selected). Queue: 3830 rules.
+26600 rules inserted. Base: 11902 rules (925 with conclusion selected). Queue: 3821 rules.
+26800 rules inserted. Base: 11930 rules (941 with conclusion selected). Queue: 3753 rules.
+select attacker(pk(sk))/-5000
+27000 rules inserted. Base: 12040 rules (950 with conclusion selected). Queue: 3754 rules.
+27200 rules inserted. Base: 12122 rules (960 with conclusion selected). Queue: 3691 rules.
+27400 rules inserted. Base: 12198 rules (972 with conclusion selected). Queue: 3724 rules.
+27600 rules inserted. Base: 12238 rules (984 with conclusion selected). Queue: 3627 rules.
+27800 rules inserted. Base: 12400 rules (984 with conclusion selected). Queue: 3460 rules.
+28000 rules inserted. Base: 12592 rules (984 with conclusion selected). Queue: 3276 rules.
+28200 rules inserted. Base: 12724 rules (984 with conclusion selected). Queue: 3250 rules.
+28400 rules inserted. Base: 12731 rules (984 with conclusion selected). Queue: 3171 rules.
+28600 rules inserted. Base: 12723 rules (984 with conclusion selected). Queue: 3087 rules.
+28800 rules inserted. Base: 12760 rules (984 with conclusion selected). Queue: 3096 rules.
+29000 rules inserted. Base: 12744 rules (984 with conclusion selected). Queue: 3096 rules.
+29200 rules inserted. Base: 12849 rules (984 with conclusion selected). Queue: 3150 rules.
+29400 rules inserted. Base: 12901 rules (984 with conclusion selected). Queue: 3239 rules.
+29600 rules inserted. Base: 12991 rules (984 with conclusion selected). Queue: 3191 rules.
+29800 rules inserted. Base: 13098 rules (1001 with conclusion selected). Queue: 3186 rules.
+30000 rules inserted. Base: 13167 rules (1001 with conclusion selected). Queue: 3113 rules.
+30200 rules inserted. Base: 13250 rules (1001 with conclusion selected). Queue: 3088 rules.
+30400 rules inserted. Base: 13402 rules (1023 with conclusion selected). Queue: 3165 rules.
+30600 rules inserted. Base: 13477 rules (1043 with conclusion selected). Queue: 3160 rules.
+30800 rules inserted. Base: 13597 rules (1053 with conclusion selected). Queue: 3147 rules.
+31000 rules inserted. Base: 13677 rules (1064 with conclusion selected). Queue: 3232 rules.
+31200 rules inserted. Base: 13691 rules (1078 with conclusion selected). Queue: 3220 rules.
+31400 rules inserted. Base: 13843 rules (1078 with conclusion selected). Queue: 3196 rules.
+31600 rules inserted. Base: 13996 rules (1078 with conclusion selected). Queue: 3067 rules.
+31800 rules inserted. Base: 14054 rules (1078 with conclusion selected). Queue: 3008 rules.
+32000 rules inserted. Base: 14246 rules (1078 with conclusion selected). Queue: 2824 rules.
+32200 rules inserted. Base: 14382 rules (1078 with conclusion selected). Queue: 2763 rules.
+32400 rules inserted. Base: 14367 rules (1078 with conclusion selected). Queue: 2670 rules.
+32600 rules inserted. Base: 14390 rules (1078 with conclusion selected). Queue: 2630 rules.
+32800 rules inserted. Base: 14498 rules (1112 with conclusion selected). Queue: 2631 rules.
+33000 rules inserted. Base: 14591 rules (1116 with conclusion selected). Queue: 2581 rules.
+33200 rules inserted. Base: 14665 rules (1116 with conclusion selected). Queue: 2553 rules.
+33400 rules inserted. Base: 14760 rules (1118 with conclusion selected). Queue: 2487 rules.
+33600 rules inserted. Base: 14934 rules (1119 with conclusion selected). Queue: 2509 rules.
+33800 rules inserted. Base: 15110 rules (1124 with conclusion selected). Queue: 2449 rules.
+34000 rules inserted. Base: 15198 rules (1132 with conclusion selected). Queue: 2473 rules.
+34200 rules inserted. Base: 15267 rules (1135 with conclusion selected). Queue: 2416 rules.
+34400 rules inserted. Base: 14776 rules (1138 with conclusion selected). Queue: 2390 rules.
+34600 rules inserted. Base: 14847 rules (1138 with conclusion selected). Queue: 2372 rules.
+34800 rules inserted. Base: 14337 rules (1138 with conclusion selected). Queue: 2344 rules.
+35000 rules inserted. Base: 14458 rules (1138 with conclusion selected). Queue: 2254 rules.
+35200 rules inserted. Base: 14526 rules (1154 with conclusion selected). Queue: 2221 rules.
+35400 rules inserted. Base: 14640 rules (1165 with conclusion selected). Queue: 2339 rules.
+35600 rules inserted. Base: 14723 rules (1165 with conclusion selected). Queue: 2303 rules.
+35800 rules inserted. Base: 14825 rules (1178 with conclusion selected). Queue: 2226 rules.
+36000 rules inserted. Base: 14959 rules (1181 with conclusion selected). Queue: 2200 rules.
+36200 rules inserted. Base: 15067 rules (1183 with conclusion selected). Queue: 2163 rules.
+36400 rules inserted. Base: 15131 rules (1190 with conclusion selected). Queue: 2197 rules.
+36600 rules inserted. Base: 15281 rules (1203 with conclusion selected). Queue: 2183 rules.
+36800 rules inserted. Base: 15401 rules (1221 with conclusion selected). Queue: 2216 rules.
+37000 rules inserted. Base: 15343 rules (1237 with conclusion selected). Queue: 2196 rules.
+37200 rules inserted. Base: 15452 rules (1237 with conclusion selected). Queue: 2141 rules.
+37400 rules inserted. Base: 15488 rules (1239 with conclusion selected). Queue: 2111 rules.
+37600 rules inserted. Base: 15606 rules (1252 with conclusion selected). Queue: 2213 rules.
+37800 rules inserted. Base: 15667 rules (1265 with conclusion selected). Queue: 2068 rules.
+38000 rules inserted. Base: 15742 rules (1284 with conclusion selected). Queue: 2195 rules.
+38200 rules inserted. Base: 15864 rules (1285 with conclusion selected). Queue: 2185 rules.
+38400 rules inserted. Base: 15968 rules (1294 with conclusion selected). Queue: 2283 rules.
+38600 rules inserted. Base: 16092 rules (1310 with conclusion selected). Queue: 2360 rules.
+38800 rules inserted. Base: 16159 rules (1323 with conclusion selected). Queue: 2299 rules.
+39000 rules inserted. Base: 16207 rules (1323 with conclusion selected). Queue: 2161 rules.
+39200 rules inserted. Base: 16198 rules (1324 with conclusion selected). Queue: 2062 rules.
+39400 rules inserted. Base: 16253 rules (1349 with conclusion selected). Queue: 2043 rules.
+39600 rules inserted. Base: 16396 rules (1355 with conclusion selected). Queue: 1959 rules.
+39800 rules inserted. Base: 16487 rules (1389 with conclusion selected). Queue: 2068 rules.
+40000 rules inserted. Base: 16624 rules (1389 with conclusion selected). Queue: 2030 rules.
+40200 rules inserted. Base: 16725 rules (1396 with conclusion selected). Queue: 2004 rules.
+40400 rules inserted. Base: 16836 rules (1396 with conclusion selected). Queue: 2049 rules.
+40600 rules inserted. Base: 16879 rules (1401 with conclusion selected). Queue: 2219 rules.
+40800 rules inserted. Base: 16990 rules (1411 with conclusion selected). Queue: 2189 rules.
+41000 rules inserted. Base: 17105 rules (1420 with conclusion selected). Queue: 2191 rules.
+41200 rules inserted. Base: 17123 rules (1436 with conclusion selected). Queue: 2238 rules.
+41400 rules inserted. Base: 17171 rules (1437 with conclusion selected). Queue: 2144 rules.
+41600 rules inserted. Base: 17261 rules (1458 with conclusion selected). Queue: 2215 rules.
+41800 rules inserted. Base: 17361 rules (1472 with conclusion selected). Queue: 2263 rules.
+42000 rules inserted. Base: 17500 rules (1473 with conclusion selected). Queue: 2211 rules.
+42200 rules inserted. Base: 17578 rules (1481 with conclusion selected). Queue: 2353 rules.
+42400 rules inserted. Base: 17590 rules (1481 with conclusion selected). Queue: 2465 rules.
+42600 rules inserted. Base: 17730 rules (1481 with conclusion selected). Queue: 2297 rules.
+42800 rules inserted. Base: 17885 rules (1488 with conclusion selected). Queue: 2458 rules.
+43000 rules inserted. Base: 18003 rules (1508 with conclusion selected). Queue: 2663 rules.
+43200 rules inserted. Base: 18121 rules (1523 with conclusion selected). Queue: 3010 rules.
+43400 rules inserted. Base: 18022 rules (1537 with conclusion selected). Queue: 2987 rules.
+43600 rules inserted. Base: 18013 rules (1550 with conclusion selected). Queue: 2953 rules.
+43800 rules inserted. Base: 18116 rules (1565 with conclusion selected). Queue: 3041 rules.
+44000 rules inserted. Base: 18232 rules (1584 with conclusion selected). Queue: 2991 rules.
+44200 rules inserted. Base: 18369 rules (1592 with conclusion selected). Queue: 3081 rules.
+44400 rules inserted. Base: 18480 rules (1596 with conclusion selected). Queue: 3208 rules.
+44600 rules inserted. Base: 18546 rules (1598 with conclusion selected). Queue: 3120 rules.
+44800 rules inserted. Base: 18476 rules (1599 with conclusion selected). Queue: 3063 rules.
+45000 rules inserted. Base: 18337 rules (1606 with conclusion selected). Queue: 3294 rules.
+45200 rules inserted. Base: 18453 rules (1607 with conclusion selected). Queue: 3359 rules.
+45400 rules inserted. Base: 18563 rules (1613 with conclusion selected). Queue: 3287 rules.
+45600 rules inserted. Base: 18665 rules (1616 with conclusion selected). Queue: 3344 rules.
+45800 rules inserted. Base: 18783 rules (1617 with conclusion selected). Queue: 3423 rules.
+46000 rules inserted. Base: 18906 rules (1623 with conclusion selected). Queue: 3344 rules.
+46200 rules inserted. Base: 19023 rules (1630 with conclusion selected). Queue: 3540 rules.
+46400 rules inserted. Base: 18981 rules (1668 with conclusion selected). Queue: 3807 rules.
+46600 rules inserted. Base: 19080 rules (1700 with conclusion selected). Queue: 3960 rules.
+46800 rules inserted. Base: 19187 rules (1705 with conclusion selected). Queue: 3930 rules.
+47000 rules inserted. Base: 19310 rules (1737 with conclusion selected). Queue: 4129 rules.
+47200 rules inserted. Base: 19424 rules (1738 with conclusion selected). Queue: 4124 rules.
+47400 rules inserted. Base: 19518 rules (1738 with conclusion selected). Queue: 4092 rules.
+47600 rules inserted. Base: 19590 rules (1741 with conclusion selected). Queue: 4013 rules.
+47800 rules inserted. Base: 19580 rules (1750 with conclusion selected). Queue: 3828 rules.
+48000 rules inserted. Base: 19770 rules (1750 with conclusion selected). Queue: 3638 rules.
+48200 rules inserted. Base: 19897 rules (1754 with conclusion selected). Queue: 3598 rules.
+48400 rules inserted. Base: 19992 rules (1754 with conclusion selected). Queue: 3579 rules.
+48600 rules inserted. Base: 20107 rules (1778 with conclusion selected). Queue: 3573 rules.
+48800 rules inserted. Base: 20200 rules (1778 with conclusion selected). Queue: 3540 rules.
+49000 rules inserted. Base: 20298 rules (1778 with conclusion selected). Queue: 3508 rules.
+49200 rules inserted. Base: 20393 rules (1778 with conclusion selected). Queue: 3479 rules.
+49400 rules inserted. Base: 20501 rules (1781 with conclusion selected). Queue: 3565 rules.
+49600 rules inserted. Base: 20633 rules (1782 with conclusion selected). Queue: 3625 rules.
+49800 rules inserted. Base: 20753 rules (1793 with conclusion selected). Queue: 3637 rules.
+50000 rules inserted. Base: 20885 rules (1806 with conclusion selected). Queue: 3643 rules.
+50200 rules inserted. Base: 21005 rules (1816 with conclusion selected). Queue: 3632 rules.
+50400 rules inserted. Base: 21092 rules (1826 with conclusion selected). Queue: 3661 rules.
+50600 rules inserted. Base: 21212 rules (1850 with conclusion selected). Queue: 3739 rules.
+50800 rules inserted. Base: 21364 rules (1858 with conclusion selected). Queue: 3892 rules.
+51000 rules inserted. Base: 21488 rules (1867 with conclusion selected). Queue: 3908 rules.
+51200 rules inserted. Base: 21652 rules (1875 with conclusion selected). Queue: 4190 rules.
+51400 rules inserted. Base: 21779 rules (1875 with conclusion selected). Queue: 4417 rules.
+51600 rules inserted. Base: 21711 rules (1891 with conclusion selected). Queue: 4750 rules.
+51800 rules inserted. Base: 21789 rules (1895 with conclusion selected). Queue: 5023 rules.
+52000 rules inserted. Base: 21923 rules (1895 with conclusion selected). Queue: 5175 rules.
+52200 rules inserted. Base: 22023 rules (1899 with conclusion selected). Queue: 5619 rules.
+52400 rules inserted. Base: 22151 rules (1899 with conclusion selected). Queue: 5851 rules.
+52600 rules inserted. Base: 22292 rules (1906 with conclusion selected). Queue: 6195 rules.
+52800 rules inserted. Base: 22393 rules (1935 with conclusion selected). Queue: 6202 rules.
+53000 rules inserted. Base: 22506 rules (1935 with conclusion selected). Queue: 6181 rules.
+53200 rules inserted. Base: 22608 rules (1935 with conclusion selected). Queue: 6165 rules.
+53400 rules inserted. Base: 22686 rules (1938 with conclusion selected). Queue: 6102 rules.
+53600 rules inserted. Base: 22873 rules (1953 with conclusion selected). Queue: 6515 rules.
+53800 rules inserted. Base: 22959 rules (1965 with conclusion selected). Queue: 6706 rules.
+54000 rules inserted. Base: 23067 rules (1980 with conclusion selected). Queue: 6658 rules.
+54200 rules inserted. Base: 23188 rules (1983 with conclusion selected). Queue: 6638 rules.
+54400 rules inserted. Base: 23329 rules (1987 with conclusion selected). Queue: 6782 rules.
+54600 rules inserted. Base: 23476 rules (1993 with conclusion selected). Queue: 6812 rules.
+54800 rules inserted. Base: 23649 rules (2004 with conclusion selected). Queue: 7137 rules.
+55000 rules inserted. Base: 23791 rules (2010 with conclusion selected). Queue: 7482 rules.
+55200 rules inserted. Base: 23921 rules (2011 with conclusion selected). Queue: 7574 rules.
+55400 rules inserted. Base: 23909 rules (2013 with conclusion selected). Queue: 7452 rules.
+55600 rules inserted. Base: 23876 rules (2016 with conclusion selected). Queue: 7311 rules.
+55800 rules inserted. Base: 23931 rules (2021 with conclusion selected). Queue: 7216 rules.
+56000 rules inserted. Base: 23915 rules (2025 with conclusion selected). Queue: 7088 rules.
+56200 rules inserted. Base: 23926 rules (2029 with conclusion selected). Queue: 6989 rules.
+56400 rules inserted. Base: 23981 rules (2041 with conclusion selected). Queue: 7076 rules.
+56600 rules inserted. Base: 23947 rules (2044 with conclusion selected). Queue: 6936 rules.
+56800 rules inserted. Base: 23934 rules (2051 with conclusion selected). Queue: 6841 rules.
+57000 rules inserted. Base: 23918 rules (2055 with conclusion selected). Queue: 6713 rules.
+57200 rules inserted. Base: 23937 rules (2059 with conclusion selected). Queue: 6588 rules.
+57400 rules inserted. Base: 24092 rules (2059 with conclusion selected). Queue: 6839 rules.
+57600 rules inserted. Base: 24085 rules (2059 with conclusion selected). Queue: 6630 rules.
+57800 rules inserted. Base: 24018 rules (2061 with conclusion selected). Queue: 6491 rules.
+58000 rules inserted. Base: 23984 rules (2063 with conclusion selected). Queue: 6349 rules.
+58200 rules inserted. Base: 24039 rules (2069 with conclusion selected). Queue: 6256 rules.
+58400 rules inserted. Base: 24023 rules (2073 with conclusion selected). Queue: 6128 rules.
+58600 rules inserted. Base: 24036 rules (2077 with conclusion selected). Queue: 6031 rules.
+58800 rules inserted. Base: 24204 rules (2079 with conclusion selected). Queue: 6040 rules.
+59000 rules inserted. Base: 24329 rules (2079 with conclusion selected). Queue: 6305 rules.
+59200 rules inserted. Base: 24471 rules (2079 with conclusion selected). Queue: 6547 rules.
+59400 rules inserted. Base: 24571 rules (2095 with conclusion selected). Queue: 6739 rules.
+59600 rules inserted. Base: 24665 rules (2099 with conclusion selected). Queue: 6910 rules.
+59800 rules inserted. Base: 24822 rules (2100 with conclusion selected). Queue: 7032 rules.
+60000 rules inserted. Base: 24916 rules (2103 with conclusion selected). Queue: 7135 rules.
+60200 rules inserted. Base: 25033 rules (2106 with conclusion selected). Queue: 7057 rules.
+60400 rules inserted. Base: 25121 rules (2129 with conclusion selected). Queue: 7150 rules.
+60600 rules inserted. Base: 25246 rules (2149 with conclusion selected). Queue: 7139 rules.
+60800 rules inserted. Base: 25344 rules (2154 with conclusion selected). Queue: 7270 rules.
+61000 rules inserted. Base: 25386 rules (2154 with conclusion selected). Queue: 7216 rules.
+61200 rules inserted. Base: 25533 rules (2163 with conclusion selected). Queue: 7621 rules.
+61400 rules inserted. Base: 25654 rules (2167 with conclusion selected). Queue: 7725 rules.
+61600 rules inserted. Base: 25775 rules (2167 with conclusion selected). Queue: 7878 rules.
+61800 rules inserted. Base: 25872 rules (2171 with conclusion selected). Queue: 7979 rules.
+62000 rules inserted. Base: 26011 rules (2171 with conclusion selected). Queue: 7993 rules.
+62200 rules inserted. Base: 26158 rules (2171 with conclusion selected). Queue: 7959 rules.
+62400 rules inserted. Base: 26243 rules (2171 with conclusion selected). Queue: 7947 rules.
+62600 rules inserted. Base: 26332 rules (2173 with conclusion selected). Queue: 7936 rules.
+62800 rules inserted. Base: 26355 rules (2179 with conclusion selected). Queue: 7929 rules.
+63000 rules inserted. Base: 26482 rules (2190 with conclusion selected). Queue: 8131 rules.
+63200 rules inserted. Base: 26596 rules (2196 with conclusion selected). Queue: 8150 rules.
+63400 rules inserted. Base: 26580 rules (2202 with conclusion selected). Queue: 8236 rules.
+63600 rules inserted. Base: 26611 rules (2208 with conclusion selected). Queue: 8232 rules.
+63800 rules inserted. Base: 26773 rules (2216 with conclusion selected). Queue: 8436 rules.
+64000 rules inserted. Base: 26813 rules (2217 with conclusion selected). Queue: 8248 rules.
+64200 rules inserted. Base: 26801 rules (2223 with conclusion selected). Queue: 8135 rules.
+64400 rules inserted. Base: 26825 rules (2229 with conclusion selected). Queue: 8121 rules.
+64600 rules inserted. Base: 26943 rules (2240 with conclusion selected). Queue: 8300 rules.
+64800 rules inserted. Base: 27018 rules (2242 with conclusion selected). Queue: 8446 rules.
+65000 rules inserted. Base: 27006 rules (2246 with conclusion selected). Queue: 8312 rules.
+65200 rules inserted. Base: 27036 rules (2250 with conclusion selected). Queue: 8190 rules.
+65400 rules inserted. Base: 26999 rules (2254 with conclusion selected). Queue: 8103 rules.
+65600 rules inserted. Base: 26961 rules (2258 with conclusion selected). Queue: 7987 rules.
+65800 rules inserted. Base: 27032 rules (2262 with conclusion selected). Queue: 7913 rules.
+66000 rules inserted. Base: 27158 rules (2280 with conclusion selected). Queue: 7894 rules.
+66200 rules inserted. Base: 27280 rules (2280 with conclusion selected). Queue: 7877 rules.
+66400 rules inserted. Base: 27373 rules (2280 with conclusion selected). Queue: 7868 rules.
+66600 rules inserted. Base: 27508 rules (2284 with conclusion selected). Queue: 8013 rules.
+66800 rules inserted. Base: 27610 rules (2284 with conclusion selected). Queue: 7996 rules.
+67000 rules inserted. Base: 27720 rules (2284 with conclusion selected). Queue: 7986 rules.
+67200 rules inserted. Base: 27811 rules (2289 with conclusion selected). Queue: 8125 rules.
+67400 rules inserted. Base: 27959 rules (2314 with conclusion selected). Queue: 8089 rules.
+67600 rules inserted. Base: 28068 rules (2314 with conclusion selected). Queue: 8064 rules.
+67800 rules inserted. Base: 28100 rules (2318 with conclusion selected). Queue: 7987 rules.
+68000 rules inserted. Base: 28178 rules (2322 with conclusion selected). Queue: 8076 rules.
+68200 rules inserted. Base: 28277 rules (2330 with conclusion selected). Queue: 7992 rules.
+68400 rules inserted. Base: 28315 rules (2330 with conclusion selected). Queue: 8102 rules.
+68600 rules inserted. Base: 28398 rules (2334 with conclusion selected). Queue: 8221 rules.
+68800 rules inserted. Base: 28546 rules (2334 with conclusion selected). Queue: 8139 rules.
+69000 rules inserted. Base: 28655 rules (2334 with conclusion selected). Queue: 8108 rules.
+69200 rules inserted. Base: 28750 rules (2334 with conclusion selected). Queue: 8096 rules.
+69400 rules inserted. Base: 28870 rules (2334 with conclusion selected). Queue: 8077 rules.
+69600 rules inserted. Base: 28963 rules (2334 with conclusion selected). Queue: 8060 rules.
+69800 rules inserted. Base: 29086 rules (2334 with conclusion selected). Queue: 8050 rules.
+70000 rules inserted. Base: 29227 rules (2334 with conclusion selected). Queue: 8220 rules.
+70200 rules inserted. Base: 29366 rules (2334 with conclusion selected). Queue: 8324 rules.
+70400 rules inserted. Base: 29479 rules (2338 with conclusion selected). Queue: 8736 rules.
+70600 rules inserted. Base: 29604 rules (2342 with conclusion selected). Queue: 8636 rules.
+70800 rules inserted. Base: 29740 rules (2346 with conclusion selected). Queue: 8764 rules.
+71000 rules inserted. Base: 29814 rules (2350 with conclusion selected). Queue: 8891 rules.
+71200 rules inserted. Base: 29980 rules (2351 with conclusion selected). Queue: 8955 rules.
+71400 rules inserted. Base: 29991 rules (2353 with conclusion selected). Queue: 8792 rules.
+71600 rules inserted. Base: 30107 rules (2358 with conclusion selected). Queue: 8704 rules.
+71800 rules inserted. Base: 30253 rules (2363 with conclusion selected). Queue: 8828 rules.
+72000 rules inserted. Base: 30335 rules (2364 with conclusion selected). Queue: 8937 rules.
+72200 rules inserted. Base: 30456 rules (2376 with conclusion selected). Queue: 8817 rules.
+72400 rules inserted. Base: 30587 rules (2380 with conclusion selected). Queue: 8709 rules.
+72600 rules inserted. Base: 30725 rules (2384 with conclusion selected). Queue: 8838 rules.
+72800 rules inserted. Base: 30799 rules (2388 with conclusion selected). Queue: 8959 rules.
+73000 rules inserted. Base: 30961 rules (2390 with conclusion selected). Queue: 8896 rules.
+73200 rules inserted. Base: 31069 rules (2392 with conclusion selected). Queue: 9186 rules.
+73400 rules inserted. Base: 31102 rules (2400 with conclusion selected). Queue: 9190 rules.
+73600 rules inserted. Base: 31167 rules (2408 with conclusion selected). Queue: 9202 rules.
+73800 rules inserted. Base: 31340 rules (2415 with conclusion selected). Queue: 9434 rules.
+74000 rules inserted. Base: 31515 rules (2415 with conclusion selected). Queue: 9592 rules.
+74200 rules inserted. Base: 31639 rules (2415 with conclusion selected). Queue: 9690 rules.
+74400 rules inserted. Base: 31790 rules (2415 with conclusion selected). Queue: 9984 rules.
+74600 rules inserted. Base: 31939 rules (2419 with conclusion selected). Queue: 10165 rules.
+74800 rules inserted. Base: 32078 rules (2419 with conclusion selected). Queue: 10270 rules.
+75000 rules inserted. Base: 32228 rules (2419 with conclusion selected). Queue: 10462 rules.
+75200 rules inserted. Base: 32378 rules (2425 with conclusion selected). Queue: 10541 rules.
+75400 rules inserted. Base: 32479 rules (2444 with conclusion selected). Queue: 10586 rules.
+75600 rules inserted. Base: 32643 rules (2446 with conclusion selected). Queue: 10572 rules.
+75800 rules inserted. Base: 32781 rules (2452 with conclusion selected). Queue: 10457 rules.
+76000 rules inserted. Base: 32808 rules (2456 with conclusion selected). Queue: 10386 rules.
+76200 rules inserted. Base: 32875 rules (2462 with conclusion selected). Queue: 10441 rules.
+76400 rules inserted. Base: 32992 rules (2465 with conclusion selected). Queue: 10420 rules.
+76600 rules inserted. Base: 33111 rules (2465 with conclusion selected). Queue: 10404 rules.
+76800 rules inserted. Base: 33224 rules (2465 with conclusion selected). Queue: 10392 rules.
+77000 rules inserted. Base: 33382 rules (2465 with conclusion selected). Queue: 10542 rules.
+77200 rules inserted. Base: 33524 rules (2465 with conclusion selected). Queue: 10644 rules.
+77400 rules inserted. Base: 33663 rules (2469 with conclusion selected). Queue: 11145 rules.
+77600 rules inserted. Base: 33821 rules (2469 with conclusion selected). Queue: 11416 rules.
+77800 rules inserted. Base: 33956 rules (2469 with conclusion selected). Queue: 11521 rules.
+78000 rules inserted. Base: 33969 rules (2473 with conclusion selected). Queue: 11836 rules.
+78200 rules inserted. Base: 33895 rules (2477 with conclusion selected). Queue: 11684 rules.
+78400 rules inserted. Base: 33933 rules (2481 with conclusion selected). Queue: 11540 rules.
+78600 rules inserted. Base: 33950 rules (2485 with conclusion selected). Queue: 11475 rules.
+78800 rules inserted. Base: 33970 rules (2489 with conclusion selected). Queue: 11377 rules.
+79000 rules inserted. Base: 33976 rules (2493 with conclusion selected). Queue: 11297 rules.
+79200 rules inserted. Base: 33957 rules (2520 with conclusion selected). Queue: 11278 rules.
+79400 rules inserted. Base: 34083 rules (2533 with conclusion selected). Queue: 11283 rules.
+79600 rules inserted. Base: 34195 rules (2533 with conclusion selected). Queue: 11252 rules.
+79800 rules inserted. Base: 34309 rules (2533 with conclusion selected). Queue: 11242 rules.
+80000 rules inserted. Base: 34439 rules (2533 with conclusion selected). Queue: 11158 rules.
+80200 rules inserted. Base: 34371 rules (2559 with conclusion selected). Queue: 11212 rules.
+80400 rules inserted. Base: 34434 rules (2581 with conclusion selected). Queue: 11212 rules.
+80600 rules inserted. Base: 34534 rules (2581 with conclusion selected). Queue: 11196 rules.
+80800 rules inserted. Base: 34651 rules (2581 with conclusion selected). Queue: 11185 rules.
+81000 rules inserted. Base: 34705 rules (2604 with conclusion selected). Queue: 11316 rules.
+81200 rules inserted. Base: 34773 rules (2627 with conclusion selected). Queue: 11335 rules.
+81400 rules inserted. Base: 34905 rules (2627 with conclusion selected). Queue: 11302 rules.
+81600 rules inserted. Base: 34982 rules (2627 with conclusion selected). Queue: 11291 rules.
+81800 rules inserted. Base: 35066 rules (2631 with conclusion selected). Queue: 11264 rules.
+82000 rules inserted. Base: 35064 rules (2631 with conclusion selected). Queue: 11182 rules.
+82200 rules inserted. Base: 35098 rules (2635 with conclusion selected). Queue: 11100 rules.
+82400 rules inserted. Base: 35166 rules (2637 with conclusion selected). Queue: 10983 rules.
+82600 rules inserted. Base: 35304 rules (2641 with conclusion selected). Queue: 10875 rules.
+82800 rules inserted. Base: 35466 rules (2646 with conclusion selected). Queue: 11003 rules.
+83000 rules inserted. Base: 35554 rules (2647 with conclusion selected). Queue: 11120 rules.
+83200 rules inserted. Base: 35574 rules (2648 with conclusion selected). Queue: 11077 rules.
+83400 rules inserted. Base: 35597 rules (2652 with conclusion selected). Queue: 10949 rules.
+83600 rules inserted. Base: 35602 rules (2656 with conclusion selected). Queue: 10847 rules.
+83800 rules inserted. Base: 35620 rules (2660 with conclusion selected). Queue: 10781 rules.
+84000 rules inserted. Base: 35552 rules (2664 with conclusion selected). Queue: 10693 rules.
+84200 rules inserted. Base: 35589 rules (2664 with conclusion selected). Queue: 10603 rules.
+84400 rules inserted. Base: 35637 rules (2671 with conclusion selected). Queue: 10821 rules.
+84600 rules inserted. Base: 35664 rules (2675 with conclusion selected). Queue: 10693 rules.
+84800 rules inserted. Base: 35659 rules (2679 with conclusion selected). Queue: 10591 rules.
+85000 rules inserted. Base: 35677 rules (2683 with conclusion selected). Queue: 10524 rules.
+85200 rules inserted. Base: 35609 rules (2687 with conclusion selected). Queue: 10434 rules.
+85400 rules inserted. Base: 35568 rules (2687 with conclusion selected). Queue: 10313 rules.
+85600 rules inserted. Base: 35755 rules (2694 with conclusion selected). Queue: 10543 rules.
+85800 rules inserted. Base: 35891 rules (2716 with conclusion selected). Queue: 10713 rules.
+86000 rules inserted. Base: 36025 rules (2720 with conclusion selected). Queue: 10857 rules.
+86200 rules inserted. Base: 36152 rules (2729 with conclusion selected). Queue: 10747 rules.
+86400 rules inserted. Base: 36186 rules (2729 with conclusion selected). Queue: 10581 rules.
+86600 rules inserted. Base: 36330 rules (2732 with conclusion selected). Queue: 10879 rules.
+86800 rules inserted. Base: 36469 rules (2732 with conclusion selected). Queue: 11002 rules.
+87000 rules inserted. Base: 36612 rules (2732 with conclusion selected). Queue: 11197 rules.
+87200 rules inserted. Base: 36570 rules (2737 with conclusion selected). Queue: 11375 rules.
+87400 rules inserted. Base: 36565 rules (2740 with conclusion selected). Queue: 11270 rules.
+87600 rules inserted. Base: 36528 rules (2744 with conclusion selected). Queue: 11124 rules.
+87800 rules inserted. Base: 36540 rules (2748 with conclusion selected). Queue: 11015 rules.
+88000 rules inserted. Base: 36551 rules (2752 with conclusion selected). Queue: 10922 rules.
+88200 rules inserted. Base: 36634 rules (2756 with conclusion selected). Queue: 10889 rules.
+88400 rules inserted. Base: 36662 rules (2756 with conclusion selected). Queue: 10811 rules.
+88600 rules inserted. Base: 36578 rules (2760 with conclusion selected). Queue: 10707 rules.
+88800 rules inserted. Base: 36547 rules (2764 with conclusion selected). Queue: 10540 rules.
+89000 rules inserted. Base: 36632 rules (2768 with conclusion selected). Queue: 10451 rules.
+89200 rules inserted. Base: 36564 rules (2772 with conclusion selected). Queue: 10359 rules.
+89400 rules inserted. Base: 36651 rules (2776 with conclusion selected). Queue: 10314 rules.
+89600 rules inserted. Base: 36710 rules (2781 with conclusion selected). Queue: 10325 rules.
+89800 rules inserted. Base: 36730 rules (2791 with conclusion selected). Queue: 10312 rules.
+90000 rules inserted. Base: 36821 rules (2799 with conclusion selected). Queue: 10363 rules.
+90200 rules inserted. Base: 36881 rules (2803 with conclusion selected). Queue: 10576 rules.
+90400 rules inserted. Base: 36964 rules (2803 with conclusion selected). Queue: 10583 rules.
+90600 rules inserted. Base: 37087 rules (2803 with conclusion selected). Queue: 10860 rules.
+90800 rules inserted. Base: 37255 rules (2803 with conclusion selected). Queue: 10951 rules.
+91000 rules inserted. Base: 37307 rules (2805 with conclusion selected). Queue: 11007 rules.
+91200 rules inserted. Base: 37296 rules (2815 with conclusion selected). Queue: 10891 rules.
+91400 rules inserted. Base: 37379 rules (2815 with conclusion selected). Queue: 10900 rules.
+91600 rules inserted. Base: 37501 rules (2815 with conclusion selected). Queue: 11175 rules.
+91800 rules inserted. Base: 37668 rules (2815 with conclusion selected). Queue: 11292 rules.
+92000 rules inserted. Base: 37742 rules (2815 with conclusion selected). Queue: 11886 rules.
+92200 rules inserted. Base: 37719 rules (2815 with conclusion selected). Queue: 11884 rules.
+92400 rules inserted. Base: 37793 rules (2815 with conclusion selected). Queue: 12035 rules.
+92600 rules inserted. Base: 37930 rules (2815 with conclusion selected). Queue: 12153 rules.
+92800 rules inserted. Base: 38091 rules (2815 with conclusion selected). Queue: 12276 rules.
+93000 rules inserted. Base: 38204 rules (2821 with conclusion selected). Queue: 12329 rules.
+93200 rules inserted. Base: 38269 rules (2844 with conclusion selected). Queue: 12246 rules.
+93400 rules inserted. Base: 38326 rules (2867 with conclusion selected). Queue: 12259 rules.
+93600 rules inserted. Base: 38464 rules (2867 with conclusion selected). Queue: 12241 rules.
+93800 rules inserted. Base: 38558 rules (2867 with conclusion selected). Queue: 12225 rules.
+94000 rules inserted. Base: 38685 rules (2869 with conclusion selected). Queue: 12183 rules.
+94200 rules inserted. Base: 38750 rules (2875 with conclusion selected). Queue: 12173 rules.
+94400 rules inserted. Base: 38758 rules (2880 with conclusion selected). Queue: 12152 rules.
+94600 rules inserted. Base: 38790 rules (2890 with conclusion selected). Queue: 12164 rules.
+94800 rules inserted. Base: 38927 rules (2894 with conclusion selected). Queue: 12291 rules.
+95000 rules inserted. Base: 39023 rules (2894 with conclusion selected). Queue: 12431 rules.
+95200 rules inserted. Base: 39058 rules (2904 with conclusion selected). Queue: 12448 rules.
+95400 rules inserted. Base: 39073 rules (2909 with conclusion selected). Queue: 12433 rules.
+95600 rules inserted. Base: 39168 rules (2914 with conclusion selected). Queue: 12623 rules.
+95800 rules inserted. Base: 39234 rules (2918 with conclusion selected). Queue: 12756 rules.
+96000 rules inserted. Base: 39412 rules (2918 with conclusion selected). Queue: 12740 rules.
+96200 rules inserted. Base: 39449 rules (2922 with conclusion selected). Queue: 12653 rules.
+96400 rules inserted. Base: 39526 rules (2924 with conclusion selected). Queue: 12774 rules.
+96600 rules inserted. Base: 39604 rules (2927 with conclusion selected). Queue: 12621 rules.
+96800 rules inserted. Base: 39651 rules (2930 with conclusion selected). Queue: 12711 rules.
+97000 rules inserted. Base: 39675 rules (2930 with conclusion selected). Queue: 12548 rules.
+97200 rules inserted. Base: 39632 rules (2934 with conclusion selected). Queue: 12457 rules.
+97400 rules inserted. Base: 39620 rules (2934 with conclusion selected). Queue: 12352 rules.
+97600 rules inserted. Base: 39573 rules (2938 with conclusion selected). Queue: 12206 rules.
+97800 rules inserted. Base: 39662 rules (2942 with conclusion selected). Queue: 12105 rules.
+98000 rules inserted. Base: 39584 rules (2946 with conclusion selected). Queue: 12021 rules.
+98200 rules inserted. Base: 39668 rules (2950 with conclusion selected). Queue: 11973 rules.
+98400 rules inserted. Base: 39724 rules (2955 with conclusion selected). Queue: 11984 rules.
+98600 rules inserted. Base: 39741 rules (2963 with conclusion selected). Queue: 11966 rules.
+98800 rules inserted. Base: 39830 rules (2970 with conclusion selected). Queue: 12001 rules.
+99000 rules inserted. Base: 39940 rules (2977 with conclusion selected). Queue: 12277 rules.
+99200 rules inserted. Base: 39978 rules (2987 with conclusion selected). Queue: 12301 rules.
+99400 rules inserted. Base: 39997 rules (2997 with conclusion selected). Queue: 12279 rules.
+99600 rules inserted. Base: 40164 rules (3004 with conclusion selected). Queue: 12564 rules.
+99800 rules inserted. Base: 40314 rules (3007 with conclusion selected). Queue: 12440 rules.
+100000 rules inserted. Base: 40450 rules (3010 with conclusion selected). Queue: 12319 rules.
+100200 rules inserted. Base: 40596 rules (3015 with conclusion selected). Queue: 12498 rules.
+100400 rules inserted. Base: 40643 rules (3016 with conclusion selected). Queue: 12645 rules.
+100600 rules inserted. Base: 40809 rules (3022 with conclusion selected). Queue: 12530 rules.
+100800 rules inserted. Base: 40796 rules (3025 with conclusion selected). Queue: 12556 rules.
+101000 rules inserted. Base: 40772 rules (3029 with conclusion selected). Queue: 12383 rules.
+101200 rules inserted. Base: 40809 rules (3033 with conclusion selected). Queue: 12282 rules.
+101400 rules inserted. Base: 40815 rules (3037 with conclusion selected). Queue: 12223 rules.
+101600 rules inserted. Base: 40732 rules (3041 with conclusion selected). Queue: 12140 rules.
+101800 rules inserted. Base: 40724 rules (3051 with conclusion selected). Queue: 11954 rules.
+102000 rules inserted. Base: 40848 rules (3061 with conclusion selected). Queue: 11890 rules.
+102200 rules inserted. Base: 40877 rules (3061 with conclusion selected). Queue: 11797 rules.
+102400 rules inserted. Base: 40778 rules (3065 with conclusion selected). Queue: 11702 rules.
+102600 rules inserted. Base: 40756 rules (3069 with conclusion selected). Queue: 11530 rules.
+102800 rules inserted. Base: 40814 rules (3073 with conclusion selected). Queue: 11455 rules.
+103000 rules inserted. Base: 40731 rules (3077 with conclusion selected). Queue: 11372 rules.
+103200 rules inserted. Base: 40749 rules (3077 with conclusion selected). Queue: 11172 rules.
+103400 rules inserted. Base: 40779 rules (3077 with conclusion selected). Queue: 10982 rules.
+103600 rules inserted. Base: 40724 rules (3078 with conclusion selected). Queue: 10959 rules.
+103800 rules inserted. Base: 40757 rules (3081 with conclusion selected). Queue: 10805 rules.
+104000 rules inserted. Base: 40834 rules (3087 with conclusion selected). Queue: 10707 rules.
+104200 rules inserted. Base: 40831 rules (3091 with conclusion selected). Queue: 10612 rules.
+104400 rules inserted. Base: 40815 rules (3091 with conclusion selected). Queue: 10509 rules.
+104600 rules inserted. Base: 40763 rules (3095 with conclusion selected). Queue: 10415 rules.
+104800 rules inserted. Base: 40724 rules (3099 with conclusion selected). Queue: 10278 rules.
+105000 rules inserted. Base: 40768 rules (3103 with conclusion selected). Queue: 10179 rules.
+105200 rules inserted. Base: 40792 rules (3109 with conclusion selected). Queue: 10446 rules.
+105400 rules inserted. Base: 40734 rules (3109 with conclusion selected). Queue: 10400 rules.
+105600 rules inserted. Base: 40906 rules (3109 with conclusion selected). Queue: 10578 rules.
+105800 rules inserted. Base: 41041 rules (3109 with conclusion selected). Queue: 10699 rules.
+106000 rules inserted. Base: 41149 rules (3110 with conclusion selected). Queue: 10986 rules.
+106200 rules inserted. Base: 41280 rules (3114 with conclusion selected). Queue: 10860 rules.
+106400 rules inserted. Base: 41431 rules (3118 with conclusion selected). Queue: 10747 rules.
+106600 rules inserted. Base: 41581 rules (3120 with conclusion selected). Queue: 10640 rules.
+106800 rules inserted. Base: 41700 rules (3120 with conclusion selected). Queue: 10629 rules.
+107000 rules inserted. Base: 41811 rules (3120 with conclusion selected). Queue: 10615 rules.
+107200 rules inserted. Base: 41932 rules (3120 with conclusion selected). Queue: 10597 rules.
+107400 rules inserted. Base: 42061 rules (3122 with conclusion selected). Queue: 10479 rules.
+107600 rules inserted. Base: 42212 rules (3126 with conclusion selected). Queue: 10366 rules.
+107800 rules inserted. Base: 42338 rules (3128 with conclusion selected). Queue: 10283 rules.
+108000 rules inserted. Base: 42455 rules (3128 with conclusion selected). Queue: 10271 rules.
+108200 rules inserted. Base: 42552 rules (3128 with conclusion selected). Queue: 10257 rules.
+108400 rules inserted. Base: 42686 rules (3128 with conclusion selected). Queue: 10239 rules.
+108600 rules inserted. Base: 42811 rules (3131 with conclusion selected). Queue: 10207 rules.
+108800 rules inserted. Base: 42921 rules (3139 with conclusion selected). Queue: 10112 rules.
+109000 rules inserted. Base: 42927 rules (3139 with conclusion selected). Queue: 10194 rules.
+109200 rules inserted. Base: 43017 rules (3140 with conclusion selected). Queue: 10045 rules.
+109400 rules inserted. Base: 43021 rules (3142 with conclusion selected). Queue: 9997 rules.
+109600 rules inserted. Base: 43057 rules (3152 with conclusion selected). Queue: 10014 rules.
+109800 rules inserted. Base: 43067 rules (3157 with conclusion selected). Queue: 9996 rules.
+110000 rules inserted. Base: 43206 rules (3169 with conclusion selected). Queue: 10149 rules.
+110200 rules inserted. Base: 43343 rules (3171 with conclusion selected). Queue: 10181 rules.
+110400 rules inserted. Base: 43494 rules (3173 with conclusion selected). Queue: 10058 rules.
+110600 rules inserted. Base: 43642 rules (3177 with conclusion selected). Queue: 10096 rules.
+110800 rules inserted. Base: 43735 rules (3181 with conclusion selected). Queue: 10150 rules.
+111000 rules inserted. Base: 43815 rules (3181 with conclusion selected). Queue: 10257 rules.
+111200 rules inserted. Base: 43957 rules (3183 with conclusion selected). Queue: 10122 rules.
+111400 rules inserted. Base: 44091 rules (3187 with conclusion selected). Queue: 10022 rules.
+111600 rules inserted. Base: 44253 rules (3189 with conclusion selected). Queue: 10183 rules.
+111800 rules inserted. Base: 44284 rules (3193 with conclusion selected). Queue: 10260 rules.
+112000 rules inserted. Base: 44349 rules (3211 with conclusion selected). Queue: 10240 rules.
+112200 rules inserted. Base: 44404 rules (3233 with conclusion selected). Queue: 10255 rules.
+112400 rules inserted. Base: 44519 rules (3233 with conclusion selected). Queue: 10244 rules.
+112600 rules inserted. Base: 44626 rules (3233 with conclusion selected). Queue: 10212 rules.
+112800 rules inserted. Base: 44736 rules (3233 with conclusion selected). Queue: 10196 rules.
+113000 rules inserted. Base: 44809 rules (3233 with conclusion selected). Queue: 10093 rules.
+113200 rules inserted. Base: 44854 rules (3242 with conclusion selected). Queue: 10104 rules.
+113400 rules inserted. Base: 44865 rules (3247 with conclusion selected). Queue: 10087 rules.
+113600 rules inserted. Base: 44929 rules (3267 with conclusion selected). Queue: 10061 rules.
+113800 rules inserted. Base: 44996 rules (3268 with conclusion selected). Queue: 10051 rules.
+114000 rules inserted. Base: 45034 rules (3278 with conclusion selected). Queue: 10075 rules.
+114200 rules inserted. Base: 45042 rules (3283 with conclusion selected). Queue: 10058 rules.
+114400 rules inserted. Base: 45094 rules (3294 with conclusion selected). Queue: 9923 rules.
+114600 rules inserted. Base: 45139 rules (3303 with conclusion selected). Queue: 9848 rules.
+114800 rules inserted. Base: 45172 rules (3308 with conclusion selected). Queue: 9861 rules.
+115000 rules inserted. Base: 45194 rules (3318 with conclusion selected). Queue: 9848 rules.
+115200 rules inserted. Base: 45275 rules (3323 with conclusion selected). Queue: 9772 rules.
+115400 rules inserted. Base: 45291 rules (3323 with conclusion selected). Queue: 9610 rules.
+115600 rules inserted. Base: 45313 rules (3325 with conclusion selected). Queue: 9478 rules.
+115800 rules inserted. Base: 45410 rules (3331 with conclusion selected). Queue: 9396 rules.
+116000 rules inserted. Base: 45367 rules (3335 with conclusion selected). Queue: 9312 rules.
+116200 rules inserted. Base: 45343 rules (3335 with conclusion selected). Queue: 9216 rules.
+116400 rules inserted. Base: 45305 rules (3339 with conclusion selected). Queue: 9049 rules.
+116600 rules inserted. Base: 45367 rules (3343 with conclusion selected). Queue: 8977 rules.
+116800 rules inserted. Base: 45278 rules (3347 with conclusion selected). Queue: 8897 rules.
+117000 rules inserted. Base: 45249 rules (3365 with conclusion selected). Queue: 8969 rules.
+117200 rules inserted. Base: 45233 rules (3384 with conclusion selected). Queue: 9016 rules.
+117400 rules inserted. Base: 45388 rules (3384 with conclusion selected). Queue: 9299 rules.
+117600 rules inserted. Base: 45524 rules (3384 with conclusion selected). Queue: 9321 rules.
+117800 rules inserted. Base: 45577 rules (3395 with conclusion selected). Queue: 9563 rules.
+118000 rules inserted. Base: 45652 rules (3420 with conclusion selected). Queue: 9604 rules.
+118200 rules inserted. Base: 45829 rules (3420 with conclusion selected). Queue: 9727 rules.
+118400 rules inserted. Base: 45965 rules (3420 with conclusion selected). Queue: 9833 rules.
+118600 rules inserted. Base: 46086 rules (3420 with conclusion selected). Queue: 10133 rules.
+118800 rules inserted. Base: 46170 rules (3426 with conclusion selected). Queue: 10225 rules.
+119000 rules inserted. Base: 46338 rules (3432 with conclusion selected). Queue: 10086 rules.
+119200 rules inserted. Base: 46300 rules (3434 with conclusion selected). Queue: 10118 rules.
+119400 rules inserted. Base: 46386 rules (3439 with conclusion selected). Queue: 10015 rules.
+119600 rules inserted. Base: 46525 rules (3442 with conclusion selected). Queue: 9897 rules.
+119800 rules inserted. Base: 46680 rules (3446 with conclusion selected). Queue: 9792 rules.
+120000 rules inserted. Base: 46843 rules (3449 with conclusion selected). Queue: 9933 rules.
+120200 rules inserted. Base: 46878 rules (3450 with conclusion selected). Queue: 10068 rules.
+120400 rules inserted. Base: 46846 rules (3477 with conclusion selected). Queue: 10047 rules.
+120600 rules inserted. Base: 46970 rules (3490 with conclusion selected). Queue: 10072 rules.
+120800 rules inserted. Base: 47086 rules (3490 with conclusion selected). Queue: 10043 rules.
+121000 rules inserted. Base: 47166 rules (3490 with conclusion selected). Queue: 10033 rules.
+121200 rules inserted. Base: 47203 rules (3505 with conclusion selected). Queue: 10027 rules.
+121400 rules inserted. Base: 47258 rules (3530 with conclusion selected). Queue: 10054 rules.
+121600 rules inserted. Base: 47367 rules (3530 with conclusion selected). Queue: 10043 rules.
+121800 rules inserted. Base: 47487 rules (3530 with conclusion selected). Queue: 10028 rules.
+122000 rules inserted. Base: 47594 rules (3530 with conclusion selected). Queue: 10010 rules.
+122200 rules inserted. Base: 47530 rules (3530 with conclusion selected). Queue: 9972 rules.
+122400 rules inserted. Base: 47707 rules (3530 with conclusion selected). Queue: 10136 rules.
+122600 rules inserted. Base: 47846 rules (3530 with conclusion selected). Queue: 10251 rules.
+122800 rules inserted. Base: 48013 rules (3530 with conclusion selected). Queue: 10354 rules.
+123000 rules inserted. Base: 48089 rules (3537 with conclusion selected). Queue: 10610 rules.
+123200 rules inserted. Base: 48225 rules (3539 with conclusion selected). Queue: 10473 rules.
+123400 rules inserted. Base: 48372 rules (3543 with conclusion selected). Queue: 10368 rules.
+123600 rules inserted. Base: 48482 rules (3549 with conclusion selected). Queue: 10263 rules.
+123800 rules inserted. Base: 48586 rules (3555 with conclusion selected). Queue: 10178 rules.
+124000 rules inserted. Base: 48745 rules (3557 with conclusion selected). Queue: 10027 rules.
+124200 rules inserted. Base: 48885 rules (3569 with conclusion selected). Queue: 9944 rules.
+124400 rules inserted. Base: 48943 rules (3587 with conclusion selected). Queue: 9858 rules.
+124600 rules inserted. Base: 49094 rules (3591 with conclusion selected). Queue: 9749 rules.
+124800 rules inserted. Base: 49246 rules (3593 with conclusion selected). Queue: 9604 rules.
+125000 rules inserted. Base: 49378 rules (3595 with conclusion selected). Queue: 9543 rules.
+125200 rules inserted. Base: 49418 rules (3599 with conclusion selected). Queue: 9494 rules.
+125400 rules inserted. Base: 49454 rules (3605 with conclusion selected). Queue: 9510 rules.
+125600 rules inserted. Base: 49461 rules (3610 with conclusion selected). Queue: 9488 rules.
+125800 rules inserted. Base: 49547 rules (3615 with conclusion selected). Queue: 9325 rules.
+126000 rules inserted. Base: 49496 rules (3615 with conclusion selected). Queue: 9457 rules.
+126200 rules inserted. Base: 49415 rules (3615 with conclusion selected). Queue: 9442 rules.
+126400 rules inserted. Base: 49380 rules (3619 with conclusion selected). Queue: 9261 rules.
+126600 rules inserted. Base: 49414 rules (3623 with conclusion selected). Queue: 9166 rules.
+126800 rules inserted. Base: 49407 rules (3627 with conclusion selected). Queue: 9117 rules.
+127000 rules inserted. Base: 49336 rules (3627 with conclusion selected). Queue: 9014 rules.
+127200 rules inserted. Base: 49333 rules (3631 with conclusion selected). Queue: 8858 rules.
+127400 rules inserted. Base: 49377 rules (3631 with conclusion selected). Queue: 8857 rules.
+127600 rules inserted. Base: 49295 rules (3631 with conclusion selected). Queue: 8842 rules.
+127800 rules inserted. Base: 49252 rules (3635 with conclusion selected). Queue: 8663 rules.
+128000 rules inserted. Base: 49295 rules (3639 with conclusion selected). Queue: 8565 rules.
+128200 rules inserted. Base: 49288 rules (3643 with conclusion selected). Queue: 8516 rules.
+128400 rules inserted. Base: 49217 rules (3643 with conclusion selected). Queue: 8419 rules.
+128600 rules inserted. Base: 49190 rules (3647 with conclusion selected). Queue: 8255 rules.
+128800 rules inserted. Base: 49188 rules (3650 with conclusion selected). Queue: 8123 rules.
+129000 rules inserted. Base: 49253 rules (3655 with conclusion selected). Queue: 8189 rules.
+129200 rules inserted. Base: 49253 rules (3657 with conclusion selected). Queue: 8011 rules.
+129400 rules inserted. Base: 49249 rules (3679 with conclusion selected). Queue: 8332 rules.
+129600 rules inserted. Base: 49306 rules (3701 with conclusion selected). Queue: 8364 rules.
+129800 rules inserted. Base: 49414 rules (3701 with conclusion selected). Queue: 8348 rules.
+130000 rules inserted. Base: 49498 rules (3701 with conclusion selected). Queue: 8337 rules.
+130200 rules inserted. Base: 49637 rules (3701 with conclusion selected). Queue: 8306 rules.
+130400 rules inserted. Base: 49583 rules (3701 with conclusion selected). Queue: 8291 rules.
+130600 rules inserted. Base: 49759 rules (3701 with conclusion selected). Queue: 8423 rules.
+130800 rules inserted. Base: 49900 rules (3701 with conclusion selected). Queue: 8530 rules.
+131000 rules inserted. Base: 50066 rules (3701 with conclusion selected). Queue: 8662 rules.
+131200 rules inserted. Base: 50090 rules (3701 with conclusion selected). Queue: 8801 rules.
+131400 rules inserted. Base: 50177 rules (3701 with conclusion selected). Queue: 8818 rules.
+131600 rules inserted. Base: 50324 rules (3701 with conclusion selected). Queue: 9088 rules.
+131800 rules inserted. Base: 50468 rules (3701 with conclusion selected). Queue: 9193 rules.
+132000 rules inserted. Base: 50605 rules (3705 with conclusion selected). Queue: 9328 rules.
+132200 rules inserted. Base: 50607 rules (3710 with conclusion selected). Queue: 9310 rules.
+132400 rules inserted. Base: 50680 rules (3714 with conclusion selected). Queue: 9202 rules.
+132600 rules inserted. Base: 50651 rules (3714 with conclusion selected). Queue: 9109 rules.
+132800 rules inserted. Base: 50582 rules (3718 with conclusion selected). Queue: 9031 rules.
+133000 rules inserted. Base: 50551 rules (3722 with conclusion selected). Queue: 8885 rules.
+133200 rules inserted. Base: 50567 rules (3726 with conclusion selected). Queue: 8801 rules.
+133400 rules inserted. Base: 50597 rules (3729 with conclusion selected). Queue: 8691 rules.
+133600 rules inserted. Base: 50539 rules (3757 with conclusion selected). Queue: 8709 rules.
+133800 rules inserted. Base: 50551 rules (3793 with conclusion selected). Queue: 8842 rules.
+134000 rules inserted. Base: 50616 rules (3830 with conclusion selected). Queue: 8843 rules.
+134200 rules inserted. Base: 50533 rules (3863 with conclusion selected). Queue: 8990 rules.
+134400 rules inserted. Base: 50594 rules (3881 with conclusion selected). Queue: 8966 rules.
+134600 rules inserted. Base: 50726 rules (3884 with conclusion selected). Queue: 8903 rules.
+134800 rules inserted. Base: 50890 rules (3886 with conclusion selected). Queue: 8771 rules.
+135000 rules inserted. Base: 51038 rules (3892 with conclusion selected). Queue: 8656 rules.
+135200 rules inserted. Base: 51058 rules (3894 with conclusion selected). Queue: 8505 rules.
+135400 rules inserted. Base: 51149 rules (3901 with conclusion selected). Queue: 8452 rules.
+135600 rules inserted. Base: 51175 rules (3906 with conclusion selected). Queue: 8464 rules.
+135800 rules inserted. Base: 51196 rules (3916 with conclusion selected). Queue: 8450 rules.
+136000 rules inserted. Base: 51208 rules (3921 with conclusion selected). Queue: 8449 rules.
+136200 rules inserted. Base: 51314 rules (3929 with conclusion selected). Queue: 8375 rules.
+136400 rules inserted. Base: 51374 rules (3935 with conclusion selected). Queue: 8396 rules.
+136600 rules inserted. Base: 51386 rules (3940 with conclusion selected). Queue: 8394 rules.
+136800 rules inserted. Base: 51413 rules (3950 with conclusion selected). Queue: 8385 rules.
+137000 rules inserted. Base: 51476 rules (3951 with conclusion selected). Queue: 8446 rules.
+137200 rules inserted. Base: 51535 rules (3957 with conclusion selected). Queue: 8672 rules.
+137400 rules inserted. Base: 51561 rules (3957 with conclusion selected). Queue: 8472 rules.
+137600 rules inserted. Base: 51564 rules (3957 with conclusion selected). Queue: 8661 rules.
+137800 rules inserted. Base: 51510 rules (3957 with conclusion selected). Queue: 8639 rules.
+138000 rules inserted. Base: 51683 rules (3957 with conclusion selected). Queue: 8785 rules.
+138200 rules inserted. Base: 51825 rules (3957 with conclusion selected). Queue: 8911 rules.
+138400 rules inserted. Base: 51974 rules (3957 with conclusion selected). Queue: 9123 rules.
+138600 rules inserted. Base: 52091 rules (3965 with conclusion selected). Queue: 9133 rules.
+138800 rules inserted. Base: 52091 rules (3965 with conclusion selected). Queue: 9083 rules.
+139000 rules inserted. Base: 51978 rules (3969 with conclusion selected). Queue: 8934 rules.
+139200 rules inserted. Base: 52085 rules (3973 with conclusion selected). Queue: 8805 rules.
+139400 rules inserted. Base: 52077 rules (3977 with conclusion selected). Queue: 8755 rules.
+139600 rules inserted. Base: 51975 rules (3981 with conclusion selected). Queue: 8681 rules.
+139800 rules inserted. Base: 51988 rules (3983 with conclusion selected). Queue: 8510 rules.
+140000 rules inserted. Base: 52093 rules (3989 with conclusion selected). Queue: 8435 rules.
+140200 rules inserted. Base: 52114 rules (3989 with conclusion selected). Queue: 8348 rules.
+140400 rules inserted. Base: 51996 rules (3993 with conclusion selected). Queue: 8262 rules.
+140600 rules inserted. Base: 52021 rules (3997 with conclusion selected). Queue: 8069 rules.
+140800 rules inserted. Base: 52008 rules (4001 with conclusion selected). Queue: 8024 rules.
+141000 rules inserted. Base: 51998 rules (4005 with conclusion selected). Queue: 7946 rules.
+141200 rules inserted. Base: 51997 rules (4005 with conclusion selected). Queue: 7763 rules.
+141400 rules inserted. Base: 52035 rules (4009 with conclusion selected). Queue: 7718 rules.
+141600 rules inserted. Base: 52060 rules (4018 with conclusion selected). Queue: 7731 rules.
+141800 rules inserted. Base: 52079 rules (4024 with conclusion selected). Queue: 7718 rules.
+142000 rules inserted. Base: 52163 rules (4085 with conclusion selected). Queue: 7769 rules.
+142200 rules inserted. Base: 52175 rules (4085 with conclusion selected). Queue: 7743 rules.
+142400 rules inserted. Base: 52216 rules (4088 with conclusion selected). Queue: 7700 rules.
+142600 rules inserted. Base: 52245 rules (4088 with conclusion selected). Queue: 7656 rules.
+142800 rules inserted. Base: 52266 rules (4095 with conclusion selected). Queue: 7653 rules.
+143000 rules inserted. Base: 52314 rules (4095 with conclusion selected). Queue: 7577 rules.
+143200 rules inserted. Base: 52325 rules (4099 with conclusion selected). Queue: 7543 rules.
+143400 rules inserted. Base: 52331 rules (4121 with conclusion selected). Queue: 7553 rules.
+143600 rules inserted. Base: 52389 rules (4147 with conclusion selected). Queue: 7517 rules.
+143800 rules inserted. Base: 52493 rules (4148 with conclusion selected). Queue: 7375 rules.
+144000 rules inserted. Base: 52632 rules (4151 with conclusion selected). Queue: 7259 rules.
+144200 rules inserted. Base: 52797 rules (4153 with conclusion selected). Queue: 7109 rules.
+144400 rules inserted. Base: 52964 rules (4155 with conclusion selected). Queue: 6972 rules.
+144600 rules inserted. Base: 53068 rules (4157 with conclusion selected). Queue: 6856 rules.
+144800 rules inserted. Base: 53215 rules (4159 with conclusion selected). Queue: 6708 rules.
+145000 rules inserted. Base: 53371 rules (4161 with conclusion selected). Queue: 6578 rules.
+145200 rules inserted. Base: 53455 rules (4163 with conclusion selected). Queue: 6411 rules.
+145400 rules inserted. Base: 53482 rules (4167 with conclusion selected). Queue: 6493 rules.
+145600 rules inserted. Base: 53504 rules (4167 with conclusion selected). Queue: 6297 rules.
+145800 rules inserted. Base: 53507 rules (4171 with conclusion selected). Queue: 6474 rules.
+146000 rules inserted. Base: 53440 rules (4171 with conclusion selected). Queue: 6280 rules.
+146200 rules inserted. Base: 53518 rules (4177 with conclusion selected). Queue: 6155 rules.
+146400 rules inserted. Base: 53483 rules (4179 with conclusion selected). Queue: 6080 rules.
+146600 rules inserted. Base: 53588 rules (4183 with conclusion selected). Queue: 5955 rules.
+146800 rules inserted. Base: 53466 rules (4186 with conclusion selected). Queue: 5871 rules.
+147000 rules inserted. Base: 53478 rules (4188 with conclusion selected). Queue: 5799 rules.
+147200 rules inserted. Base: 53450 rules (4192 with conclusion selected). Queue: 5644 rules.
+147400 rules inserted. Base: 53458 rules (4197 with conclusion selected). Queue: 5565 rules.
+147600 rules inserted. Base: 53499 rules (4197 with conclusion selected). Queue: 5402 rules.
+147800 rules inserted. Base: 53539 rules (4203 with conclusion selected). Queue: 5476 rules.
+148000 rules inserted. Base: 53551 rules (4208 with conclusion selected). Queue: 5469 rules.
+148200 rules inserted. Base: 53591 rules (4218 with conclusion selected). Queue: 5446 rules.
+148400 rules inserted. Base: 53670 rules (4219 with conclusion selected). Queue: 5417 rules.
+148600 rules inserted. Base: 53706 rules (4229 with conclusion selected). Queue: 5438 rules.
+148800 rules inserted. Base: 53716 rules (4234 with conclusion selected). Queue: 5424 rules.
+149000 rules inserted. Base: 53739 rules (4239 with conclusion selected). Queue: 5391 rules.
+149200 rules inserted. Base: 53875 rules (4248 with conclusion selected). Queue: 5373 rules.
+149400 rules inserted. Base: 54034 rules (4250 with conclusion selected). Queue: 5227 rules.
+149600 rules inserted. Base: 54181 rules (4254 with conclusion selected). Queue: 5138 rules.
+149800 rules inserted. Base: 54333 rules (4257 with conclusion selected). Queue: 5120 rules.
+150000 rules inserted. Base: 54442 rules (4284 with conclusion selected). Queue: 5148 rules.
+150200 rules inserted. Base: 54571 rules (4323 with conclusion selected). Queue: 5137 rules.
+150400 rules inserted. Base: 54639 rules (4325 with conclusion selected). Queue: 5101 rules.
+150600 rules inserted. Base: 54750 rules (4332 with conclusion selected). Queue: 5028 rules.
+150800 rules inserted. Base: 54827 rules (4340 with conclusion selected). Queue: 5794 rules.
+151000 rules inserted. Base: 54762 rules (4340 with conclusion selected). Queue: 5759 rules.
+151200 rules inserted. Base: 54809 rules (4360 with conclusion selected). Queue: 5834 rules.
+151400 rules inserted. Base: 54652 rules (4387 with conclusion selected). Queue: 5835 rules.
+151600 rules inserted. Base: 54722 rules (4416 with conclusion selected). Queue: 5832 rules.
+151800 rules inserted. Base: 54705 rules (4420 with conclusion selected). Queue: 5667 rules.
+152000 rules inserted. Base: 54775 rules (4424 with conclusion selected). Queue: 5522 rules.
+152200 rules inserted. Base: 54797 rules (4424 with conclusion selected). Queue: 5322 rules.
+152400 rules inserted. Base: 54815 rules (4432 with conclusion selected). Queue: 5200 rules.
+152600 rules inserted. Base: 54846 rules (4437 with conclusion selected). Queue: 5215 rules.
+152800 rules inserted. Base: 54857 rules (4442 with conclusion selected). Queue: 5194 rules.
+153000 rules inserted. Base: 54897 rules (4452 with conclusion selected). Queue: 5172 rules.
+153200 rules inserted. Base: 54993 rules (4457 with conclusion selected). Queue: 5086 rules.
+153400 rules inserted. Base: 55133 rules (4460 with conclusion selected). Queue: 4963 rules.
+153600 rules inserted. Base: 55297 rules (4462 with conclusion selected). Queue: 4815 rules.
+153800 rules inserted. Base: 55357 rules (4468 with conclusion selected). Queue: 4764 rules.
+154000 rules inserted. Base: 55517 rules (4470 with conclusion selected). Queue: 4626 rules.
+154200 rules inserted. Base: 55665 rules (4474 with conclusion selected). Queue: 4517 rules.
+154400 rules inserted. Base: 55768 rules (4479 with conclusion selected). Queue: 4447 rules.
+154600 rules inserted. Base: 55812 rules (4497 with conclusion selected). Queue: 4409 rules.
+154800 rules inserted. Base: 55894 rules (4519 with conclusion selected). Queue: 4509 rules.
+155000 rules inserted. Base: 56047 rules (4520 with conclusion selected). Queue: 4404 rules.
+155200 rules inserted. Base: 56141 rules (4524 with conclusion selected). Queue: 4402 rules.
+155400 rules inserted. Base: 56232 rules (4525 with conclusion selected). Queue: 4351 rules.
+155600 rules inserted. Base: 56364 rules (4583 with conclusion selected). Queue: 4331 rules.
+155800 rules inserted. Base: 56414 rules (4584 with conclusion selected). Queue: 4241 rules.
+156000 rules inserted. Base: 56434 rules (4584 with conclusion selected). Queue: 4043 rules.
+156200 rules inserted. Base: 56454 rules (4584 with conclusion selected). Queue: 3853 rules.
+156400 rules inserted. Base: 56369 rules (4584 with conclusion selected). Queue: 3671 rules.
+156600 rules inserted. Base: 56494 rules (4589 with conclusion selected). Queue: 3602 rules.
+156800 rules inserted. Base: 56598 rules (4595 with conclusion selected). Queue: 3527 rules.
+157000 rules inserted. Base: 56578 rules (4595 with conclusion selected). Queue: 3509 rules.
+157200 rules inserted. Base: 56625 rules (4596 with conclusion selected). Queue: 3480 rules.
+157400 rules inserted. Base: 56572 rules (4598 with conclusion selected). Queue: 3467 rules.
+157600 rules inserted. Base: 56653 rules (4615 with conclusion selected). Queue: 3981 rules.
+157800 rules inserted. Base: 56805 rules (4617 with conclusion selected). Queue: 3840 rules.
+158000 rules inserted. Base: 56968 rules (4621 with conclusion selected). Queue: 3731 rules.
+158200 rules inserted. Base: 57077 rules (4623 with conclusion selected). Queue: 3633 rules.
+158400 rules inserted. Base: 57026 rules (4657 with conclusion selected). Queue: 3759 rules.
+158600 rules inserted. Base: 57037 rules (4694 with conclusion selected). Queue: 3879 rules.
+158800 rules inserted. Base: 57118 rules (4762 with conclusion selected). Queue: 3948 rules.
+159000 rules inserted. Base: 57136 rules (4775 with conclusion selected). Queue: 3926 rules.
+159200 rules inserted. Base: 57217 rules (4775 with conclusion selected). Queue: 3918 rules.
+159400 rules inserted. Base: 57375 rules (4777 with conclusion selected). Queue: 4064 rules.
+159600 rules inserted. Base: 57505 rules (4784 with conclusion selected). Queue: 4259 rules.
+159800 rules inserted. Base: 57607 rules (4788 with conclusion selected). Queue: 4201 rules.
+160000 rules inserted. Base: 57710 rules (4789 with conclusion selected). Queue: 4142 rules.
+160200 rules inserted. Base: 57785 rules (4801 with conclusion selected). Queue: 4105 rules.
+160400 rules inserted. Base: 57915 rules (4801 with conclusion selected). Queue: 3955 rules.
+160600 rules inserted. Base: 58031 rules (4810 with conclusion selected). Queue: 3875 rules.
+160800 rules inserted. Base: 58165 rules (4819 with conclusion selected). Queue: 3812 rules.
+161000 rules inserted. Base: 58229 rules (4822 with conclusion selected). Queue: 3685 rules.
+161200 rules inserted. Base: 58247 rules (4822 with conclusion selected). Queue: 3483 rules.
+161400 rules inserted. Base: 58235 rules (4826 with conclusion selected). Queue: 3956 rules.
+161600 rules inserted. Base: 58162 rules (4839 with conclusion selected). Queue: 4164 rules.
+161800 rules inserted. Base: 58221 rules (4870 with conclusion selected). Queue: 4195 rules.
+162000 rules inserted. Base: 58334 rules (4873 with conclusion selected). Queue: 4134 rules.
+162200 rules inserted. Base: 58282 rules (4873 with conclusion selected). Queue: 4112 rules.
+162400 rules inserted. Base: 58389 rules (4876 with conclusion selected). Queue: 4057 rules.
+162600 rules inserted. Base: 58332 rules (4876 with conclusion selected). Queue: 4022 rules.
+162800 rules inserted. Base: 58486 rules (4877 with conclusion selected). Queue: 4018 rules.
+163000 rules inserted. Base: 58592 rules (4885 with conclusion selected). Queue: 3945 rules.
+163200 rules inserted. Base: 58656 rules (4886 with conclusion selected). Queue: 3972 rules.
+163400 rules inserted. Base: 58715 rules (4890 with conclusion selected). Queue: 3813 rules.
+163600 rules inserted. Base: 58724 rules (4893 with conclusion selected). Queue: 3730 rules.
+163800 rules inserted. Base: 58866 rules (4893 with conclusion selected). Queue: 3634 rules.
+164000 rules inserted. Base: 58982 rules (4901 with conclusion selected). Queue: 3791 rules.
+164200 rules inserted. Base: 59088 rules (4953 with conclusion selected). Queue: 3948 rules.
+164400 rules inserted. Base: 59197 rules (4971 with conclusion selected). Queue: 3925 rules.
+164600 rules inserted. Base: 59301 rules (4971 with conclusion selected). Queue: 3782 rules.
+164800 rules inserted. Base: 59355 rules (4975 with conclusion selected). Queue: 3645 rules.
+165000 rules inserted. Base: 59367 rules (4975 with conclusion selected). Queue: 3445 rules.
+165200 rules inserted. Base: 59370 rules (4975 with conclusion selected). Queue: 3345 rules.
+165400 rules inserted. Base: 59375 rules (4977 with conclusion selected). Queue: 3434 rules.
+165600 rules inserted. Base: 59391 rules (4977 with conclusion selected). Queue: 3330 rules.
+165800 rules inserted. Base: 59321 rules (4984 with conclusion selected). Queue: 3480 rules.
+166000 rules inserted. Base: 59332 rules (4984 with conclusion selected). Queue: 3466 rules.
+166200 rules inserted. Base: 59438 rules (4990 with conclusion selected). Queue: 3408 rules.
+166400 rules inserted. Base: 59551 rules (5045 with conclusion selected). Queue: 3429 rules.
+166600 rules inserted. Base: 59661 rules (5053 with conclusion selected). Queue: 3357 rules.
+166800 rules inserted. Base: 59831 rules (5054 with conclusion selected). Queue: 3437 rules.
+167000 rules inserted. Base: 59905 rules (5054 with conclusion selected). Queue: 3331 rules.
+167200 rules inserted. Base: 59857 rules (5061 with conclusion selected). Queue: 3225 rules.
+167400 rules inserted. Base: 59933 rules (5122 with conclusion selected). Queue: 3250 rules.
+167600 rules inserted. Base: 60027 rules (5127 with conclusion selected). Queue: 3180 rules.
+167800 rules inserted. Base: 60223 rules (5127 with conclusion selected). Queue: 3180 rules.
+168000 rules inserted. Base: 60325 rules (5132 with conclusion selected). Queue: 3308 rules.
+168200 rules inserted. Base: 60488 rules (5132 with conclusion selected). Queue: 3625 rules.
+168400 rules inserted. Base: 60548 rules (5140 with conclusion selected). Queue: 3649 rules.
+168600 rules inserted. Base: 60636 rules (5146 with conclusion selected). Queue: 3465 rules.
+168800 rules inserted. Base: 60557 rules (5149 with conclusion selected). Queue: 3460 rules.
+169000 rules inserted. Base: 60550 rules (5156 with conclusion selected). Queue: 3275 rules.
+169200 rules inserted. Base: 60664 rules (5161 with conclusion selected). Queue: 3210 rules.
+169400 rules inserted. Base: 60761 rules (5173 with conclusion selected). Queue: 3143 rules.
+169600 rules inserted. Base: 60897 rules (5225 with conclusion selected). Queue: 3109 rules.
+169800 rules inserted. Base: 61018 rules (5226 with conclusion selected). Queue: 3138 rules.
+170000 rules inserted. Base: 61135 rules (5227 with conclusion selected). Queue: 3096 rules.
+170200 rules inserted. Base: 61325 rules (5229 with conclusion selected). Queue: 3092 rules.
+170400 rules inserted. Base: 61421 rules (5236 with conclusion selected). Queue: 3310 rules.
+170600 rules inserted. Base: 61568 rules (5241 with conclusion selected). Queue: 3296 rules.
+170800 rules inserted. Base: 61685 rules (5295 with conclusion selected). Queue: 3307 rules.
+171000 rules inserted. Base: 61735 rules (5299 with conclusion selected). Queue: 3241 rules.
+171200 rules inserted. Base: 61709 rules (5299 with conclusion selected). Queue: 3079 rules.
+171400 rules inserted. Base: 61743 rules (5299 with conclusion selected). Queue: 3054 rules.
+171600 rules inserted. Base: 61753 rules (5299 with conclusion selected). Queue: 3048 rules.
+171800 rules inserted. Base: 61835 rules (5299 with conclusion selected). Queue: 3177 rules.
+172000 rules inserted. Base: 61865 rules (5307 with conclusion selected). Queue: 3241 rules.
+172200 rules inserted. Base: 61942 rules (5321 with conclusion selected). Queue: 3264 rules.
+172400 rules inserted. Base: 61941 rules (5339 with conclusion selected). Queue: 3187 rules.
+172600 rules inserted. Base: 62075 rules (5339 with conclusion selected). Queue: 3114 rules.
+172800 rules inserted. Base: 62167 rules (5344 with conclusion selected). Queue: 3081 rules.
+173000 rules inserted. Base: 62298 rules (5344 with conclusion selected). Queue: 3102 rules.
+173200 rules inserted. Base: 62341 rules (5348 with conclusion selected). Queue: 3066 rules.
+173400 rules inserted. Base: 62378 rules (5352 with conclusion selected). Queue: 2925 rules.
+173600 rules inserted. Base: 62406 rules (5355 with conclusion selected). Queue: 2821 rules.
+173800 rules inserted. Base: 62547 rules (5360 with conclusion selected). Queue: 2902 rules.
+174000 rules inserted. Base: 62728 rules (5365 with conclusion selected). Queue: 2879 rules.
+174200 rules inserted. Base: 62653 rules (5366 with conclusion selected). Queue: 2768 rules.
+174400 rules inserted. Base: 62804 rules (5430 with conclusion selected). Queue: 2758 rules.
+174600 rules inserted. Base: 62804 rules (5432 with conclusion selected). Queue: 2564 rules.
+174800 rules inserted. Base: 62790 rules (5433 with conclusion selected). Queue: 2411 rules.
+175000 rules inserted. Base: 62893 rules (5437 with conclusion selected). Queue: 2353 rules.
+175200 rules inserted. Base: 63050 rules (5440 with conclusion selected). Queue: 2198 rules.
+175400 rules inserted. Base: 63147 rules (5440 with conclusion selected). Queue: 2102 rules.
+175600 rules inserted. Base: 63174 rules (5526 with conclusion selected). Queue: 2455 rules.
+175800 rules inserted. Base: 63290 rules (5529 with conclusion selected). Queue: 2554 rules.
+176000 rules inserted. Base: 63438 rules (5534 with conclusion selected). Queue: 2555 rules.
+176200 rules inserted. Base: 63418 rules (5542 with conclusion selected). Queue: 2567 rules.
+176400 rules inserted. Base: 63499 rules (5606 with conclusion selected). Queue: 2566 rules.
+176600 rules inserted. Base: 63634 rules (5606 with conclusion selected). Queue: 2563 rules.
+176800 rules inserted. Base: 63818 rules (5608 with conclusion selected). Queue: 2807 rules.
+177000 rules inserted. Base: 63996 rules (5612 with conclusion selected). Queue: 2790 rules.
+177200 rules inserted. Base: 64119 rules (5629 with conclusion selected). Queue: 2733 rules.
+177400 rules inserted. Base: 64162 rules (5634 with conclusion selected). Queue: 2679 rules.
+177600 rules inserted. Base: 64164 rules (5635 with conclusion selected). Queue: 2483 rules.
+177800 rules inserted. Base: 64173 rules (5653 with conclusion selected). Queue: 2486 rules.
+178000 rules inserted. Base: 64313 rules (5653 with conclusion selected). Queue: 2439 rules.
+178200 rules inserted. Base: 64489 rules (5657 with conclusion selected). Queue: 2443 rules.
+178400 rules inserted. Base: 64618 rules (5662 with conclusion selected). Queue: 2584 rules.
+178600 rules inserted. Base: 64639 rules (5664 with conclusion selected). Queue: 2521 rules.
+178800 rules inserted. Base: 64781 rules (5671 with conclusion selected). Queue: 2439 rules.
+179000 rules inserted. Base: 64892 rules (5672 with conclusion selected). Queue: 2424 rules.
+179200 rules inserted. Base: 64936 rules (5672 with conclusion selected). Queue: 2380 rules.
+179400 rules inserted. Base: 64981 rules (5676 with conclusion selected). Queue: 2232 rules.
+179600 rules inserted. Base: 65034 rules (5676 with conclusion selected). Queue: 2126 rules.
+179800 rules inserted. Base: 65179 rules (5682 with conclusion selected). Queue: 2141 rules.
+180000 rules inserted. Base: 65365 rules (5757 with conclusion selected). Queue: 2197 rules.
+180200 rules inserted. Base: 65407 rules (5767 with conclusion selected). Queue: 2154 rules.
+180400 rules inserted. Base: 65488 rules (5771 with conclusion selected). Queue: 2187 rules.
+180600 rules inserted. Base: 65540 rules (5778 with conclusion selected). Queue: 2245 rules.
+180800 rules inserted. Base: 65555 rules (5782 with conclusion selected). Queue: 2114 rules.
+181000 rules inserted. Base: 65553 rules (5782 with conclusion selected). Queue: 2026 rules.
+181200 rules inserted. Base: 65707 rules (5840 with conclusion selected). Queue: 2030 rules.
+181400 rules inserted. Base: 65862 rules (5842 with conclusion selected). Queue: 2099 rules.
+181600 rules inserted. Base: 65796 rules (5843 with conclusion selected). Queue: 1975 rules.
+181800 rules inserted. Base: 65866 rules (5850 with conclusion selected). Queue: 1906 rules.
+182000 rules inserted. Base: 66052 rules (5850 with conclusion selected). Queue: 1906 rules.
+182200 rules inserted. Base: 66236 rules (5864 with conclusion selected). Queue: 2078 rules.
+182400 rules inserted. Base: 66312 rules (5882 with conclusion selected). Queue: 2022 rules.
+182600 rules inserted. Base: 66425 rules (5883 with conclusion selected). Queue: 1945 rules.
+182800 rules inserted. Base: 66443 rules (5886 with conclusion selected). Queue: 1842 rules.
+183000 rules inserted. Base: 66507 rules (5950 with conclusion selected). Queue: 1842 rules.
+183200 rules inserted. Base: 66649 rules (5954 with conclusion selected). Queue: 1832 rules.
+183400 rules inserted. Base: 66811 rules (5954 with conclusion selected). Queue: 1830 rules.
+183600 rules inserted. Base: 66978 rules (5968 with conclusion selected). Queue: 1975 rules.
+183800 rules inserted. Base: 67040 rules (5969 with conclusion selected). Queue: 1903 rules.
+184000 rules inserted. Base: 67118 rules (5973 with conclusion selected). Queue: 1809 rules.
+184200 rules inserted. Base: 67106 rules (5973 with conclusion selected). Queue: 1717 rules.
+184400 rules inserted. Base: 67184 rules (5990 with conclusion selected). Queue: 1669 rules.
+184600 rules inserted. Base: 67212 rules (5992 with conclusion selected). Queue: 1615 rules.
+184800 rules inserted. Base: 67383 rules (5996 with conclusion selected). Queue: 1586 rules.
+185000 rules inserted. Base: 67562 rules (5997 with conclusion selected). Queue: 1638 rules.
+185200 rules inserted. Base: 67598 rules (5997 with conclusion selected). Queue: 1582 rules.
+185400 rules inserted. Base: 67606 rules (6001 with conclusion selected). Queue: 1471 rules.
+185600 rules inserted. Base: 67662 rules (6014 with conclusion selected). Queue: 1366 rules.
+185800 rules inserted. Base: 67601 rules (6016 with conclusion selected). Queue: 1244 rules.
+186000 rules inserted. Base: 67747 rules (6020 with conclusion selected). Queue: 1166 rules.
+186200 rules inserted. Base: 67904 rules (6083 with conclusion selected). Queue: 1138 rules.
+186400 rules inserted. Base: 68051 rules (6088 with conclusion selected). Queue: 1245 rules.
+186600 rules inserted. Base: 68190 rules (6089 with conclusion selected). Queue: 1158 rules.
+186800 rules inserted. Base: 68143 rules (6090 with conclusion selected). Queue: 1041 rules.
+187000 rules inserted. Base: 68247 rules (6104 with conclusion selected). Queue: 1163 rules.
+187200 rules inserted. Base: 68321 rules (6115 with conclusion selected). Queue: 1188 rules.
+187400 rules inserted. Base: 68489 rules (6115 with conclusion selected). Queue: 1153 rules.
+187600 rules inserted. Base: 68675 rules (6115 with conclusion selected). Queue: 1153 rules.
+187800 rules inserted. Base: 68756 rules (6127 with conclusion selected). Queue: 1269 rules.
+188000 rules inserted. Base: 68836 rules (6133 with conclusion selected). Queue: 1232 rules.
+188200 rules inserted. Base: 68854 rules (6142 with conclusion selected). Queue: 1133 rules.
+188400 rules inserted. Base: 68926 rules (6143 with conclusion selected). Queue: 1084 rules.
+188600 rules inserted. Base: 69028 rules (6143 with conclusion selected). Queue: 1172 rules.
+188800 rules inserted. Base: 69064 rules (6147 with conclusion selected). Queue: 1118 rules.
+189000 rules inserted. Base: 69058 rules (6147 with conclusion selected). Queue: 931 rules.
+189200 rules inserted. Base: 69230 rules (6161 with conclusion selected). Queue: 808 rules.
+189400 rules inserted. Base: 69249 rules (6168 with conclusion selected). Queue: 904 rules.
+189600 rules inserted. Base: 69306 rules (6169 with conclusion selected). Queue: 782 rules.
+189800 rules inserted. Base: 69343 rules (6170 with conclusion selected). Queue: 675 rules.
+190000 rules inserted. Base: 69363 rules (6180 with conclusion selected). Queue: 803 rules.
+190200 rules inserted. Base: 69451 rules (6196 with conclusion selected). Queue: 721 rules.
+190400 rules inserted. Base: 69382 rules (6198 with conclusion selected). Queue: 632 rules.
+190600 rules inserted. Base: 69538 rules (6213 with conclusion selected). Queue: 529 rules.
+190800 rules inserted. Base: 69475 rules (6214 with conclusion selected). Queue: 473 rules.
+191000 rules inserted. Base: 69519 rules (6227 with conclusion selected). Queue: 330 rules.
+191200 rules inserted. Base: 69687 rules (6241 with conclusion selected). Queue: 213 rules.
+191400 rules inserted. Base: 69694 rules (6264 with conclusion selected). Queue: 520 rules.
+191600 rules inserted. Base: 69782 rules (6280 with conclusion selected). Queue: 437 rules.
+191800 rules inserted. Base: 69770 rules (6287 with conclusion selected). Queue: 369 rules.
+192000 rules inserted. Base: 69804 rules (6296 with conclusion selected). Queue: 224 rules.
+192200 rules inserted. Base: 69761 rules (6306 with conclusion selected). Queue: 262 rules.
+192400 rules inserted. Base: 69847 rules (6314 with conclusion selected). Queue: 375 rules.
+192600 rules inserted. Base: 69827 rules (6332 with conclusion selected). Queue: 296 rules.
+192800 rules inserted. Base: 69821 rules (6349 with conclusion selected). Queue: 117 rules.
+193000 rules inserted. Base: 69913 rules (6368 with conclusion selected). Queue: 128 rules.
+193200 rules inserted. Base: 69909 rules (6374 with conclusion selected). Queue: 36 rules.
+Starting query inj-event(appCompletesProtocol(m_96,m_97,m_98,m_99,m_100,m_101,m_102,m_103)) ==> inj-event(userSendsLastMessageToApp(m_96,m_97,m_98,m_99)) && inj-event(issuerSendsLastMessageToApp(m_100,m_101,m_102,m_103))
+goal reachable: begin(issuerSendsLastMessageToApp((tag9,bitG(g(x_12))),(tag10,bitG(g(y_12)),enc(sign((g(y_12),g(x_12)),ski[]),GtoSymK(exp(g(x_12),y_12)))),enc((tag11,pk(sks_4),sign((a[],jti_8,code_12,pkce_8),sks_4)),GtoSymK(exp(g(x_12),y_12))),enc((tag12,sign((hash_pk(pk(sks_4)),jti_8,scope_12,a[],i[],u[]),ski[])),GtoSymK(exp(g(x_12),y_12)))),@occ460_1) && begin(userSendsLastMessageToApp((tag1,bitG(g(x_13))),(tag2,bitG(g(y_13)),enc(sign((g(y_13),g(x_13)),ska[]),GtoSymK(exp(g(y_13),x_13)))),enc((tag3,a[],hash(pkce_8),scope_12),GtoSymK(exp(g(y_13),x_13))),enc((tag8,code_12),GtoSymK(exp(g(y_13),x_13)))),@occ276_1) -> end(@occ73_1,appCompletesProtocol((tag1,bitG(g(x_13))),(tag2,bitG(g(y_13)),enc(sign((g(y_13),g(x_13)),ska[]),GtoSymK(exp(g(y_13),x_13)))),enc((tag3,a[],hash(pkce_8),scope_12),GtoSymK(exp(g(y_13),x_13))),enc((tag8,code_12),GtoSymK(exp(g(y_13),x_13))),(tag9,bitG(g(x_12))),(tag10,bitG(g(y_12)),enc(sign((g(y_12),g(x_12)),ski[]),GtoSymK(exp(g(x_12),y_12)))),enc((tag11,pk(sks_4),sign((a[],jti_8,code_12,pkce_8),sks_4)),GtoSymK(exp(g(x_12),y_12))),enc((tag12,sign((hash_pk(pk(sks_4)),jti_8,scope_12,a[],i[],u[]),ski[])),GtoSymK(exp(g(x_12),y_12)))))
+The 1st, 2nd hypotheses occur strictly before the conclusion.
+Abbreviations:
+x_13 = x_4[e2_1 = i[],e1_1 = a[],!1 = @sid]
+pkce_8 = pkce[m_1 = (tag1,bitG(g(x_13))),e2 = i[],e1 = u[],!1 = @sid_1]
+scope_12 = scope[m_1 = (tag1,bitG(g(x_13))),e2 = i[],e1 = u[],!1 = @sid_1]
+y_13 = y[m_1 = (tag1,bitG(g(x_13))),e2 = i[],e1 = u[],!1 = @sid_1]
+x_14 = x_5[m_34 = enc((tag3,a[],hash(pkce_8),scope_12),GtoSymK(exp(g(y_13),x_13))),m_33 = (tag2,bitG(g(y_13)),enc(sign((g(y_13),g(x_13)),ska[]),GtoSymK(exp(g(y_13),x_13)))),e2_1 = i[],e1_1 = a[],!1 = @sid]
+y_14 = y_4[m_64 = (tag4,bitG(g(x_14))),e2_2 = u[],e1_2 = a[],!1 = @sid_2]
+code_12 = code_8[m_66 = enc((tag6,a[],hash(pkce_8),scope_12,u[],password[]),GtoSymK(exp(g(y_14),x_14))),m_64 = (tag4,bitG(g(x_14))),e2_2 = u[],e1_2 = a[],!1 = @sid_2]
+x_12 = x[m_8 = enc((tag8,code_12),GtoSymK(exp(g(y_13),x_13))),m_1 = (tag1,bitG(g(x_13))),e2 = i[],e1 = u[],!1 = @sid_1]
+y_12 = y_5[m_68 = (tag9,bitG(g(x_12))),m_66 = enc((tag6,a[],hash(pkce_8),scope_12,u[],password[]),GtoSymK(exp(g(y_14),x_14))),m_64 = (tag4,bitG(g(x_14))),e2_2 = u[],e1_2 = a[],!1 = @sid_2]
+sks_4 = sks[m_10 = (tag10,bitG(g(y_12)),enc(sign((g(y_12),g(x_12)),ski[]),GtoSymK(exp(g(x_12),y_12)))),m_8 = enc((tag8,code_12),GtoSymK(exp(g(y_13),x_13))),m_1 = (tag1,bitG(g(x_13))),e2 = i[],e1 = u[],!1 = @sid_1]
+jti_8 = jti[m_10 = (tag10,bitG(g(y_12)),enc(sign((g(y_12),g(x_12)),ski[]),GtoSymK(exp(g(x_12),y_12)))),m_8 = enc((tag8,code_12),GtoSymK(exp(g(y_13),x_13))),m_1 = (tag1,bitG(g(x_13))),e2 = i[],e1 = u[],!1 = @sid_1]
+@occ73_1 = @occ73[m_12 = enc((tag12,sign((hash_pk(pk(sks_4)),jti_8,scope_12,a[],i[],u[]),ski[])),GtoSymK(exp(g(x_12),y_12))),m_10 = (tag10,bitG(g(y_12)),enc(sign((g(y_12),g(x_12)),ski[]),GtoSymK(exp(g(x_12),y_12)))),m_8 = enc((tag8,code_12),GtoSymK(exp(g(y_13),x_13))),m_1 = (tag1,bitG(g(x_13))),e2 = i[],e1 = u[],!1 = @sid_1]
+@occ460_1 = @occ460[m_70 = enc((tag11,pk(sks_4),sign((a[],jti_8,code_12,pkce_8),sks_4)),GtoSymK(exp(g(x_12),y_12))),m_68 = (tag9,bitG(g(x_12))),m_66 = enc((tag6,a[],hash(pkce_8),scope_12,u[],password[]),GtoSymK(exp(g(y_14),x_14))),m_64 = (tag4,bitG(g(x_14))),e2_2 = u[],e1_2 = a[],!1 = @sid_2]
+@occ276_1 = @occ276[m_38 = enc((tag7,code_12),GtoSymK(exp(g(y_14),x_14))),m_36 = (tag5,bitG(g(y_14)),enc(sign((g(y_14),g(x_14)),ski[]),GtoSymK(exp(g(y_14),x_14)))),m_34 = enc((tag3,a[],hash(pkce_8),scope_12),GtoSymK(exp(g(y_13),x_13))),m_33 = (tag2,bitG(g(y_13)),enc(sign((g(y_13),g(x_13)),ska[]),GtoSymK(exp(g(y_13),x_13)))),e2_1 = i[],e1_1 = a[],!1 = @sid]
+RESULT inj-event(appCompletesProtocol(m_96,m_97,m_98,m_99,m_100,m_101,m_102,m_103)) ==> inj-event(userSendsLastMessageToApp(m_96,m_97,m_98,m_99)) && inj-event(issuerSendsLastMessageToApp(m_100,m_101,m_102,m_103)) is true.
+
+--------------------------------------------------------------
+Verification summary:
+
+Query inj-event(appCompletesProtocol(m_96,m_97,m_98,m_99,m_100,m_101,m_102,m_103)) ==> inj-event(userSendsLastMessageToApp(m_96,m_97,m_98,m_99)) && inj-event(issuerSendsLastMessageToApp(m_100,m_101,m_102,m_103)) is true.
+
+--------------------------------------------------------------
+

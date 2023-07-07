@@ -1,0 +1,2404 @@
+File "soidc_fix_nopkce.pv", line 144, characters 73-74:
+Warning: identifier i' rebound.
+File "soidc_fix_nopkce.pv", line 194, characters 9-12:
+Warning: identifier sskI rebound.
+Process 0 (that is, the initial process):
+{1}new a: bitstring;
+{2}new u: bitstring;
+{3}new i: bitstring;
+{4}out(c, a);
+{5}out(c, u);
+{6}out(c, i);
+{7}new ska: SecretKey;
+{8}new sku: SecretKey;
+{9}new ski: SecretKey;
+{10}out(c, pk(ska));
+{11}out(c, pk(sku));
+{12}out(c, pk(ski));
+{13}new password: bitstring;
+(
+    {14}!
+    {15}let c_1: channel = c in
+    {16}let a_1: bitstring = a in
+    {17}let ska_1: SecretKey = ska in
+    {18}let u_1: bitstring = u in
+    {19}let pku: PublicKey = pk(sku) in
+    {20}let i_1: bitstring = i in
+    {21}let pki: PublicKey = pk(ski) in
+    {22}in(c_1, e1: bitstring);
+    {23}in(c_1, e2: bitstring);
+    {24}if ((e1 = u_1) && (e2 = i_1)) then
+    (
+        {25}let talksOnlyToHonest: bool = true in
+        {26}in(c_1, m_1: bitstring);
+        {27}let (tag1': bitstring,n: bitstring,spkI: PublicKey) = adec(m_1,ska_1) in
+        {28}if (tag1 = tag1') then
+        {29}new k1: SymmetricKey;
+        {30}let m_2: bitstring = aenc((tag2,n,k1),spkI) in
+        {31}out(c_1, m_2);
+        {32}new scope: bitstring;
+        {33}let m_3: bitstring = enc((tag3,a_1,scope),k1) in
+        {34}event appSendsLastMessageToUser(m_1,m_2,m_3);
+        {35}out(c_1, m_3);
+        {36}in(c_1, m_8: bitstring);
+        {37}let (tag8': bitstring,code: bitstring,i': bitstring) = dec(m_8,k1) in
+        {38}if (tag8 = tag8') then
+        {39}if (i_1 = i') then
+        {40}new n2: bitstring;
+        {41}new sskI2: SecretKey;
+        {42}let m_9: bitstring = aenc((tag9,n2,pk(sskI2)),pki) in
+        {43}out(c_1, m_9);
+        {44}in(c_1, m_10: bitstring);
+        {45}let (tag10': bitstring,n2': bitstring,k3: SymmetricKey) = adec(m_10,sskI2) in
+        {46}if (tag10 = tag10') then
+        {47}if (n2 = n2') then
+        {48}new sks: SecretKey;
+        {49}new jti: bitstring;
+        {50}let T2: bitstring = (a_1,jti,code) in
+        {51}let m_11: bitstring = enc((tag11,pk(sks),sign(T2,sks)),k3) in
+        {52}event appSendsLastMessageToIssuer(m_9,m_10,m_11);
+        {53}out(c_1, m_11);
+        {54}in(c_1, m_12: bitstring);
+        {55}out(c_1, check_reach_app);
+        {56}let (tag12': bitstring,signed_M: bitstring) = dec(m_12,k3) in
+        {57}if (tag12 = tag12') then
+        {58}let M: bitstring = check(signed_M,pki) in
+        {59}let (jtk: bitstring,jti': bitstring,scope': bitstring,a': bitstring,i'_1: bitstring,u': bitstring) = M in
+        {60}if (jtk = hash_pk(pk(sks))) then
+        {61}if (jti = jti') then
+        {62}if (scope = scope') then
+        {63}if (a_1 = a') then
+        {64}if (i_1 = i'_1) then
+        {65}if (u_1 = u') then
+        {66}if talksOnlyToHonest then
+        {67}out(c_1, check_reach_app);
+        {68}event appCompletesProtocol(m_1,m_2,m_3,m_8,m_9,m_10,m_11,m_12);
+        {69}out(ch(code), free_code)
+    )
+    else
+        {70}if ((e1 ≠ u_1) && (e2 = i_1)) then
+        (
+            {71}in(c_1, pke1: PublicKey);
+            {72}let talksOnlyToHonest_1: bool = false in
+            {73}in(c_1, m: bitstring);
+            {74}let (tag1'_1: bitstring,n_1: bitstring,spkI_1: PublicKey) = adec(m,ska_1) in
+            {75}if (tag1 = tag1'_1) then
+            {76}new k1_1: SymmetricKey;
+            {77}let m_4: bitstring = aenc((tag2,n_1,k1_1),spkI_1) in
+            {78}out(c_1, m_4);
+            {79}new scope_1: bitstring;
+            {80}let m_5: bitstring = enc((tag3,a_1,scope_1),k1_1) in
+            {81}event appSendsLastMessageToUser(m,m_4,m_5);
+            {82}out(c_1, m_5);
+            {83}in(c_1, m_6: bitstring);
+            {84}let (tag8'_1: bitstring,code_1: bitstring,i'_2: bitstring) = dec(m_6,k1_1) in
+            {85}if (tag8 = tag8'_1) then
+            {86}if (i_1 = i'_2) then
+            {87}new n2_1: bitstring;
+            {88}new sskI2_1: SecretKey;
+            {89}let m_7: bitstring = aenc((tag9,n2_1,pk(sskI2_1)),pki) in
+            {90}out(c_1, m_7);
+            {91}in(c_1, m_13: bitstring);
+            {92}let (tag10'_1: bitstring,n2'_1: bitstring,k3_1: SymmetricKey) = adec(m_13,sskI2_1) in
+            {93}if (tag10 = tag10'_1) then
+            {94}if (n2_1 = n2'_1) then
+            {95}new sks_1: SecretKey;
+            {96}new jti_1: bitstring;
+            {97}let T2_1: bitstring = (a_1,jti_1,code_1) in
+            {98}let m_14: bitstring = enc((tag11,pk(sks_1),sign(T2_1,sks_1)),k3_1) in
+            {99}event appSendsLastMessageToIssuer(m_7,m_13,m_14);
+            {100}out(c_1, m_14);
+            {101}in(c_1, m_15: bitstring);
+            {102}out(c_1, check_reach_app);
+            {103}let (tag12'_1: bitstring,signed_M_1: bitstring) = dec(m_15,k3_1) in
+            {104}if (tag12 = tag12'_1) then
+            {105}let M_1: bitstring = check(signed_M_1,pki) in
+            {106}let (jtk_1: bitstring,jti'_1: bitstring,scope'_1: bitstring,a'_1: bitstring,i'_3: bitstring,u'_1: bitstring) = M_1 in
+            {107}if (jtk_1 = hash_pk(pk(sks_1))) then
+            {108}if (jti_1 = jti'_1) then
+            {109}if (scope_1 = scope'_1) then
+            {110}if (a_1 = a'_1) then
+            {111}if (i_1 = i'_3) then
+            {112}if (e1 = u'_1) then
+            {113}if talksOnlyToHonest_1 then
+            {114}out(c_1, check_reach_app);
+            {115}event appCompletesProtocol(m,m_4,m_5,m_6,m_7,m_13,m_14,m_15);
+            {116}out(ch(code_1), free_code)
+        )
+        else
+            {117}if ((e1 = u_1) && (e2 ≠ i_1)) then
+            (
+                {118}in(c_1, pke2: PublicKey);
+                {119}let talksOnlyToHonest_2: bool = false in
+                {120}in(c_1, m_16: bitstring);
+                {121}let (tag1'_2: bitstring,n_2: bitstring,spkI_2: PublicKey) = adec(m_16,ska_1) in
+                {122}if (tag1 = tag1'_2) then
+                {123}new k1_2: SymmetricKey;
+                {124}let m_17: bitstring = aenc((tag2,n_2,k1_2),spkI_2) in
+                {125}out(c_1, m_17);
+                {126}new scope_2: bitstring;
+                {127}let m_18: bitstring = enc((tag3,a_1,scope_2),k1_2) in
+                {128}event appSendsLastMessageToUser(m_16,m_17,m_18);
+                {129}out(c_1, m_18);
+                {130}in(c_1, m_19: bitstring);
+                {131}let (tag8'_2: bitstring,code_2: bitstring,i'_4: bitstring) = dec(m_19,k1_2) in
+                {132}if (tag8 = tag8'_2) then
+                {133}if (e2 = i'_4) then
+                {134}new n2_2: bitstring;
+                {135}new sskI2_2: SecretKey;
+                {136}let m_20: bitstring = aenc((tag9,n2_2,pk(sskI2_2)),pke2) in
+                {137}out(c_1, m_20);
+                {138}in(c_1, m_21: bitstring);
+                {139}let (tag10'_2: bitstring,n2'_2: bitstring,k3_2: SymmetricKey) = adec(m_21,sskI2_2) in
+                {140}if (tag10 = tag10'_2) then
+                {141}if (n2_2 = n2'_2) then
+                {142}new sks_2: SecretKey;
+                {143}new jti_2: bitstring;
+                {144}let T2_2: bitstring = (a_1,jti_2,code_2) in
+                {145}let m_22: bitstring = enc((tag11,pk(sks_2),sign(T2_2,sks_2)),k3_2) in
+                {146}event appSendsLastMessageToIssuer(m_20,m_21,m_22);
+                {147}out(c_1, m_22);
+                {148}in(c_1, m_23: bitstring);
+                {149}out(c_1, check_reach_app);
+                {150}let (tag12'_2: bitstring,signed_M_2: bitstring) = dec(m_23,k3_2) in
+                {151}if (tag12 = tag12'_2) then
+                {152}let M_2: bitstring = check(signed_M_2,pke2) in
+                {153}let (jtk_2: bitstring,jti'_2: bitstring,scope'_2: bitstring,a'_2: bitstring,i'_5: bitstring,u'_2: bitstring) = M_2 in
+                {154}if (jtk_2 = hash_pk(pk(sks_2))) then
+                {155}if (jti_2 = jti'_2) then
+                {156}if (scope_2 = scope'_2) then
+                {157}if (a_1 = a'_2) then
+                {158}if (e2 = i'_5) then
+                {159}if (u_1 = u'_2) then
+                {160}if talksOnlyToHonest_2 then
+                {161}out(c_1, check_reach_app);
+                {162}event appCompletesProtocol(m_16,m_17,m_18,m_19,m_20,m_21,m_22,m_23);
+                {163}out(ch(code_2), free_code)
+            )
+            else
+                {164}if ((e1 ≠ u_1) && (e2 ≠ i_1)) then
+                {165}in(c_1, pke1_1: PublicKey);
+                {166}in(c_1, pke2_1: PublicKey);
+                {167}let talksOnlyToHonest_3: bool = false in
+                {168}in(c_1, m_24: bitstring);
+                {169}let (tag1'_3: bitstring,n_3: bitstring,spkI_3: PublicKey) = adec(m_24,ska_1) in
+                {170}if (tag1 = tag1'_3) then
+                {171}new k1_3: SymmetricKey;
+                {172}let m_25: bitstring = aenc((tag2,n_3,k1_3),spkI_3) in
+                {173}out(c_1, m_25);
+                {174}new scope_3: bitstring;
+                {175}let m_26: bitstring = enc((tag3,a_1,scope_3),k1_3) in
+                {176}event appSendsLastMessageToUser(m_24,m_25,m_26);
+                {177}out(c_1, m_26);
+                {178}in(c_1, m_27: bitstring);
+                {179}let (tag8'_3: bitstring,code_3: bitstring,i'_6: bitstring) = dec(m_27,k1_3) in
+                {180}if (tag8 = tag8'_3) then
+                {181}if (e2 = i'_6) then
+                {182}new n2_3: bitstring;
+                {183}new sskI2_3: SecretKey;
+                {184}let m_28: bitstring = aenc((tag9,n2_3,pk(sskI2_3)),pke2_1) in
+                {185}out(c_1, m_28);
+                {186}in(c_1, m_29: bitstring);
+                {187}let (tag10'_3: bitstring,n2'_3: bitstring,k3_3: SymmetricKey) = adec(m_29,sskI2_3) in
+                {188}if (tag10 = tag10'_3) then
+                {189}if (n2_3 = n2'_3) then
+                {190}new sks_3: SecretKey;
+                {191}new jti_3: bitstring;
+                {192}let T2_3: bitstring = (a_1,jti_3,code_3) in
+                {193}let m_30: bitstring = enc((tag11,pk(sks_3),sign(T2_3,sks_3)),k3_3) in
+                {194}event appSendsLastMessageToIssuer(m_28,m_29,m_30);
+                {195}out(c_1, m_30);
+                {196}in(c_1, m_31: bitstring);
+                {197}out(c_1, check_reach_app);
+                {198}let (tag12'_3: bitstring,signed_M_3: bitstring) = dec(m_31,k3_3) in
+                {199}if (tag12 = tag12'_3) then
+                {200}let M_3: bitstring = check(signed_M_3,pke2_1) in
+                {201}let (jtk_3: bitstring,jti'_3: bitstring,scope'_3: bitstring,a'_3: bitstring,i'_7: bitstring,u'_3: bitstring) = M_3 in
+                {202}if (jtk_3 = hash_pk(pk(sks_3))) then
+                {203}if (jti_3 = jti'_3) then
+                {204}if (scope_3 = scope'_3) then
+                {205}if (a_1 = a'_3) then
+                {206}if (e2 = i'_7) then
+                {207}if (e1 = u'_3) then
+                {208}if talksOnlyToHonest_3 then
+                {209}out(c_1, check_reach_app);
+                {210}event appCompletesProtocol(m_24,m_25,m_26,m_27,m_28,m_29,m_30,m_31);
+                {211}out(ch(code_3), free_code)
+) | (
+    {212}!
+    {213}let c_2: channel = c in
+    {214}let u_2: bitstring = u in
+    {215}let sku_1: SecretKey = sku in
+    {216}let a_2: bitstring = a in
+    {217}let pka: PublicKey = pk(ska) in
+    {218}let i_2: bitstring = i in
+    {219}let pki_1: PublicKey = pk(ski) in
+    {220}let password_1: bitstring = password in
+    {221}in(c_2, e1_1: bitstring);
+    {222}in(c_2, e2_1: bitstring);
+    {223}if ((e1_1 = a_2) && (e2_1 = i_2)) then
+    (
+        {224}let talksOnlyToHonest_4: bool = true in
+        {225}new n_4: bitstring;
+        {226}new sskI: SecretKey;
+        {227}let m_32: bitstring = aenc((tag1,n_4,pk(sskI)),pka) in
+        {228}out(c_2, m_32);
+        {229}in(c_2, m_33: bitstring);
+        {230}let (tag2': bitstring,n': bitstring,k1_4: SymmetricKey) = adec(m_33,sskI) in
+        {231}if (tag2 = tag2') then
+        {232}if (n_4 = n') then
+        {233}in(c_2, m_34: bitstring);
+        {234}let (tag3': bitstring,a'_4: bitstring,scope_4: bitstring) = dec(m_34,k1_4) in
+        {235}if (tag3 = tag3') then
+        {236}if (a_2 = a'_4) then
+        {237}new n2_4: bitstring;
+        {238}new sskI_1: SecretKey;
+        {239}let m_35: bitstring = aenc((tag4,n2_4,pk(sskI_1)),pki_1) in
+        {240}out(c_2, m_35);
+        {241}in(c_2, m_36: bitstring);
+        {242}let (tag5': bitstring,n2'_4: bitstring,k2: SymmetricKey) = adec(m_36,sskI_1) in
+        {243}if (tag5 = tag5') then
+        {244}if (n2_4 = n2'_4) then
+        {245}let m_37: bitstring = enc((tag6,a_2,scope_4,u_2,password_1),k2) in
+        {246}event userSendsLastMessageToIssuer(m_35,m_36,m_37);
+        {247}out(c_2, m_37);
+        {248}in(c_2, m_38: bitstring);
+        {249}let (tag7': bitstring,code_4: bitstring,i'_8: bitstring) = dec(m_38,k2) in
+        {250}if (tag7 = tag7') then
+        {251}if (i_2 = i'_8) then
+        {252}let m_39: bitstring = enc((tag8,code_4,i_2),k1_4) in
+        {253}event userSendsLastMessageToApp(m_32,m_33,m_34,m_39);
+        {254}out(c_2, m_39);
+        {255}if talksOnlyToHonest_4 then
+        {256}out(c_2, check_reach_user);
+        {257}event userCompletesProtocol(m_32,m_33,m_34,m_35,m_36,m_37,m_38);
+        {258}out(ch(code_4), free_code);
+        {259}out(ch(password_1), free_password)
+    )
+    else
+        {260}if ((e1_1 ≠ a_2) && (e2_1 = i_2)) then
+        (
+            {261}in(c_2, pke1_2: PublicKey);
+            {262}let talksOnlyToHonest_5: bool = false in
+            {263}new n_5: bitstring;
+            {264}new sskI_2: SecretKey;
+            {265}let m_40: bitstring = aenc((tag1,n_5,pk(sskI_2)),pke1_2) in
+            {266}out(c_2, m_40);
+            {267}in(c_2, m_41: bitstring);
+            {268}let (tag2'_1: bitstring,n'_1: bitstring,k1_5: SymmetricKey) = adec(m_41,sskI_2) in
+            {269}if (tag2 = tag2'_1) then
+            {270}if (n_5 = n'_1) then
+            {271}in(c_2, m_42: bitstring);
+            {272}let (tag3'_1: bitstring,a'_5: bitstring,scope_5: bitstring) = dec(m_42,k1_5) in
+            {273}if (tag3 = tag3'_1) then
+            {274}if (e1_1 = a'_5) then
+            {275}new n2_5: bitstring;
+            {276}new sskI_3: SecretKey;
+            {277}let m_43: bitstring = aenc((tag4,n2_5,pk(sskI_3)),pki_1) in
+            {278}out(c_2, m_43);
+            {279}in(c_2, m_44: bitstring);
+            {280}let (tag5'_1: bitstring,n2'_5: bitstring,k2_1: SymmetricKey) = adec(m_44,sskI_3) in
+            {281}if (tag5 = tag5'_1) then
+            {282}if (n2_5 = n2'_5) then
+            {283}let m_45: bitstring = enc((tag6,e1_1,scope_5,u_2,password_1),k2_1) in
+            {284}event userSendsLastMessageToIssuer(m_43,m_44,m_45);
+            {285}out(c_2, m_45);
+            {286}in(c_2, m_46: bitstring);
+            {287}let (tag7'_1: bitstring,code_5: bitstring,i'_9: bitstring) = dec(m_46,k2_1) in
+            {288}if (tag7 = tag7'_1) then
+            {289}if (i_2 = i'_9) then
+            {290}let m_47: bitstring = enc((tag8,code_5,i_2),k1_5) in
+            {291}event userSendsLastMessageToApp(m_40,m_41,m_42,m_47);
+            {292}out(c_2, m_47);
+            {293}if talksOnlyToHonest_5 then
+            {294}out(c_2, check_reach_user);
+            {295}event userCompletesProtocol(m_40,m_41,m_42,m_43,m_44,m_45,m_46);
+            {296}out(ch(code_5), free_code);
+            {297}out(ch(password_1), free_password)
+        )
+        else
+            {298}if ((e1_1 = a_2) && (e2_1 ≠ i_2)) then
+            (
+                {299}in(c_2, pke2_2: PublicKey);
+                {300}in(c_2, wrong_pw: bitstring);
+                {301}let talksOnlyToHonest_6: bool = false in
+                {302}new n_6: bitstring;
+                {303}new sskI_4: SecretKey;
+                {304}let m_48: bitstring = aenc((tag1,n_6,pk(sskI_4)),pka) in
+                {305}out(c_2, m_48);
+                {306}in(c_2, m_49: bitstring);
+                {307}let (tag2'_2: bitstring,n'_2: bitstring,k1_6: SymmetricKey) = adec(m_49,sskI_4) in
+                {308}if (tag2 = tag2'_2) then
+                {309}if (n_6 = n'_2) then
+                {310}in(c_2, m_50: bitstring);
+                {311}let (tag3'_2: bitstring,a'_6: bitstring,scope_6: bitstring) = dec(m_50,k1_6) in
+                {312}if (tag3 = tag3'_2) then
+                {313}if (a_2 = a'_6) then
+                {314}new n2_6: bitstring;
+                {315}new sskI_5: SecretKey;
+                {316}let m_51: bitstring = aenc((tag4,n2_6,pk(sskI_5)),pke2_2) in
+                {317}out(c_2, m_51);
+                {318}in(c_2, m_52: bitstring);
+                {319}let (tag5'_2: bitstring,n2'_6: bitstring,k2_2: SymmetricKey) = adec(m_52,sskI_5) in
+                {320}if (tag5 = tag5'_2) then
+                {321}if (n2_6 = n2'_6) then
+                {322}let m_53: bitstring = enc((tag6,a_2,scope_6,u_2,wrong_pw),k2_2) in
+                {323}event userSendsLastMessageToIssuer(m_51,m_52,m_53);
+                {324}out(c_2, m_53);
+                {325}in(c_2, m_54: bitstring);
+                {326}let (tag7'_2: bitstring,code_6: bitstring,i'_10: bitstring) = dec(m_54,k2_2) in
+                {327}if (tag7 = tag7'_2) then
+                {328}if (e2_1 = i'_10) then
+                {329}let m_55: bitstring = enc((tag8,code_6,e2_1),k1_6) in
+                {330}event userSendsLastMessageToApp(m_48,m_49,m_50,m_55);
+                {331}out(c_2, m_55);
+                {332}if talksOnlyToHonest_6 then
+                {333}out(c_2, check_reach_user);
+                {334}event userCompletesProtocol(m_48,m_49,m_50,m_51,m_52,m_53,m_54);
+                {335}out(ch(code_6), free_code);
+                {336}out(ch(wrong_pw), free_password)
+            )
+            else
+                {337}if ((e1_1 ≠ a_2) && (e2_1 ≠ i_2)) then
+                {338}in(c_2, pke1_3: PublicKey);
+                {339}in(c_2, pke2_3: PublicKey);
+                {340}in(c_2, wrong_pw_1: bitstring);
+                {341}let talksOnlyToHonest_7: bool = false in
+                {342}new n_7: bitstring;
+                {343}new sskI_6: SecretKey;
+                {344}let m_56: bitstring = aenc((tag1,n_7,pk(sskI_6)),pke1_3) in
+                {345}out(c_2, m_56);
+                {346}in(c_2, m_57: bitstring);
+                {347}let (tag2'_3: bitstring,n'_3: bitstring,k1_7: SymmetricKey) = adec(m_57,sskI_6) in
+                {348}if (tag2 = tag2'_3) then
+                {349}if (n_7 = n'_3) then
+                {350}in(c_2, m_58: bitstring);
+                {351}let (tag3'_3: bitstring,a'_7: bitstring,scope_7: bitstring) = dec(m_58,k1_7) in
+                {352}if (tag3 = tag3'_3) then
+                {353}if (e1_1 = a'_7) then
+                {354}new n2_7: bitstring;
+                {355}new sskI_7: SecretKey;
+                {356}let m_59: bitstring = aenc((tag4,n2_7,pk(sskI_7)),pke2_3) in
+                {357}out(c_2, m_59);
+                {358}in(c_2, m_60: bitstring);
+                {359}let (tag5'_3: bitstring,n2'_7: bitstring,k2_3: SymmetricKey) = adec(m_60,sskI_7) in
+                {360}if (tag5 = tag5'_3) then
+                {361}if (n2_7 = n2'_7) then
+                {362}let m_61: bitstring = enc((tag6,e1_1,scope_7,u_2,wrong_pw_1),k2_3) in
+                {363}event userSendsLastMessageToIssuer(m_59,m_60,m_61);
+                {364}out(c_2, m_61);
+                {365}in(c_2, m_62: bitstring);
+                {366}let (tag7'_3: bitstring,code_7: bitstring,i'_11: bitstring) = dec(m_62,k2_3) in
+                {367}if (tag7 = tag7'_3) then
+                {368}if (e2_1 = i'_11) then
+                {369}let m_63: bitstring = enc((tag8,code_7,e2_1),k1_7) in
+                {370}event userSendsLastMessageToApp(m_56,m_57,m_58,m_63);
+                {371}out(c_2, m_63);
+                {372}if talksOnlyToHonest_7 then
+                {373}out(c_2, check_reach_user);
+                {374}event userCompletesProtocol(m_56,m_57,m_58,m_59,m_60,m_61,m_62);
+                {375}out(ch(code_7), free_code);
+                {376}out(ch(wrong_pw_1), free_password)
+) | (
+    {377}!
+    {378}let c_3: channel = c in
+    {379}let i_3: bitstring = i in
+    {380}let ski_1: SecretKey = ski in
+    {381}let a_3: bitstring = a in
+    {382}let pka_1: PublicKey = pk(ska) in
+    {383}let u_3: bitstring = u in
+    {384}let pku_1: PublicKey = pk(sku) in
+    {385}let password_2: bitstring = password in
+    {386}in(c_3, e1_2: bitstring);
+    {387}in(c_3, e2_2: bitstring);
+    {388}if ((e1_2 = a_3) && (e2_2 = u_3)) then
+    (
+        {389}let talksOnlyToHonest_8: bool = true in
+        {390}in(c_3, m_64: bitstring);
+        {391}let (tag4': bitstring,n_8: bitstring,spkI_4: PublicKey) = adec(m_64,ski_1) in
+        {392}if (tag4 = tag4') then
+        {393}new k2_4: SymmetricKey;
+        {394}let m_65: bitstring = aenc((tag5,n_8,k2_4),spkI_4) in
+        {395}out(c_3, m_65);
+        {396}in(c_3, m_66: bitstring);
+        {397}let (tag6': bitstring,a'_8: bitstring,scope_8: bitstring,u'_4: bitstring,password': bitstring) = dec(m_66,k2_4) in
+        {398}if (tag6 = tag6') then
+        {399}if (a_3 = a'_8) then
+        {400}if (u_3 = u'_4) then
+        {401}if (password_2 = password') then
+        {402}new code_8: bitstring;
+        {403}let m_67: bitstring = enc((tag7,code_8,i_3),k2_4) in
+        {404}event issuerSendsLastMessageToUser(m_64,m_65,m_66,m_67);
+        {405}out(c_3, m_67);
+        {406}in(c_3, m_68: bitstring);
+        {407}let (tag9': bitstring,n2_8: bitstring,spkI2: PublicKey) = adec(m_68,ski_1) in
+        {408}if (tag9 = tag9') then
+        {409}new k3_4: SymmetricKey;
+        {410}let m_69: bitstring = aenc((tag10,n2_8,k3_4),spkI2) in
+        {411}out(c_3, m_69);
+        {412}in(c_3, m_70: bitstring);
+        {413}let (tag11': bitstring,pksks: PublicKey,signature: bitstring) = dec(m_70,k3_4) in
+        {414}if (tag11 = tag11') then
+        {415}let (a'': bitstring,jti_4: bitstring,code': bitstring) = check(signature,pksks) in
+        {416}if (a_3 = a'') then
+        {417}if (code_8 = code') then
+        {418}let jtk_4: bitstring = hash_pk(pksks) in
+        {419}let M_4: bitstring = (jtk_4,jti_4,scope_8,a_3,i_3,u_3) in
+        {420}let m_71: bitstring = enc((tag12,sign(M_4,ski_1)),k3_4) in
+        {421}event issuerSendsLastMessageToApp(m_68,m_69,m_70,m_71);
+        {422}out(c_3, m_71);
+        {423}if talksOnlyToHonest_8 then
+        {424}out(c_3, check_reach_issuer);
+        {425}event issuerCompletesProtocol(m_64,m_65,m_66,m_68,m_69,m_70);
+        {426}out(ch(code_8), free_code);
+        {427}out(ch(password_2), free_password)
+    )
+    else
+        {428}if ((e1_2 ≠ a_3) && (e2_2 = u_3)) then
+        (
+            {429}in(c_3, pke1_4: PublicKey);
+            {430}let talksOnlyToHonest_9: bool = false in
+            {431}in(c_3, m_72: bitstring);
+            {432}let (tag4'_1: bitstring,n_9: bitstring,spkI_5: PublicKey) = adec(m_72,ski_1) in
+            {433}if (tag4 = tag4'_1) then
+            {434}new k2_5: SymmetricKey;
+            {435}let m_73: bitstring = aenc((tag5,n_9,k2_5),spkI_5) in
+            {436}out(c_3, m_73);
+            {437}in(c_3, m_74: bitstring);
+            {438}let (tag6'_1: bitstring,a'_9: bitstring,scope_9: bitstring,u'_5: bitstring,password'_1: bitstring) = dec(m_74,k2_5) in
+            {439}if (tag6 = tag6'_1) then
+            {440}if (e1_2 = a'_9) then
+            {441}if (u_3 = u'_5) then
+            {442}if (password_2 = password'_1) then
+            {443}new code_9: bitstring;
+            {444}let m_75: bitstring = enc((tag7,code_9,i_3),k2_5) in
+            {445}event issuerSendsLastMessageToUser(m_72,m_73,m_74,m_75);
+            {446}out(c_3, m_75);
+            {447}in(c_3, m_76: bitstring);
+            {448}let (tag9'_1: bitstring,n2_9: bitstring,spkI2_1: PublicKey) = adec(m_76,ski_1) in
+            {449}if (tag9 = tag9'_1) then
+            {450}new k3_5: SymmetricKey;
+            {451}let m_77: bitstring = aenc((tag10,n2_9,k3_5),spkI2_1) in
+            {452}out(c_3, m_77);
+            {453}in(c_3, m_78: bitstring);
+            {454}let (tag11'_1: bitstring,pksks_1: PublicKey,signature_1: bitstring) = dec(m_78,k3_5) in
+            {455}if (tag11 = tag11'_1) then
+            {456}let (a''_1: bitstring,jti_5: bitstring,code'_1: bitstring) = check(signature_1,pksks_1) in
+            {457}if (e1_2 = a''_1) then
+            {458}if (code_9 = code'_1) then
+            {459}let jtk_5: bitstring = hash_pk(pksks_1) in
+            {460}let M_5: bitstring = (jtk_5,jti_5,scope_9,e1_2,i_3,u_3) in
+            {461}let m_79: bitstring = enc((tag12,sign(M_5,ski_1)),k3_5) in
+            {462}event issuerSendsLastMessageToApp(m_76,m_77,m_78,m_79);
+            {463}out(c_3, m_79);
+            {464}if talksOnlyToHonest_9 then
+            {465}out(c_3, check_reach_issuer);
+            {466}event issuerCompletesProtocol(m_72,m_73,m_74,m_76,m_77,m_78);
+            {467}out(ch(code_9), free_code);
+            {468}out(ch(password_2), free_password)
+        )
+        else
+            {469}if ((e1_2 = a_3) && (e2_2 ≠ u_3)) then
+            (
+                {470}in(c_3, pke2_4: PublicKey);
+                {471}in(c_3, wrong_pw_2: bitstring);
+                {472}let talksOnlyToHonest_10: bool = false in
+                {473}in(c_3, m_80: bitstring);
+                {474}let (tag4'_2: bitstring,n_10: bitstring,spkI_6: PublicKey) = adec(m_80,ski_1) in
+                {475}if (tag4 = tag4'_2) then
+                {476}new k2_6: SymmetricKey;
+                {477}let m_81: bitstring = aenc((tag5,n_10,k2_6),spkI_6) in
+                {478}out(c_3, m_81);
+                {479}in(c_3, m_82: bitstring);
+                {480}let (tag6'_2: bitstring,a'_10: bitstring,scope_10: bitstring,u'_6: bitstring,password'_2: bitstring) = dec(m_82,k2_6) in
+                {481}if (tag6 = tag6'_2) then
+                {482}if (a_3 = a'_10) then
+                {483}if (e2_2 = u'_6) then
+                {484}if (wrong_pw_2 = password'_2) then
+                {485}new code_10: bitstring;
+                {486}let m_83: bitstring = enc((tag7,code_10,i_3),k2_6) in
+                {487}event issuerSendsLastMessageToUser(m_80,m_81,m_82,m_83);
+                {488}out(c_3, m_83);
+                {489}in(c_3, m_84: bitstring);
+                {490}let (tag9'_2: bitstring,n2_10: bitstring,spkI2_2: PublicKey) = adec(m_84,ski_1) in
+                {491}if (tag9 = tag9'_2) then
+                {492}new k3_6: SymmetricKey;
+                {493}let m_85: bitstring = aenc((tag10,n2_10,k3_6),spkI2_2) in
+                {494}out(c_3, m_85);
+                {495}in(c_3, m_86: bitstring);
+                {496}let (tag11'_2: bitstring,pksks_2: PublicKey,signature_2: bitstring) = dec(m_86,k3_6) in
+                {497}if (tag11 = tag11'_2) then
+                {498}let (a''_2: bitstring,jti_6: bitstring,code'_2: bitstring) = check(signature_2,pksks_2) in
+                {499}if (a_3 = a''_2) then
+                {500}if (code_10 = code'_2) then
+                {501}let jtk_6: bitstring = hash_pk(pksks_2) in
+                {502}let M_6: bitstring = (jtk_6,jti_6,scope_10,a_3,i_3,e2_2) in
+                {503}let m_87: bitstring = enc((tag12,sign(M_6,ski_1)),k3_6) in
+                {504}event issuerSendsLastMessageToApp(m_84,m_85,m_86,m_87);
+                {505}out(c_3, m_87);
+                {506}if talksOnlyToHonest_10 then
+                {507}out(c_3, check_reach_issuer);
+                {508}event issuerCompletesProtocol(m_80,m_81,m_82,m_84,m_85,m_86);
+                {509}out(ch(code_10), free_code);
+                {510}out(ch(wrong_pw_2), free_password)
+            )
+            else
+                {511}if ((e1_2 ≠ a_3) && (e2_2 ≠ u_3)) then
+                {512}in(c_3, pke1_5: PublicKey);
+                {513}in(c_3, pke2_5: PublicKey);
+                {514}in(c_3, wrong_pw_3: bitstring);
+                {515}let talksOnlyToHonest_11: bool = false in
+                {516}in(c_3, m_88: bitstring);
+                {517}let (tag4'_3: bitstring,n_11: bitstring,spkI_7: PublicKey) = adec(m_88,ski_1) in
+                {518}if (tag4 = tag4'_3) then
+                {519}new k2_7: SymmetricKey;
+                {520}let m_89: bitstring = aenc((tag5,n_11,k2_7),spkI_7) in
+                {521}out(c_3, m_89);
+                {522}in(c_3, m_90: bitstring);
+                {523}let (tag6'_3: bitstring,a'_11: bitstring,scope_11: bitstring,u'_7: bitstring,password'_3: bitstring) = dec(m_90,k2_7) in
+                {524}if (tag6 = tag6'_3) then
+                {525}if (e1_2 = a'_11) then
+                {526}if (e2_2 = u'_7) then
+                {527}if (wrong_pw_3 = password'_3) then
+                {528}new code_11: bitstring;
+                {529}let m_91: bitstring = enc((tag7,code_11,i_3),k2_7) in
+                {530}event issuerSendsLastMessageToUser(m_88,m_89,m_90,m_91);
+                {531}out(c_3, m_91);
+                {532}in(c_3, m_92: bitstring);
+                {533}let (tag9'_3: bitstring,n2_11: bitstring,spkI2_3: PublicKey) = adec(m_92,ski_1) in
+                {534}if (tag9 = tag9'_3) then
+                {535}new k3_7: SymmetricKey;
+                {536}let m_93: bitstring = aenc((tag10,n2_11,k3_7),spkI2_3) in
+                {537}out(c_3, m_93);
+                {538}in(c_3, m_94: bitstring);
+                {539}let (tag11'_3: bitstring,pksks_3: PublicKey,signature_3: bitstring) = dec(m_94,k3_7) in
+                {540}if (tag11 = tag11'_3) then
+                {541}let (a''_3: bitstring,jti_7: bitstring,code'_3: bitstring) = check(signature_3,pksks_3) in
+                {542}if (e1_2 = a''_3) then
+                {543}if (code_11 = code'_3) then
+                {544}let jtk_7: bitstring = hash_pk(pksks_3) in
+                {545}let M_7: bitstring = (jtk_7,jti_7,scope_11,e1_2,i_3,e2_2) in
+                {546}let m_95: bitstring = enc((tag12,sign(M_7,ski_1)),k3_7) in
+                {547}event issuerSendsLastMessageToApp(m_92,m_93,m_94,m_95);
+                {548}out(c_3, m_95);
+                {549}if talksOnlyToHonest_11 then
+                {550}out(c_3, check_reach_issuer);
+                {551}event issuerCompletesProtocol(m_88,m_89,m_90,m_92,m_93,m_94);
+                {552}out(ch(code_11), free_code);
+                {553}out(ch(wrong_pw_3), free_password)
+)
+
+--  Process 1 (that is, process 0, with let moved downwards):
+{1}new a: bitstring;
+{2}new u: bitstring;
+{3}new i: bitstring;
+{4}out(c, a);
+{5}out(c, u);
+{6}out(c, i);
+{7}new ska: SecretKey;
+{8}new sku: SecretKey;
+{9}new ski: SecretKey;
+{10}out(c, pk(ska));
+{11}out(c, pk(sku));
+{12}out(c, pk(ski));
+{13}new password: bitstring;
+(
+    {14}!
+    {15}let c_1: channel = c in
+    {22}in(c_1, e1: bitstring);
+    {23}in(c_1, e2: bitstring);
+    {21}let pki: PublicKey = pk(ski) in
+    {20}let i_1: bitstring = i in
+    {18}let u_1: bitstring = u in
+    {17}let ska_1: SecretKey = ska in
+    {16}let a_1: bitstring = a in
+    {24}if ((e1 = u_1) && (e2 = i_1)) then
+    (
+        {26}in(c_1, m_1: bitstring);
+        {27}let (tag1': bitstring,n: bitstring,spkI: PublicKey) = adec(m_1,ska_1) in
+        {28}if (tag1 = tag1') then
+        {29}new k1: SymmetricKey;
+        {30}let m_2: bitstring = aenc((tag2,n,k1),spkI) in
+        {31}out(c_1, m_2);
+        {32}new scope: bitstring;
+        {33}let m_3: bitstring = enc((tag3,a_1,scope),k1) in
+        {34}event appSendsLastMessageToUser(m_1,m_2,m_3);
+        {35}out(c_1, m_3);
+        {36}in(c_1, m_8: bitstring);
+        {37}let (tag8': bitstring,code: bitstring,i': bitstring) = dec(m_8,k1) in
+        {38}if (tag8 = tag8') then
+        {39}if (i_1 = i') then
+        {40}new n2: bitstring;
+        {41}new sskI2: SecretKey;
+        {42}let m_9: bitstring = aenc((tag9,n2,pk(sskI2)),pki) in
+        {43}out(c_1, m_9);
+        {44}in(c_1, m_10: bitstring);
+        {45}let (tag10': bitstring,n2': bitstring,k3: SymmetricKey) = adec(m_10,sskI2) in
+        {46}if (tag10 = tag10') then
+        {47}if (n2 = n2') then
+        {48}new sks: SecretKey;
+        {49}new jti: bitstring;
+        {50}let T2: bitstring = (a_1,jti,code) in
+        {51}let m_11: bitstring = enc((tag11,pk(sks),sign(T2,sks)),k3) in
+        {52}event appSendsLastMessageToIssuer(m_9,m_10,m_11);
+        {53}out(c_1, m_11);
+        {54}in(c_1, m_12: bitstring);
+        {55}out(c_1, check_reach_app);
+        {56}let (tag12': bitstring,signed_M: bitstring) = dec(m_12,k3) in
+        {57}if (tag12 = tag12') then
+        {58}let M: bitstring = check(signed_M,pki) in
+        {59}let (jtk: bitstring,jti': bitstring,scope': bitstring,a': bitstring,i'_1: bitstring,u': bitstring) = M in
+        {60}if (jtk = hash_pk(pk(sks))) then
+        {61}if (jti = jti') then
+        {62}if (scope = scope') then
+        {63}if (a_1 = a') then
+        {64}if (i_1 = i'_1) then
+        {65}if (u_1 = u') then
+        {25}let talksOnlyToHonest: bool = true in
+        {66}if talksOnlyToHonest then
+        {67}out(c_1, check_reach_app);
+        {68}event appCompletesProtocol(m_1,m_2,m_3,m_8,m_9,m_10,m_11,m_12);
+        {69}out(ch(code), free_code)
+    )
+    else
+        {70}if ((e1 ≠ u_1) && (e2 = i_1)) then
+        (
+            {71}in(c_1, pke1: PublicKey);
+            {73}in(c_1, m: bitstring);
+            {74}let (tag1'_1: bitstring,n_1: bitstring,spkI_1: PublicKey) = adec(m,ska_1) in
+            {75}if (tag1 = tag1'_1) then
+            {76}new k1_1: SymmetricKey;
+            {77}let m_4: bitstring = aenc((tag2,n_1,k1_1),spkI_1) in
+            {78}out(c_1, m_4);
+            {79}new scope_1: bitstring;
+            {80}let m_5: bitstring = enc((tag3,a_1,scope_1),k1_1) in
+            {81}event appSendsLastMessageToUser(m,m_4,m_5);
+            {82}out(c_1, m_5);
+            {83}in(c_1, m_6: bitstring);
+            {84}let (tag8'_1: bitstring,code_1: bitstring,i'_2: bitstring) = dec(m_6,k1_1) in
+            {85}if (tag8 = tag8'_1) then
+            {86}if (i_1 = i'_2) then
+            {87}new n2_1: bitstring;
+            {88}new sskI2_1: SecretKey;
+            {89}let m_7: bitstring = aenc((tag9,n2_1,pk(sskI2_1)),pki) in
+            {90}out(c_1, m_7);
+            {91}in(c_1, m_13: bitstring);
+            {92}let (tag10'_1: bitstring,n2'_1: bitstring,k3_1: SymmetricKey) = adec(m_13,sskI2_1) in
+            {93}if (tag10 = tag10'_1) then
+            {94}if (n2_1 = n2'_1) then
+            {95}new sks_1: SecretKey;
+            {96}new jti_1: bitstring;
+            {97}let T2_1: bitstring = (a_1,jti_1,code_1) in
+            {98}let m_14: bitstring = enc((tag11,pk(sks_1),sign(T2_1,sks_1)),k3_1) in
+            {99}event appSendsLastMessageToIssuer(m_7,m_13,m_14);
+            {100}out(c_1, m_14);
+            {101}in(c_1, m_15: bitstring);
+            {102}out(c_1, check_reach_app);
+            {103}let (tag12'_1: bitstring,signed_M_1: bitstring) = dec(m_15,k3_1) in
+            {104}if (tag12 = tag12'_1) then
+            {105}let M_1: bitstring = check(signed_M_1,pki) in
+            {106}let (jtk_1: bitstring,jti'_1: bitstring,scope'_1: bitstring,a'_1: bitstring,i'_3: bitstring,u'_1: bitstring) = M_1 in
+            {107}if (jtk_1 = hash_pk(pk(sks_1))) then
+            {108}if (jti_1 = jti'_1) then
+            {109}if (scope_1 = scope'_1) then
+            {110}if (a_1 = a'_1) then
+            {111}if (i_1 = i'_3) then
+            {112}if (e1 = u'_1) then
+            {72}let talksOnlyToHonest_1: bool = false in
+            {113}if talksOnlyToHonest_1 then
+            {114}out(c_1, check_reach_app);
+            {115}event appCompletesProtocol(m,m_4,m_5,m_6,m_7,m_13,m_14,m_15);
+            {116}out(ch(code_1), free_code)
+        )
+        else
+            {117}if ((e1 = u_1) && (e2 ≠ i_1)) then
+            (
+                {118}in(c_1, pke2: PublicKey);
+                {120}in(c_1, m_16: bitstring);
+                {121}let (tag1'_2: bitstring,n_2: bitstring,spkI_2: PublicKey) = adec(m_16,ska_1) in
+                {122}if (tag1 = tag1'_2) then
+                {123}new k1_2: SymmetricKey;
+                {124}let m_17: bitstring = aenc((tag2,n_2,k1_2),spkI_2) in
+                {125}out(c_1, m_17);
+                {126}new scope_2: bitstring;
+                {127}let m_18: bitstring = enc((tag3,a_1,scope_2),k1_2) in
+                {128}event appSendsLastMessageToUser(m_16,m_17,m_18);
+                {129}out(c_1, m_18);
+                {130}in(c_1, m_19: bitstring);
+                {131}let (tag8'_2: bitstring,code_2: bitstring,i'_4: bitstring) = dec(m_19,k1_2) in
+                {132}if (tag8 = tag8'_2) then
+                {133}if (e2 = i'_4) then
+                {134}new n2_2: bitstring;
+                {135}new sskI2_2: SecretKey;
+                {136}let m_20: bitstring = aenc((tag9,n2_2,pk(sskI2_2)),pke2) in
+                {137}out(c_1, m_20);
+                {138}in(c_1, m_21: bitstring);
+                {139}let (tag10'_2: bitstring,n2'_2: bitstring,k3_2: SymmetricKey) = adec(m_21,sskI2_2) in
+                {140}if (tag10 = tag10'_2) then
+                {141}if (n2_2 = n2'_2) then
+                {142}new sks_2: SecretKey;
+                {143}new jti_2: bitstring;
+                {144}let T2_2: bitstring = (a_1,jti_2,code_2) in
+                {145}let m_22: bitstring = enc((tag11,pk(sks_2),sign(T2_2,sks_2)),k3_2) in
+                {146}event appSendsLastMessageToIssuer(m_20,m_21,m_22);
+                {147}out(c_1, m_22);
+                {148}in(c_1, m_23: bitstring);
+                {149}out(c_1, check_reach_app);
+                {150}let (tag12'_2: bitstring,signed_M_2: bitstring) = dec(m_23,k3_2) in
+                {151}if (tag12 = tag12'_2) then
+                {152}let M_2: bitstring = check(signed_M_2,pke2) in
+                {153}let (jtk_2: bitstring,jti'_2: bitstring,scope'_2: bitstring,a'_2: bitstring,i'_5: bitstring,u'_2: bitstring) = M_2 in
+                {154}if (jtk_2 = hash_pk(pk(sks_2))) then
+                {155}if (jti_2 = jti'_2) then
+                {156}if (scope_2 = scope'_2) then
+                {157}if (a_1 = a'_2) then
+                {158}if (e2 = i'_5) then
+                {159}if (u_1 = u'_2) then
+                {119}let talksOnlyToHonest_2: bool = false in
+                {160}if talksOnlyToHonest_2 then
+                {161}out(c_1, check_reach_app);
+                {162}event appCompletesProtocol(m_16,m_17,m_18,m_19,m_20,m_21,m_22,m_23);
+                {163}out(ch(code_2), free_code)
+            )
+            else
+                {164}if ((e1 ≠ u_1) && (e2 ≠ i_1)) then
+                {165}in(c_1, pke1_1: PublicKey);
+                {166}in(c_1, pke2_1: PublicKey);
+                {168}in(c_1, m_24: bitstring);
+                {169}let (tag1'_3: bitstring,n_3: bitstring,spkI_3: PublicKey) = adec(m_24,ska_1) in
+                {170}if (tag1 = tag1'_3) then
+                {171}new k1_3: SymmetricKey;
+                {172}let m_25: bitstring = aenc((tag2,n_3,k1_3),spkI_3) in
+                {173}out(c_1, m_25);
+                {174}new scope_3: bitstring;
+                {175}let m_26: bitstring = enc((tag3,a_1,scope_3),k1_3) in
+                {176}event appSendsLastMessageToUser(m_24,m_25,m_26);
+                {177}out(c_1, m_26);
+                {178}in(c_1, m_27: bitstring);
+                {179}let (tag8'_3: bitstring,code_3: bitstring,i'_6: bitstring) = dec(m_27,k1_3) in
+                {180}if (tag8 = tag8'_3) then
+                {181}if (e2 = i'_6) then
+                {182}new n2_3: bitstring;
+                {183}new sskI2_3: SecretKey;
+                {184}let m_28: bitstring = aenc((tag9,n2_3,pk(sskI2_3)),pke2_1) in
+                {185}out(c_1, m_28);
+                {186}in(c_1, m_29: bitstring);
+                {187}let (tag10'_3: bitstring,n2'_3: bitstring,k3_3: SymmetricKey) = adec(m_29,sskI2_3) in
+                {188}if (tag10 = tag10'_3) then
+                {189}if (n2_3 = n2'_3) then
+                {190}new sks_3: SecretKey;
+                {191}new jti_3: bitstring;
+                {192}let T2_3: bitstring = (a_1,jti_3,code_3) in
+                {193}let m_30: bitstring = enc((tag11,pk(sks_3),sign(T2_3,sks_3)),k3_3) in
+                {194}event appSendsLastMessageToIssuer(m_28,m_29,m_30);
+                {195}out(c_1, m_30);
+                {196}in(c_1, m_31: bitstring);
+                {197}out(c_1, check_reach_app);
+                {198}let (tag12'_3: bitstring,signed_M_3: bitstring) = dec(m_31,k3_3) in
+                {199}if (tag12 = tag12'_3) then
+                {200}let M_3: bitstring = check(signed_M_3,pke2_1) in
+                {201}let (jtk_3: bitstring,jti'_3: bitstring,scope'_3: bitstring,a'_3: bitstring,i'_7: bitstring,u'_3: bitstring) = M_3 in
+                {202}if (jtk_3 = hash_pk(pk(sks_3))) then
+                {203}if (jti_3 = jti'_3) then
+                {204}if (scope_3 = scope'_3) then
+                {205}if (a_1 = a'_3) then
+                {206}if (e2 = i'_7) then
+                {207}if (e1 = u'_3) then
+                {167}let talksOnlyToHonest_3: bool = false in
+                {208}if talksOnlyToHonest_3 then
+                {209}out(c_1, check_reach_app);
+                {210}event appCompletesProtocol(m_24,m_25,m_26,m_27,m_28,m_29,m_30,m_31);
+                {211}out(ch(code_3), free_code)
+) | (
+    {212}!
+    {213}let c_2: channel = c in
+    {221}in(c_2, e1_1: bitstring);
+    {222}in(c_2, e2_1: bitstring);
+    {220}let password_1: bitstring = password in
+    {219}let pki_1: PublicKey = pk(ski) in
+    {218}let i_2: bitstring = i in
+    {217}let pka: PublicKey = pk(ska) in
+    {216}let a_2: bitstring = a in
+    {214}let u_2: bitstring = u in
+    {223}if ((e1_1 = a_2) && (e2_1 = i_2)) then
+    (
+        {225}new n_4: bitstring;
+        {226}new sskI: SecretKey;
+        {227}let m_32: bitstring = aenc((tag1,n_4,pk(sskI)),pka) in
+        {228}out(c_2, m_32);
+        {229}in(c_2, m_33: bitstring);
+        {230}let (tag2': bitstring,n': bitstring,k1_4: SymmetricKey) = adec(m_33,sskI) in
+        {231}if (tag2 = tag2') then
+        {232}if (n_4 = n') then
+        {233}in(c_2, m_34: bitstring);
+        {234}let (tag3': bitstring,a'_4: bitstring,scope_4: bitstring) = dec(m_34,k1_4) in
+        {235}if (tag3 = tag3') then
+        {236}if (a_2 = a'_4) then
+        {237}new n2_4: bitstring;
+        {238}new sskI_1: SecretKey;
+        {239}let m_35: bitstring = aenc((tag4,n2_4,pk(sskI_1)),pki_1) in
+        {240}out(c_2, m_35);
+        {241}in(c_2, m_36: bitstring);
+        {242}let (tag5': bitstring,n2'_4: bitstring,k2: SymmetricKey) = adec(m_36,sskI_1) in
+        {243}if (tag5 = tag5') then
+        {244}if (n2_4 = n2'_4) then
+        {245}let m_37: bitstring = enc((tag6,a_2,scope_4,u_2,password_1),k2) in
+        {246}event userSendsLastMessageToIssuer(m_35,m_36,m_37);
+        {247}out(c_2, m_37);
+        {248}in(c_2, m_38: bitstring);
+        {249}let (tag7': bitstring,code_4: bitstring,i'_8: bitstring) = dec(m_38,k2) in
+        {250}if (tag7 = tag7') then
+        {251}if (i_2 = i'_8) then
+        {252}let m_39: bitstring = enc((tag8,code_4,i_2),k1_4) in
+        {253}event userSendsLastMessageToApp(m_32,m_33,m_34,m_39);
+        {254}out(c_2, m_39);
+        {224}let talksOnlyToHonest_4: bool = true in
+        {255}if talksOnlyToHonest_4 then
+        {256}out(c_2, check_reach_user);
+        {257}event userCompletesProtocol(m_32,m_33,m_34,m_35,m_36,m_37,m_38);
+        {258}out(ch(code_4), free_code);
+        {259}out(ch(password_1), free_password)
+    )
+    else
+        {260}if ((e1_1 ≠ a_2) && (e2_1 = i_2)) then
+        (
+            {261}in(c_2, pke1_2: PublicKey);
+            {263}new n_5: bitstring;
+            {264}new sskI_2: SecretKey;
+            {265}let m_40: bitstring = aenc((tag1,n_5,pk(sskI_2)),pke1_2) in
+            {266}out(c_2, m_40);
+            {267}in(c_2, m_41: bitstring);
+            {268}let (tag2'_1: bitstring,n'_1: bitstring,k1_5: SymmetricKey) = adec(m_41,sskI_2) in
+            {269}if (tag2 = tag2'_1) then
+            {270}if (n_5 = n'_1) then
+            {271}in(c_2, m_42: bitstring);
+            {272}let (tag3'_1: bitstring,a'_5: bitstring,scope_5: bitstring) = dec(m_42,k1_5) in
+            {273}if (tag3 = tag3'_1) then
+            {274}if (e1_1 = a'_5) then
+            {275}new n2_5: bitstring;
+            {276}new sskI_3: SecretKey;
+            {277}let m_43: bitstring = aenc((tag4,n2_5,pk(sskI_3)),pki_1) in
+            {278}out(c_2, m_43);
+            {279}in(c_2, m_44: bitstring);
+            {280}let (tag5'_1: bitstring,n2'_5: bitstring,k2_1: SymmetricKey) = adec(m_44,sskI_3) in
+            {281}if (tag5 = tag5'_1) then
+            {282}if (n2_5 = n2'_5) then
+            {283}let m_45: bitstring = enc((tag6,e1_1,scope_5,u_2,password_1),k2_1) in
+            {284}event userSendsLastMessageToIssuer(m_43,m_44,m_45);
+            {285}out(c_2, m_45);
+            {286}in(c_2, m_46: bitstring);
+            {287}let (tag7'_1: bitstring,code_5: bitstring,i'_9: bitstring) = dec(m_46,k2_1) in
+            {288}if (tag7 = tag7'_1) then
+            {289}if (i_2 = i'_9) then
+            {290}let m_47: bitstring = enc((tag8,code_5,i_2),k1_5) in
+            {291}event userSendsLastMessageToApp(m_40,m_41,m_42,m_47);
+            {292}out(c_2, m_47);
+            {262}let talksOnlyToHonest_5: bool = false in
+            {293}if talksOnlyToHonest_5 then
+            {294}out(c_2, check_reach_user);
+            {295}event userCompletesProtocol(m_40,m_41,m_42,m_43,m_44,m_45,m_46);
+            {296}out(ch(code_5), free_code);
+            {297}out(ch(password_1), free_password)
+        )
+        else
+            {298}if ((e1_1 = a_2) && (e2_1 ≠ i_2)) then
+            (
+                {299}in(c_2, pke2_2: PublicKey);
+                {300}in(c_2, wrong_pw: bitstring);
+                {302}new n_6: bitstring;
+                {303}new sskI_4: SecretKey;
+                {304}let m_48: bitstring = aenc((tag1,n_6,pk(sskI_4)),pka) in
+                {305}out(c_2, m_48);
+                {306}in(c_2, m_49: bitstring);
+                {307}let (tag2'_2: bitstring,n'_2: bitstring,k1_6: SymmetricKey) = adec(m_49,sskI_4) in
+                {308}if (tag2 = tag2'_2) then
+                {309}if (n_6 = n'_2) then
+                {310}in(c_2, m_50: bitstring);
+                {311}let (tag3'_2: bitstring,a'_6: bitstring,scope_6: bitstring) = dec(m_50,k1_6) in
+                {312}if (tag3 = tag3'_2) then
+                {313}if (a_2 = a'_6) then
+                {314}new n2_6: bitstring;
+                {315}new sskI_5: SecretKey;
+                {316}let m_51: bitstring = aenc((tag4,n2_6,pk(sskI_5)),pke2_2) in
+                {317}out(c_2, m_51);
+                {318}in(c_2, m_52: bitstring);
+                {319}let (tag5'_2: bitstring,n2'_6: bitstring,k2_2: SymmetricKey) = adec(m_52,sskI_5) in
+                {320}if (tag5 = tag5'_2) then
+                {321}if (n2_6 = n2'_6) then
+                {322}let m_53: bitstring = enc((tag6,a_2,scope_6,u_2,wrong_pw),k2_2) in
+                {323}event userSendsLastMessageToIssuer(m_51,m_52,m_53);
+                {324}out(c_2, m_53);
+                {325}in(c_2, m_54: bitstring);
+                {326}let (tag7'_2: bitstring,code_6: bitstring,i'_10: bitstring) = dec(m_54,k2_2) in
+                {327}if (tag7 = tag7'_2) then
+                {328}if (e2_1 = i'_10) then
+                {329}let m_55: bitstring = enc((tag8,code_6,e2_1),k1_6) in
+                {330}event userSendsLastMessageToApp(m_48,m_49,m_50,m_55);
+                {331}out(c_2, m_55);
+                {301}let talksOnlyToHonest_6: bool = false in
+                {332}if talksOnlyToHonest_6 then
+                {333}out(c_2, check_reach_user);
+                {334}event userCompletesProtocol(m_48,m_49,m_50,m_51,m_52,m_53,m_54);
+                {335}out(ch(code_6), free_code);
+                {336}out(ch(wrong_pw), free_password)
+            )
+            else
+                {337}if ((e1_1 ≠ a_2) && (e2_1 ≠ i_2)) then
+                {338}in(c_2, pke1_3: PublicKey);
+                {339}in(c_2, pke2_3: PublicKey);
+                {340}in(c_2, wrong_pw_1: bitstring);
+                {342}new n_7: bitstring;
+                {343}new sskI_6: SecretKey;
+                {344}let m_56: bitstring = aenc((tag1,n_7,pk(sskI_6)),pke1_3) in
+                {345}out(c_2, m_56);
+                {346}in(c_2, m_57: bitstring);
+                {347}let (tag2'_3: bitstring,n'_3: bitstring,k1_7: SymmetricKey) = adec(m_57,sskI_6) in
+                {348}if (tag2 = tag2'_3) then
+                {349}if (n_7 = n'_3) then
+                {350}in(c_2, m_58: bitstring);
+                {351}let (tag3'_3: bitstring,a'_7: bitstring,scope_7: bitstring) = dec(m_58,k1_7) in
+                {352}if (tag3 = tag3'_3) then
+                {353}if (e1_1 = a'_7) then
+                {354}new n2_7: bitstring;
+                {355}new sskI_7: SecretKey;
+                {356}let m_59: bitstring = aenc((tag4,n2_7,pk(sskI_7)),pke2_3) in
+                {357}out(c_2, m_59);
+                {358}in(c_2, m_60: bitstring);
+                {359}let (tag5'_3: bitstring,n2'_7: bitstring,k2_3: SymmetricKey) = adec(m_60,sskI_7) in
+                {360}if (tag5 = tag5'_3) then
+                {361}if (n2_7 = n2'_7) then
+                {362}let m_61: bitstring = enc((tag6,e1_1,scope_7,u_2,wrong_pw_1),k2_3) in
+                {363}event userSendsLastMessageToIssuer(m_59,m_60,m_61);
+                {364}out(c_2, m_61);
+                {365}in(c_2, m_62: bitstring);
+                {366}let (tag7'_3: bitstring,code_7: bitstring,i'_11: bitstring) = dec(m_62,k2_3) in
+                {367}if (tag7 = tag7'_3) then
+                {368}if (e2_1 = i'_11) then
+                {369}let m_63: bitstring = enc((tag8,code_7,e2_1),k1_7) in
+                {370}event userSendsLastMessageToApp(m_56,m_57,m_58,m_63);
+                {371}out(c_2, m_63);
+                {341}let talksOnlyToHonest_7: bool = false in
+                {372}if talksOnlyToHonest_7 then
+                {373}out(c_2, check_reach_user);
+                {374}event userCompletesProtocol(m_56,m_57,m_58,m_59,m_60,m_61,m_62);
+                {375}out(ch(code_7), free_code);
+                {376}out(ch(wrong_pw_1), free_password)
+) | (
+    {377}!
+    {378}let c_3: channel = c in
+    {386}in(c_3, e1_2: bitstring);
+    {387}in(c_3, e2_2: bitstring);
+    {385}let password_2: bitstring = password in
+    {383}let u_3: bitstring = u in
+    {381}let a_3: bitstring = a in
+    {380}let ski_1: SecretKey = ski in
+    {379}let i_3: bitstring = i in
+    {388}if ((e1_2 = a_3) && (e2_2 = u_3)) then
+    (
+        {390}in(c_3, m_64: bitstring);
+        {391}let (tag4': bitstring,n_8: bitstring,spkI_4: PublicKey) = adec(m_64,ski_1) in
+        {392}if (tag4 = tag4') then
+        {393}new k2_4: SymmetricKey;
+        {394}let m_65: bitstring = aenc((tag5,n_8,k2_4),spkI_4) in
+        {395}out(c_3, m_65);
+        {396}in(c_3, m_66: bitstring);
+        {397}let (tag6': bitstring,a'_8: bitstring,scope_8: bitstring,u'_4: bitstring,password': bitstring) = dec(m_66,k2_4) in
+        {398}if (tag6 = tag6') then
+        {399}if (a_3 = a'_8) then
+        {400}if (u_3 = u'_4) then
+        {401}if (password_2 = password') then
+        {402}new code_8: bitstring;
+        {403}let m_67: bitstring = enc((tag7,code_8,i_3),k2_4) in
+        {404}event issuerSendsLastMessageToUser(m_64,m_65,m_66,m_67);
+        {405}out(c_3, m_67);
+        {406}in(c_3, m_68: bitstring);
+        {407}let (tag9': bitstring,n2_8: bitstring,spkI2: PublicKey) = adec(m_68,ski_1) in
+        {408}if (tag9 = tag9') then
+        {409}new k3_4: SymmetricKey;
+        {410}let m_69: bitstring = aenc((tag10,n2_8,k3_4),spkI2) in
+        {411}out(c_3, m_69);
+        {412}in(c_3, m_70: bitstring);
+        {413}let (tag11': bitstring,pksks: PublicKey,signature: bitstring) = dec(m_70,k3_4) in
+        {414}if (tag11 = tag11') then
+        {415}let (a'': bitstring,jti_4: bitstring,code': bitstring) = check(signature,pksks) in
+        {416}if (a_3 = a'') then
+        {417}if (code_8 = code') then
+        {418}let jtk_4: bitstring = hash_pk(pksks) in
+        {419}let M_4: bitstring = (jtk_4,jti_4,scope_8,a_3,i_3,u_3) in
+        {420}let m_71: bitstring = enc((tag12,sign(M_4,ski_1)),k3_4) in
+        {421}event issuerSendsLastMessageToApp(m_68,m_69,m_70,m_71);
+        {422}out(c_3, m_71);
+        {389}let talksOnlyToHonest_8: bool = true in
+        {423}if talksOnlyToHonest_8 then
+        {424}out(c_3, check_reach_issuer);
+        {425}event issuerCompletesProtocol(m_64,m_65,m_66,m_68,m_69,m_70);
+        {426}out(ch(code_8), free_code);
+        {427}out(ch(password_2), free_password)
+    )
+    else
+        {428}if ((e1_2 ≠ a_3) && (e2_2 = u_3)) then
+        (
+            {429}in(c_3, pke1_4: PublicKey);
+            {431}in(c_3, m_72: bitstring);
+            {432}let (tag4'_1: bitstring,n_9: bitstring,spkI_5: PublicKey) = adec(m_72,ski_1) in
+            {433}if (tag4 = tag4'_1) then
+            {434}new k2_5: SymmetricKey;
+            {435}let m_73: bitstring = aenc((tag5,n_9,k2_5),spkI_5) in
+            {436}out(c_3, m_73);
+            {437}in(c_3, m_74: bitstring);
+            {438}let (tag6'_1: bitstring,a'_9: bitstring,scope_9: bitstring,u'_5: bitstring,password'_1: bitstring) = dec(m_74,k2_5) in
+            {439}if (tag6 = tag6'_1) then
+            {440}if (e1_2 = a'_9) then
+            {441}if (u_3 = u'_5) then
+            {442}if (password_2 = password'_1) then
+            {443}new code_9: bitstring;
+            {444}let m_75: bitstring = enc((tag7,code_9,i_3),k2_5) in
+            {445}event issuerSendsLastMessageToUser(m_72,m_73,m_74,m_75);
+            {446}out(c_3, m_75);
+            {447}in(c_3, m_76: bitstring);
+            {448}let (tag9'_1: bitstring,n2_9: bitstring,spkI2_1: PublicKey) = adec(m_76,ski_1) in
+            {449}if (tag9 = tag9'_1) then
+            {450}new k3_5: SymmetricKey;
+            {451}let m_77: bitstring = aenc((tag10,n2_9,k3_5),spkI2_1) in
+            {452}out(c_3, m_77);
+            {453}in(c_3, m_78: bitstring);
+            {454}let (tag11'_1: bitstring,pksks_1: PublicKey,signature_1: bitstring) = dec(m_78,k3_5) in
+            {455}if (tag11 = tag11'_1) then
+            {456}let (a''_1: bitstring,jti_5: bitstring,code'_1: bitstring) = check(signature_1,pksks_1) in
+            {457}if (e1_2 = a''_1) then
+            {458}if (code_9 = code'_1) then
+            {459}let jtk_5: bitstring = hash_pk(pksks_1) in
+            {460}let M_5: bitstring = (jtk_5,jti_5,scope_9,e1_2,i_3,u_3) in
+            {461}let m_79: bitstring = enc((tag12,sign(M_5,ski_1)),k3_5) in
+            {462}event issuerSendsLastMessageToApp(m_76,m_77,m_78,m_79);
+            {463}out(c_3, m_79);
+            {430}let talksOnlyToHonest_9: bool = false in
+            {464}if talksOnlyToHonest_9 then
+            {465}out(c_3, check_reach_issuer);
+            {466}event issuerCompletesProtocol(m_72,m_73,m_74,m_76,m_77,m_78);
+            {467}out(ch(code_9), free_code);
+            {468}out(ch(password_2), free_password)
+        )
+        else
+            {469}if ((e1_2 = a_3) && (e2_2 ≠ u_3)) then
+            (
+                {470}in(c_3, pke2_4: PublicKey);
+                {471}in(c_3, wrong_pw_2: bitstring);
+                {473}in(c_3, m_80: bitstring);
+                {474}let (tag4'_2: bitstring,n_10: bitstring,spkI_6: PublicKey) = adec(m_80,ski_1) in
+                {475}if (tag4 = tag4'_2) then
+                {476}new k2_6: SymmetricKey;
+                {477}let m_81: bitstring = aenc((tag5,n_10,k2_6),spkI_6) in
+                {478}out(c_3, m_81);
+                {479}in(c_3, m_82: bitstring);
+                {480}let (tag6'_2: bitstring,a'_10: bitstring,scope_10: bitstring,u'_6: bitstring,password'_2: bitstring) = dec(m_82,k2_6) in
+                {481}if (tag6 = tag6'_2) then
+                {482}if (a_3 = a'_10) then
+                {483}if (e2_2 = u'_6) then
+                {484}if (wrong_pw_2 = password'_2) then
+                {485}new code_10: bitstring;
+                {486}let m_83: bitstring = enc((tag7,code_10,i_3),k2_6) in
+                {487}event issuerSendsLastMessageToUser(m_80,m_81,m_82,m_83);
+                {488}out(c_3, m_83);
+                {489}in(c_3, m_84: bitstring);
+                {490}let (tag9'_2: bitstring,n2_10: bitstring,spkI2_2: PublicKey) = adec(m_84,ski_1) in
+                {491}if (tag9 = tag9'_2) then
+                {492}new k3_6: SymmetricKey;
+                {493}let m_85: bitstring = aenc((tag10,n2_10,k3_6),spkI2_2) in
+                {494}out(c_3, m_85);
+                {495}in(c_3, m_86: bitstring);
+                {496}let (tag11'_2: bitstring,pksks_2: PublicKey,signature_2: bitstring) = dec(m_86,k3_6) in
+                {497}if (tag11 = tag11'_2) then
+                {498}let (a''_2: bitstring,jti_6: bitstring,code'_2: bitstring) = check(signature_2,pksks_2) in
+                {499}if (a_3 = a''_2) then
+                {500}if (code_10 = code'_2) then
+                {501}let jtk_6: bitstring = hash_pk(pksks_2) in
+                {502}let M_6: bitstring = (jtk_6,jti_6,scope_10,a_3,i_3,e2_2) in
+                {503}let m_87: bitstring = enc((tag12,sign(M_6,ski_1)),k3_6) in
+                {504}event issuerSendsLastMessageToApp(m_84,m_85,m_86,m_87);
+                {505}out(c_3, m_87);
+                {472}let talksOnlyToHonest_10: bool = false in
+                {506}if talksOnlyToHonest_10 then
+                {507}out(c_3, check_reach_issuer);
+                {508}event issuerCompletesProtocol(m_80,m_81,m_82,m_84,m_85,m_86);
+                {509}out(ch(code_10), free_code);
+                {510}out(ch(wrong_pw_2), free_password)
+            )
+            else
+                {511}if ((e1_2 ≠ a_3) && (e2_2 ≠ u_3)) then
+                {512}in(c_3, pke1_5: PublicKey);
+                {513}in(c_3, pke2_5: PublicKey);
+                {514}in(c_3, wrong_pw_3: bitstring);
+                {516}in(c_3, m_88: bitstring);
+                {517}let (tag4'_3: bitstring,n_11: bitstring,spkI_7: PublicKey) = adec(m_88,ski_1) in
+                {518}if (tag4 = tag4'_3) then
+                {519}new k2_7: SymmetricKey;
+                {520}let m_89: bitstring = aenc((tag5,n_11,k2_7),spkI_7) in
+                {521}out(c_3, m_89);
+                {522}in(c_3, m_90: bitstring);
+                {523}let (tag6'_3: bitstring,a'_11: bitstring,scope_11: bitstring,u'_7: bitstring,password'_3: bitstring) = dec(m_90,k2_7) in
+                {524}if (tag6 = tag6'_3) then
+                {525}if (e1_2 = a'_11) then
+                {526}if (e2_2 = u'_7) then
+                {527}if (wrong_pw_3 = password'_3) then
+                {528}new code_11: bitstring;
+                {529}let m_91: bitstring = enc((tag7,code_11,i_3),k2_7) in
+                {530}event issuerSendsLastMessageToUser(m_88,m_89,m_90,m_91);
+                {531}out(c_3, m_91);
+                {532}in(c_3, m_92: bitstring);
+                {533}let (tag9'_3: bitstring,n2_11: bitstring,spkI2_3: PublicKey) = adec(m_92,ski_1) in
+                {534}if (tag9 = tag9'_3) then
+                {535}new k3_7: SymmetricKey;
+                {536}let m_93: bitstring = aenc((tag10,n2_11,k3_7),spkI2_3) in
+                {537}out(c_3, m_93);
+                {538}in(c_3, m_94: bitstring);
+                {539}let (tag11'_3: bitstring,pksks_3: PublicKey,signature_3: bitstring) = dec(m_94,k3_7) in
+                {540}if (tag11 = tag11'_3) then
+                {541}let (a''_3: bitstring,jti_7: bitstring,code'_3: bitstring) = check(signature_3,pksks_3) in
+                {542}if (e1_2 = a''_3) then
+                {543}if (code_11 = code'_3) then
+                {544}let jtk_7: bitstring = hash_pk(pksks_3) in
+                {545}let M_7: bitstring = (jtk_7,jti_7,scope_11,e1_2,i_3,e2_2) in
+                {546}let m_95: bitstring = enc((tag12,sign(M_7,ski_1)),k3_7) in
+                {547}event issuerSendsLastMessageToApp(m_92,m_93,m_94,m_95);
+                {548}out(c_3, m_95);
+                {515}let talksOnlyToHonest_11: bool = false in
+                {549}if talksOnlyToHonest_11 then
+                {550}out(c_3, check_reach_issuer);
+                {551}event issuerCompletesProtocol(m_88,m_89,m_90,m_92,m_93,m_94);
+                {552}out(ch(code_11), free_code);
+                {553}out(ch(wrong_pw_3), free_password)
+)
+
+-- Query not attacker(check_reach_app[]) in process 1.
+Translating the process into Horn clauses...
+Completing...
+select attacker(pk(sk))/-5000
+200 rules inserted. Base: 170 rules (45 with conclusion selected). Queue: 66 rules.
+400 rules inserted. Base: 316 rules (92 with conclusion selected). Queue: 117 rules.
+600 rules inserted. Base: 467 rules (110 with conclusion selected). Queue: 100 rules.
+800 rules inserted. Base: 575 rules (134 with conclusion selected). Queue: 176 rules.
+1000 rules inserted. Base: 661 rules (149 with conclusion selected). Queue: 196 rules.
+1200 rules inserted. Base: 711 rules (165 with conclusion selected). Queue: 211 rules.
+1400 rules inserted. Base: 797 rules (182 with conclusion selected). Queue: 217 rules.
+1600 rules inserted. Base: 868 rules (194 with conclusion selected). Queue: 192 rules.
+1800 rules inserted. Base: 989 rules (215 with conclusion selected). Queue: 146 rules.
+2000 rules inserted. Base: 1091 rules (245 with conclusion selected). Queue: 163 rules.
+2200 rules inserted. Base: 1173 rules (263 with conclusion selected). Queue: 184 rules.
+2400 rules inserted. Base: 1264 rules (277 with conclusion selected). Queue: 167 rules.
+2600 rules inserted. Base: 1361 rules (294 with conclusion selected). Queue: 147 rules.
+2800 rules inserted. Base: 1445 rules (303 with conclusion selected). Queue: 99 rules.
+3000 rules inserted. Base: 1433 rules (324 with conclusion selected). Queue: 126 rules.
+3200 rules inserted. Base: 1503 rules (357 with conclusion selected). Queue: 134 rules.
+3400 rules inserted. Base: 1584 rules (369 with conclusion selected). Queue: 146 rules.
+3600 rules inserted. Base: 1659 rules (389 with conclusion selected). Queue: 132 rules.
+3800 rules inserted. Base: 1750 rules (406 with conclusion selected). Queue: 152 rules.
+4000 rules inserted. Base: 1845 rules (431 with conclusion selected). Queue: 175 rules.
+4200 rules inserted. Base: 1939 rules (451 with conclusion selected). Queue: 137 rules.
+4400 rules inserted. Base: 2064 rules (470 with conclusion selected). Queue: 100 rules.
+4600 rules inserted. Base: 2159 rules (488 with conclusion selected). Queue: 59 rules.
+4800 rules inserted. Base: 2242 rules (511 with conclusion selected). Queue: 44 rules.
+Starting query not attacker(check_reach_app[])
+goal reachable: attacker(check_reach_app[])
+
+Derivation:
+Abbreviations:
+n_12 = n_4[e2_1 = i[],e1_1 = a[],!1 = @sid]
+sskI_8 = sskI[e2_1 = i[],e1_1 = a[],!1 = @sid]
+scope_12 = scope_1[m = aenc((tag1,n_12,pk(sskI_8)),pk(ska[])),pke1 = pke1_6,e2 = i[],e1 = e1_3,!1 = @sid_1]
+k1_8 = k1_1[m = aenc((tag1,n_12,pk(sskI_8)),pk(ska[])),pke1 = pke1_6,e2 = i[],e1 = e1_3,!1 = @sid_1]
+n2_12 = n2_4[m_34 = enc((tag3,a[],scope_12),k1_8),m_33 = aenc((tag2,n_12,k1_8),pk(sskI_8)),e2_1 = i[],e1_1 = a[],!1 = @sid]
+sskI_9 = sskI_1[m_34 = enc((tag3,a[],scope_12),k1_8),m_33 = aenc((tag2,n_12,k1_8),pk(sskI_8)),e2_1 = i[],e1_1 = a[],!1 = @sid]
+k2_8 = k2_4[m_64 = aenc((tag4,n2_12,pk(sskI_9)),pk(ski[])),e2_2 = u[],e1_2 = a[],!1 = @sid_2]
+code_12 = code_8[m_66 = enc((tag6,a[],scope_12,u[],password[]),k2_8),m_64 = aenc((tag4,n2_12,pk(sskI_9)),pk(ski[])),e2_2 = u[],e1_2 = a[],!1 = @sid_2]
+n2_13 = n2_1[m_6 = enc((tag8,code_12,i[]),k1_8),m = aenc((tag1,n_12,pk(sskI_8)),pk(ska[])),pke1 = pke1_6,e2 = i[],e1 = e1_3,!1 = @sid_1]
+sskI2_4 = sskI2_1[m_6 = enc((tag8,code_12,i[]),k1_8),m = aenc((tag1,n_12,pk(sskI_8)),pk(ska[])),pke1 = pke1_6,e2 = i[],e1 = e1_3,!1 = @sid_1]
+n_13 = n_4[e2_1 = i[],e1_1 = a[],!1 = @sid_3]
+sskI_10 = sskI[e2_1 = i[],e1_1 = a[],!1 = @sid_3]
+scope_13 = scope[m_1 = aenc((tag1,n_13,pk(sskI_10)),pk(ska[])),e2 = i[],e1 = u[],!1 = @sid_4]
+k1_9 = k1[m_1 = aenc((tag1,n_13,pk(sskI_10)),pk(ska[])),e2 = i[],e1 = u[],!1 = @sid_4]
+n2_14 = n2_4[m_34 = enc((tag3,a[],scope_13),k1_9),m_33 = aenc((tag2,n_13,k1_9),pk(sskI_10)),e2_1 = i[],e1_1 = a[],!1 = @sid_3]
+sskI_11 = sskI_1[m_34 = enc((tag3,a[],scope_13),k1_9),m_33 = aenc((tag2,n_13,k1_9),pk(sskI_10)),e2_1 = i[],e1_1 = a[],!1 = @sid_3]
+k2_9 = k2_4[m_64 = aenc((tag4,n2_14,pk(sskI_11)),pk(ski[])),e2_2 = u[],e1_2 = a[],!1 = @sid_5]
+k3_8 = k3_4[m_68 = aenc((tag9,n2_13,pk(sskI2_4)),pk(ski[])),m_66 = enc((tag6,a[],scope_13,u[],password[]),k2_9),m_64 = aenc((tag4,n2_14,pk(sskI_11)),pk(ski[])),e2_2 = u[],e1_2 = a[],!1 = @sid_5]
+
+1. The attacker has some term e1_3.
+attacker(e1_3).
+
+2. The message i[] may be sent to the attacker at output {6}.
+attacker(i[]).
+
+3. The attacker has some term pke1_6.
+attacker(pke1_6).
+
+4. The message a[] may be sent to the attacker at output {4}.
+attacker(a[]).
+
+5. The message a[] that the attacker may have by 4 may be received at input {221}.
+The message i[] that the attacker may have by 2 may be received at input {222}.
+So the message aenc((tag1,n_12,pk(sskI_8)),pk(ska[])) may be sent to the attacker at output {228}.
+attacker(aenc((tag1,n_12,pk(sskI_8)),pk(ska[]))).
+
+6. The message e1_3 that the attacker may have by 1 may be received at input {22}.
+The message i[] that the attacker may have by 2 may be received at input {23}.
+The message pke1_6 that the attacker may have by 3 may be received at input {71}.
+The message aenc((tag1,n_12,pk(sskI_8)),pk(ska[])) that the attacker may have by 5 may be received at input {73}.
+We have e1_3 ≠ u[].
+So the message aenc((tag2,n_12,k1_8),pk(sskI_8)) may be sent to the attacker at output {78}.
+attacker(aenc((tag2,n_12,k1_8),pk(sskI_8))).
+
+7. The message e1_3 that the attacker may have by 1 may be received at input {22}.
+The message i[] that the attacker may have by 2 may be received at input {23}.
+The message pke1_6 that the attacker may have by 3 may be received at input {71}.
+The message aenc((tag1,n_12,pk(sskI_8)),pk(ska[])) that the attacker may have by 5 may be received at input {73}.
+We have e1_3 ≠ u[].
+So the message enc((tag3,a[],scope_12),k1_8) may be sent to the attacker at output {82}.
+attacker(enc((tag3,a[],scope_12),k1_8)).
+
+8. The message u[] may be sent to the attacker at output {5}.
+attacker(u[]).
+
+9. The message a[] that the attacker may have by 4 may be received at input {221}.
+The message i[] that the attacker may have by 2 may be received at input {222}.
+The message aenc((tag2,n_12,k1_8),pk(sskI_8)) that the attacker may have by 6 may be received at input {229}.
+The message enc((tag3,a[],scope_12),k1_8) that the attacker may have by 7 may be received at input {233}.
+So the message aenc((tag4,n2_12,pk(sskI_9)),pk(ski[])) may be sent to the attacker at output {240}.
+attacker(aenc((tag4,n2_12,pk(sskI_9)),pk(ski[]))).
+
+10. The message a[] that the attacker may have by 4 may be received at input {386}.
+The message u[] that the attacker may have by 8 may be received at input {387}.
+The message aenc((tag4,n2_12,pk(sskI_9)),pk(ski[])) that the attacker may have by 9 may be received at input {390}.
+So the message aenc((tag5,n2_12,k2_8),pk(sskI_9)) may be sent to the attacker at output {395}.
+attacker(aenc((tag5,n2_12,k2_8),pk(sskI_9))).
+
+11. The message a[] that the attacker may have by 4 may be received at input {221}.
+The message i[] that the attacker may have by 2 may be received at input {222}.
+The message aenc((tag2,n_12,k1_8),pk(sskI_8)) that the attacker may have by 6 may be received at input {229}.
+The message enc((tag3,a[],scope_12),k1_8) that the attacker may have by 7 may be received at input {233}.
+The message aenc((tag5,n2_12,k2_8),pk(sskI_9)) that the attacker may have by 10 may be received at input {241}.
+So the message enc((tag6,a[],scope_12,u[],password[]),k2_8) may be sent to the attacker at output {247}.
+attacker(enc((tag6,a[],scope_12,u[],password[]),k2_8)).
+
+12. The message a[] that the attacker may have by 4 may be received at input {386}.
+The message u[] that the attacker may have by 8 may be received at input {387}.
+The message aenc((tag4,n2_12,pk(sskI_9)),pk(ski[])) that the attacker may have by 9 may be received at input {390}.
+The message enc((tag6,a[],scope_12,u[],password[]),k2_8) that the attacker may have by 11 may be received at input {396}.
+So the message enc((tag7,code_12,i[]),k2_8) may be sent to the attacker at output {405}.
+attacker(enc((tag7,code_12,i[]),k2_8)).
+
+13. The message a[] that the attacker may have by 4 may be received at input {221}.
+The message i[] that the attacker may have by 2 may be received at input {222}.
+The message aenc((tag2,n_12,k1_8),pk(sskI_8)) that the attacker may have by 6 may be received at input {229}.
+The message enc((tag3,a[],scope_12),k1_8) that the attacker may have by 7 may be received at input {233}.
+The message aenc((tag5,n2_12,k2_8),pk(sskI_9)) that the attacker may have by 10 may be received at input {241}.
+The message enc((tag7,code_12,i[]),k2_8) that the attacker may have by 12 may be received at input {248}.
+So the message enc((tag8,code_12,i[]),k1_8) may be sent to the attacker at output {254}.
+attacker(enc((tag8,code_12,i[]),k1_8)).
+
+14. The message a[] that the attacker may have by 4 may be received at input {221}.
+The message i[] that the attacker may have by 2 may be received at input {222}.
+So the message aenc((tag1,n_13,pk(sskI_10)),pk(ska[])) may be sent to the attacker at output {228}.
+attacker(aenc((tag1,n_13,pk(sskI_10)),pk(ska[]))).
+
+15. The message u[] that the attacker may have by 8 may be received at input {22}.
+The message i[] that the attacker may have by 2 may be received at input {23}.
+The message aenc((tag1,n_13,pk(sskI_10)),pk(ska[])) that the attacker may have by 14 may be received at input {26}.
+So the message aenc((tag2,n_13,k1_9),pk(sskI_10)) may be sent to the attacker at output {31}.
+attacker(aenc((tag2,n_13,k1_9),pk(sskI_10))).
+
+16. The message u[] that the attacker may have by 8 may be received at input {22}.
+The message i[] that the attacker may have by 2 may be received at input {23}.
+The message aenc((tag1,n_13,pk(sskI_10)),pk(ska[])) that the attacker may have by 14 may be received at input {26}.
+So the message enc((tag3,a[],scope_13),k1_9) may be sent to the attacker at output {35}.
+attacker(enc((tag3,a[],scope_13),k1_9)).
+
+17. The message a[] that the attacker may have by 4 may be received at input {221}.
+The message i[] that the attacker may have by 2 may be received at input {222}.
+The message aenc((tag2,n_13,k1_9),pk(sskI_10)) that the attacker may have by 15 may be received at input {229}.
+The message enc((tag3,a[],scope_13),k1_9) that the attacker may have by 16 may be received at input {233}.
+So the message aenc((tag4,n2_14,pk(sskI_11)),pk(ski[])) may be sent to the attacker at output {240}.
+attacker(aenc((tag4,n2_14,pk(sskI_11)),pk(ski[]))).
+
+18. The message a[] that the attacker may have by 4 may be received at input {386}.
+The message u[] that the attacker may have by 8 may be received at input {387}.
+The message aenc((tag4,n2_14,pk(sskI_11)),pk(ski[])) that the attacker may have by 17 may be received at input {390}.
+So the message aenc((tag5,n2_14,k2_9),pk(sskI_11)) may be sent to the attacker at output {395}.
+attacker(aenc((tag5,n2_14,k2_9),pk(sskI_11))).
+
+19. The message a[] that the attacker may have by 4 may be received at input {221}.
+The message i[] that the attacker may have by 2 may be received at input {222}.
+The message aenc((tag2,n_13,k1_9),pk(sskI_10)) that the attacker may have by 15 may be received at input {229}.
+The message enc((tag3,a[],scope_13),k1_9) that the attacker may have by 16 may be received at input {233}.
+The message aenc((tag5,n2_14,k2_9),pk(sskI_11)) that the attacker may have by 18 may be received at input {241}.
+So the message enc((tag6,a[],scope_13,u[],password[]),k2_9) may be sent to the attacker at output {247}.
+attacker(enc((tag6,a[],scope_13,u[],password[]),k2_9)).
+
+20. The message e1_3 that the attacker may have by 1 may be received at input {22}.
+The message i[] that the attacker may have by 2 may be received at input {23}.
+The message pke1_6 that the attacker may have by 3 may be received at input {71}.
+The message aenc((tag1,n_12,pk(sskI_8)),pk(ska[])) that the attacker may have by 5 may be received at input {73}.
+The message enc((tag8,code_12,i[]),k1_8) that the attacker may have by 13 may be received at input {83}.
+We have e1_3 ≠ u[].
+So the message aenc((tag9,n2_13,pk(sskI2_4)),pk(ski[])) may be sent to the attacker at output {90}.
+attacker(aenc((tag9,n2_13,pk(sskI2_4)),pk(ski[]))).
+
+21. The message a[] that the attacker may have by 4 may be received at input {386}.
+The message u[] that the attacker may have by 8 may be received at input {387}.
+The message aenc((tag4,n2_14,pk(sskI_11)),pk(ski[])) that the attacker may have by 17 may be received at input {390}.
+The message enc((tag6,a[],scope_13,u[],password[]),k2_9) that the attacker may have by 19 may be received at input {396}.
+The message aenc((tag9,n2_13,pk(sskI2_4)),pk(ski[])) that the attacker may have by 20 may be received at input {406}.
+So the message aenc((tag10,n2_13,k3_8),pk(sskI2_4)) may be sent to the attacker at output {411}.
+attacker(aenc((tag10,n2_13,k3_8),pk(sskI2_4))).
+
+22. The attacker has some term m_96.
+attacker(m_96).
+
+23. The message e1_3 that the attacker may have by 1 may be received at input {22}.
+The message i[] that the attacker may have by 2 may be received at input {23}.
+The message pke1_6 that the attacker may have by 3 may be received at input {71}.
+The message aenc((tag1,n_12,pk(sskI_8)),pk(ska[])) that the attacker may have by 5 may be received at input {73}.
+The message enc((tag8,code_12,i[]),k1_8) that the attacker may have by 13 may be received at input {83}.
+The message aenc((tag10,n2_13,k3_8),pk(sskI2_4)) that the attacker may have by 21 may be received at input {91}.
+The message m_96 that the attacker may have by 22 may be received at input {101}.
+We have e1_3 ≠ u[].
+So the message check_reach_app[] may be sent to the attacker at output {102}.
+attacker(check_reach_app[]).
+
+24. By 23, attacker(check_reach_app[]).
+The goal is reached, represented in the following fact:
+attacker(check_reach_app[]).
+
+
+A more detailed output of the traces is available with
+  set traceDisplay = long.
+
+new a: bitstring creating a_4 at {1}
+
+new u: bitstring creating u_4 at {2}
+
+new i: bitstring creating i_4 at {3}
+
+out(c, ~M) with ~M = a_4 at {4}
+
+out(c, ~M_1) with ~M_1 = u_4 at {5}
+
+out(c, ~M_2) with ~M_2 = i_4 at {6}
+
+new ska: SecretKey creating ska_2 at {7}
+
+new sku: SecretKey creating sku_2 at {8}
+
+new ski: SecretKey creating ski_2 at {9}
+
+out(c, ~M_3) with ~M_3 = pk(ska_2) at {10}
+
+out(c, ~M_4) with ~M_4 = pk(sku_2) at {11}
+
+out(c, ~M_5) with ~M_5 = pk(ski_2) at {12}
+
+new password: bitstring creating password_3 at {13}
+
+in(c, ~M_1) with ~M_1 = u_4 at {22} in copy a_5
+
+in(c, ~M_2) with ~M_2 = i_4 at {23} in copy a_5
+
+in(c, a_6) at {22} in copy a_7
+
+in(c, ~M_2) with ~M_2 = i_4 at {23} in copy a_7
+
+in(c, a_8) at {71} in copy a_7
+
+in(c, ~M) with ~M = a_4 at {221} in copy a_9
+
+in(c, ~M_2) with ~M_2 = i_4 at {222} in copy a_9
+
+new n_4: bitstring creating n_12 at {225} in copy a_9
+
+new sskI: SecretKey creating sskI_8 at {226} in copy a_9
+
+out(c, ~M_6) with ~M_6 = aenc((tag1,n_12,pk(sskI_8)),pk(ska_2)) at {228} in copy a_9
+
+in(c, ~M_6) with ~M_6 = aenc((tag1,n_12,pk(sskI_8)),pk(ska_2)) at {26} in copy a_5
+
+new k1: SymmetricKey creating k1_8 at {29} in copy a_5
+
+out(c, ~M_7) with ~M_7 = aenc((tag2,n_12,k1_8),pk(sskI_8)) at {31} in copy a_5
+
+new scope: bitstring creating scope_12 at {32} in copy a_5
+
+event appSendsLastMessageToUser(aenc((tag1,n_12,pk(sskI_8)),pk(ska_2)),aenc((tag2,n_12,k1_8),pk(sskI_8)),enc((tag3,a_4,scope_12),k1_8)) at {34} in copy a_5
+
+out(c, ~M_8) with ~M_8 = enc((tag3,a_4,scope_12),k1_8) at {35} in copy a_5
+
+in(c, ~M_7) with ~M_7 = aenc((tag2,n_12,k1_8),pk(sskI_8)) at {229} in copy a_9
+
+in(c, ~M_8) with ~M_8 = enc((tag3,a_4,scope_12),k1_8) at {233} in copy a_9
+
+new n2_4: bitstring creating n2_12 at {237} in copy a_9
+
+new sskI_1: SecretKey creating sskI_9 at {238} in copy a_9
+
+out(c, ~M_9) with ~M_9 = aenc((tag4,n2_12,pk(sskI_9)),pk(ski_2)) at {240} in copy a_9
+
+in(c, ~M) with ~M = a_4 at {221} in copy a_10
+
+in(c, ~M_2) with ~M_2 = i_4 at {222} in copy a_10
+
+new n_4: bitstring creating n_13 at {225} in copy a_10
+
+new sskI: SecretKey creating sskI_10 at {226} in copy a_10
+
+out(c, ~M_10) with ~M_10 = aenc((tag1,n_13,pk(sskI_10)),pk(ska_2)) at {228} in copy a_10
+
+in(c, ~M_10) with ~M_10 = aenc((tag1,n_13,pk(sskI_10)),pk(ska_2)) at {73} in copy a_7
+
+new k1_1: SymmetricKey creating k1_9 at {76} in copy a_7
+
+out(c, ~M_11) with ~M_11 = aenc((tag2,n_13,k1_9),pk(sskI_10)) at {78} in copy a_7
+
+new scope_1: bitstring creating scope_13 at {79} in copy a_7
+
+event appSendsLastMessageToUser(aenc((tag1,n_13,pk(sskI_10)),pk(ska_2)),aenc((tag2,n_13,k1_9),pk(sskI_10)),enc((tag3,a_4,scope_13),k1_9)) at {81} in copy a_7
+
+out(c, ~M_12) with ~M_12 = enc((tag3,a_4,scope_13),k1_9) at {82} in copy a_7
+
+in(c, ~M_11) with ~M_11 = aenc((tag2,n_13,k1_9),pk(sskI_10)) at {229} in copy a_10
+
+in(c, ~M_12) with ~M_12 = enc((tag3,a_4,scope_13),k1_9) at {233} in copy a_10
+
+new n2_4: bitstring creating n2_13 at {237} in copy a_10
+
+new sskI_1: SecretKey creating sskI_11 at {238} in copy a_10
+
+out(c, ~M_13) with ~M_13 = aenc((tag4,n2_13,pk(sskI_11)),pk(ski_2)) at {240} in copy a_10
+
+in(c, ~M) with ~M = a_4 at {386} in copy a_11
+
+in(c, ~M_1) with ~M_1 = u_4 at {387} in copy a_11
+
+in(c, ~M_9) with ~M_9 = aenc((tag4,n2_12,pk(sskI_9)),pk(ski_2)) at {390} in copy a_11
+
+new k2_4: SymmetricKey creating k2_8 at {393} in copy a_11
+
+out(c, ~M_14) with ~M_14 = aenc((tag5,n2_12,k2_8),pk(sskI_9)) at {395} in copy a_11
+
+in(c, ~M_14) with ~M_14 = aenc((tag5,n2_12,k2_8),pk(sskI_9)) at {241} in copy a_9
+
+event userSendsLastMessageToIssuer(aenc((tag4,n2_12,pk(sskI_9)),pk(ski_2)),aenc((tag5,n2_12,k2_8),pk(sskI_9)),enc((tag6,a_4,scope_12,u_4,password_3),k2_8)) at {246} in copy a_9
+
+out(c, ~M_15) with ~M_15 = enc((tag6,a_4,scope_12,u_4,password_3),k2_8) at {247} in copy a_9
+
+in(c, ~M_15) with ~M_15 = enc((tag6,a_4,scope_12,u_4,password_3),k2_8) at {396} in copy a_11
+
+new code_8: bitstring creating code_12 at {402} in copy a_11
+
+event issuerSendsLastMessageToUser(aenc((tag4,n2_12,pk(sskI_9)),pk(ski_2)),aenc((tag5,n2_12,k2_8),pk(sskI_9)),enc((tag6,a_4,scope_12,u_4,password_3),k2_8),enc((tag7,code_12,i_4),k2_8)) at {404} in copy a_11
+
+out(c, ~M_16) with ~M_16 = enc((tag7,code_12,i_4),k2_8) at {405} in copy a_11
+
+in(c, ~M) with ~M = a_4 at {386} in copy a_12
+
+in(c, ~M_1) with ~M_1 = u_4 at {387} in copy a_12
+
+in(c, ~M_13) with ~M_13 = aenc((tag4,n2_13,pk(sskI_11)),pk(ski_2)) at {390} in copy a_12
+
+new k2_4: SymmetricKey creating k2_9 at {393} in copy a_12
+
+out(c, ~M_17) with ~M_17 = aenc((tag5,n2_13,k2_9),pk(sskI_11)) at {395} in copy a_12
+
+in(c, ~M_17) with ~M_17 = aenc((tag5,n2_13,k2_9),pk(sskI_11)) at {241} in copy a_10
+
+event userSendsLastMessageToIssuer(aenc((tag4,n2_13,pk(sskI_11)),pk(ski_2)),aenc((tag5,n2_13,k2_9),pk(sskI_11)),enc((tag6,a_4,scope_13,u_4,password_3),k2_9)) at {246} in copy a_10
+
+out(c, ~M_18) with ~M_18 = enc((tag6,a_4,scope_13,u_4,password_3),k2_9) at {247} in copy a_10
+
+in(c, ~M_18) with ~M_18 = enc((tag6,a_4,scope_13,u_4,password_3),k2_9) at {396} in copy a_12
+
+new code_8: bitstring creating code_13 at {402} in copy a_12
+
+event issuerSendsLastMessageToUser(aenc((tag4,n2_13,pk(sskI_11)),pk(ski_2)),aenc((tag5,n2_13,k2_9),pk(sskI_11)),enc((tag6,a_4,scope_13,u_4,password_3),k2_9),enc((tag7,code_13,i_4),k2_9)) at {404} in copy a_12
+
+out(c, ~M_19) with ~M_19 = enc((tag7,code_13,i_4),k2_9) at {405} in copy a_12
+
+in(c, ~M_19) with ~M_19 = enc((tag7,code_13,i_4),k2_9) at {248} in copy a_10
+
+event userSendsLastMessageToApp(aenc((tag1,n_13,pk(sskI_10)),pk(ska_2)),aenc((tag2,n_13,k1_9),pk(sskI_10)),enc((tag3,a_4,scope_13),k1_9),enc((tag8,code_13,i_4),k1_9)) at {253} in copy a_10
+
+out(c, ~M_20) with ~M_20 = enc((tag8,code_13,i_4),k1_9) at {254} in copy a_10
+
+out(c, ~M_21) with ~M_21 = check_reach_user at {256} in copy a_10
+
+event userCompletesProtocol(aenc((tag1,n_13,pk(sskI_10)),pk(ska_2)),aenc((tag2,n_13,k1_9),pk(sskI_10)),enc((tag3,a_4,scope_13),k1_9),aenc((tag4,n2_13,pk(sskI_11)),pk(ski_2)),aenc((tag5,n2_13,k2_9),pk(sskI_11)),enc((tag6,a_4,scope_13,u_4,password_3),k2_9),enc((tag7,code_13,i_4),k2_9)) at {257} in copy a_10
+
+in(c, ~M_20) with ~M_20 = enc((tag8,code_13,i_4),k1_9) at {83} in copy a_7
+
+new n2_1: bitstring creating n2_14 at {87} in copy a_7
+
+new sskI2_1: SecretKey creating sskI2_4 at {88} in copy a_7
+
+out(c, ~M_22) with ~M_22 = aenc((tag9,n2_14,pk(sskI2_4)),pk(ski_2)) at {90} in copy a_7
+
+in(c, ~M_22) with ~M_22 = aenc((tag9,n2_14,pk(sskI2_4)),pk(ski_2)) at {406} in copy a_11
+
+new k3_4: SymmetricKey creating k3_8 at {409} in copy a_11
+
+out(c, ~M_23) with ~M_23 = aenc((tag10,n2_14,k3_8),pk(sskI2_4)) at {411} in copy a_11
+
+in(c, ~M_23) with ~M_23 = aenc((tag10,n2_14,k3_8),pk(sskI2_4)) at {91} in copy a_7
+
+new sks_1: SecretKey creating sks_4 at {95} in copy a_7
+
+new jti_1: bitstring creating jti_8 at {96} in copy a_7
+
+event appSendsLastMessageToIssuer(aenc((tag9,n2_14,pk(sskI2_4)),pk(ski_2)),aenc((tag10,n2_14,k3_8),pk(sskI2_4)),enc((tag11,pk(sks_4),sign((a_4,jti_8,code_13),sks_4)),k3_8)) at {99} in copy a_7
+
+out(c, ~M_24) with ~M_24 = enc((tag11,pk(sks_4),sign((a_4,jti_8,code_13),sks_4)),k3_8) at {100} in copy a_7
+
+in(c, a_13) at {101} in copy a_7
+
+out(c, ~M_25) with ~M_25 = check_reach_app at {102} in copy a_7
+
+The attacker has the message ~M_25 = check_reach_app.
+A trace has been found.
+RESULT not attacker(check_reach_app[]) is false.
+-- Query not attacker(check_reach_user[]) in process 1.
+Translating the process into Horn clauses...
+Completing...
+select attacker(pk(sk))/-5000
+200 rules inserted. Base: 170 rules (45 with conclusion selected). Queue: 66 rules.
+400 rules inserted. Base: 316 rules (92 with conclusion selected). Queue: 117 rules.
+600 rules inserted. Base: 467 rules (110 with conclusion selected). Queue: 100 rules.
+800 rules inserted. Base: 575 rules (134 with conclusion selected). Queue: 176 rules.
+1000 rules inserted. Base: 661 rules (149 with conclusion selected). Queue: 196 rules.
+1200 rules inserted. Base: 711 rules (165 with conclusion selected). Queue: 211 rules.
+1400 rules inserted. Base: 797 rules (182 with conclusion selected). Queue: 217 rules.
+1600 rules inserted. Base: 868 rules (194 with conclusion selected). Queue: 192 rules.
+1800 rules inserted. Base: 989 rules (215 with conclusion selected). Queue: 146 rules.
+2000 rules inserted. Base: 1091 rules (245 with conclusion selected). Queue: 163 rules.
+2200 rules inserted. Base: 1173 rules (263 with conclusion selected). Queue: 184 rules.
+2400 rules inserted. Base: 1264 rules (277 with conclusion selected). Queue: 167 rules.
+2600 rules inserted. Base: 1361 rules (294 with conclusion selected). Queue: 147 rules.
+2800 rules inserted. Base: 1445 rules (303 with conclusion selected). Queue: 99 rules.
+3000 rules inserted. Base: 1433 rules (324 with conclusion selected). Queue: 126 rules.
+3200 rules inserted. Base: 1503 rules (357 with conclusion selected). Queue: 134 rules.
+3400 rules inserted. Base: 1584 rules (369 with conclusion selected). Queue: 146 rules.
+3600 rules inserted. Base: 1659 rules (389 with conclusion selected). Queue: 132 rules.
+3800 rules inserted. Base: 1750 rules (406 with conclusion selected). Queue: 152 rules.
+4000 rules inserted. Base: 1845 rules (431 with conclusion selected). Queue: 175 rules.
+4200 rules inserted. Base: 1939 rules (451 with conclusion selected). Queue: 137 rules.
+4400 rules inserted. Base: 2064 rules (470 with conclusion selected). Queue: 100 rules.
+4600 rules inserted. Base: 2159 rules (488 with conclusion selected). Queue: 59 rules.
+4800 rules inserted. Base: 2242 rules (511 with conclusion selected). Queue: 44 rules.
+Starting query not attacker(check_reach_user[])
+goal reachable: attacker(check_reach_user[])
+
+Derivation:
+Abbreviations:
+n_12 = n_4[e2_1 = i[],e1_1 = a[],!1 = @sid]
+sskI_8 = sskI[e2_1 = i[],e1_1 = a[],!1 = @sid]
+scope_12 = scope_3[m_24 = aenc((tag1,n_12,pk(sskI_8)),pk(ska[])),pke2_1 = pke2_6,pke1_1 = pke1_6,e2 = e2_3,e1 = e1_3,!1 = @sid_1]
+k1_8 = k1_3[m_24 = aenc((tag1,n_12,pk(sskI_8)),pk(ska[])),pke2_1 = pke2_6,pke1_1 = pke1_6,e2 = e2_3,e1 = e1_3,!1 = @sid_1]
+n2_12 = n2_4[m_34 = enc((tag3,a[],scope_12),k1_8),m_33 = aenc((tag2,n_12,k1_8),pk(sskI_8)),e2_1 = i[],e1_1 = a[],!1 = @sid]
+sskI_9 = sskI_1[m_34 = enc((tag3,a[],scope_12),k1_8),m_33 = aenc((tag2,n_12,k1_8),pk(sskI_8)),e2_1 = i[],e1_1 = a[],!1 = @sid]
+k2_8 = k2_4[m_64 = aenc((tag4,n2_12,pk(sskI_9)),pk(ski[])),e2_2 = u[],e1_2 = a[],!1 = @sid_2]
+code_12 = code_8[m_66 = enc((tag6,a[],scope_12,u[],password[]),k2_8),m_64 = aenc((tag4,n2_12,pk(sskI_9)),pk(ski[])),e2_2 = u[],e1_2 = a[],!1 = @sid_2]
+
+1. The message a[] may be sent to the attacker at output {4}.
+attacker(a[]).
+
+2. The message i[] may be sent to the attacker at output {6}.
+attacker(i[]).
+
+3. The attacker has some term e1_3.
+attacker(e1_3).
+
+4. The attacker has some term e2_3.
+attacker(e2_3).
+
+5. The attacker has some term pke1_6.
+attacker(pke1_6).
+
+6. The attacker has some term pke2_6.
+attacker(pke2_6).
+
+7. The message a[] that the attacker may have by 1 may be received at input {221}.
+The message i[] that the attacker may have by 2 may be received at input {222}.
+So the message aenc((tag1,n_12,pk(sskI_8)),pk(ska[])) may be sent to the attacker at output {228}.
+attacker(aenc((tag1,n_12,pk(sskI_8)),pk(ska[]))).
+
+8. The message e1_3 that the attacker may have by 3 may be received at input {22}.
+The message e2_3 that the attacker may have by 4 may be received at input {23}.
+The message pke1_6 that the attacker may have by 5 may be received at input {165}.
+The message pke2_6 that the attacker may have by 6 may be received at input {166}.
+The message aenc((tag1,n_12,pk(sskI_8)),pk(ska[])) that the attacker may have by 7 may be received at input {168}.
+We have e2_3 ≠ i[] && e1_3 ≠ u[].
+So the message aenc((tag2,n_12,k1_8),pk(sskI_8)) may be sent to the attacker at output {173}.
+attacker(aenc((tag2,n_12,k1_8),pk(sskI_8))).
+
+9. The message e1_3 that the attacker may have by 3 may be received at input {22}.
+The message e2_3 that the attacker may have by 4 may be received at input {23}.
+The message pke1_6 that the attacker may have by 5 may be received at input {165}.
+The message pke2_6 that the attacker may have by 6 may be received at input {166}.
+The message aenc((tag1,n_12,pk(sskI_8)),pk(ska[])) that the attacker may have by 7 may be received at input {168}.
+We have e2_3 ≠ i[] && e1_3 ≠ u[].
+So the message enc((tag3,a[],scope_12),k1_8) may be sent to the attacker at output {177}.
+attacker(enc((tag3,a[],scope_12),k1_8)).
+
+10. The message u[] may be sent to the attacker at output {5}.
+attacker(u[]).
+
+11. The message a[] that the attacker may have by 1 may be received at input {221}.
+The message i[] that the attacker may have by 2 may be received at input {222}.
+The message aenc((tag2,n_12,k1_8),pk(sskI_8)) that the attacker may have by 8 may be received at input {229}.
+The message enc((tag3,a[],scope_12),k1_8) that the attacker may have by 9 may be received at input {233}.
+So the message aenc((tag4,n2_12,pk(sskI_9)),pk(ski[])) may be sent to the attacker at output {240}.
+attacker(aenc((tag4,n2_12,pk(sskI_9)),pk(ski[]))).
+
+12. The message a[] that the attacker may have by 1 may be received at input {386}.
+The message u[] that the attacker may have by 10 may be received at input {387}.
+The message aenc((tag4,n2_12,pk(sskI_9)),pk(ski[])) that the attacker may have by 11 may be received at input {390}.
+So the message aenc((tag5,n2_12,k2_8),pk(sskI_9)) may be sent to the attacker at output {395}.
+attacker(aenc((tag5,n2_12,k2_8),pk(sskI_9))).
+
+13. The message a[] that the attacker may have by 1 may be received at input {221}.
+The message i[] that the attacker may have by 2 may be received at input {222}.
+The message aenc((tag2,n_12,k1_8),pk(sskI_8)) that the attacker may have by 8 may be received at input {229}.
+The message enc((tag3,a[],scope_12),k1_8) that the attacker may have by 9 may be received at input {233}.
+The message aenc((tag5,n2_12,k2_8),pk(sskI_9)) that the attacker may have by 12 may be received at input {241}.
+So the message enc((tag6,a[],scope_12,u[],password[]),k2_8) may be sent to the attacker at output {247}.
+attacker(enc((tag6,a[],scope_12,u[],password[]),k2_8)).
+
+14. The message a[] that the attacker may have by 1 may be received at input {386}.
+The message u[] that the attacker may have by 10 may be received at input {387}.
+The message aenc((tag4,n2_12,pk(sskI_9)),pk(ski[])) that the attacker may have by 11 may be received at input {390}.
+The message enc((tag6,a[],scope_12,u[],password[]),k2_8) that the attacker may have by 13 may be received at input {396}.
+So the message enc((tag7,code_12,i[]),k2_8) may be sent to the attacker at output {405}.
+attacker(enc((tag7,code_12,i[]),k2_8)).
+
+15. The message a[] that the attacker may have by 1 may be received at input {221}.
+The message i[] that the attacker may have by 2 may be received at input {222}.
+The message aenc((tag2,n_12,k1_8),pk(sskI_8)) that the attacker may have by 8 may be received at input {229}.
+The message enc((tag3,a[],scope_12),k1_8) that the attacker may have by 9 may be received at input {233}.
+The message aenc((tag5,n2_12,k2_8),pk(sskI_9)) that the attacker may have by 12 may be received at input {241}.
+The message enc((tag7,code_12,i[]),k2_8) that the attacker may have by 14 may be received at input {248}.
+So the message check_reach_user[] may be sent to the attacker at output {256}.
+attacker(check_reach_user[]).
+
+16. By 15, attacker(check_reach_user[]).
+The goal is reached, represented in the following fact:
+attacker(check_reach_user[]).
+
+
+A more detailed output of the traces is available with
+  set traceDisplay = long.
+
+new a: bitstring creating a_4 at {1}
+
+new u: bitstring creating u_4 at {2}
+
+new i: bitstring creating i_4 at {3}
+
+out(c, ~M) with ~M = a_4 at {4}
+
+out(c, ~M_1) with ~M_1 = u_4 at {5}
+
+out(c, ~M_2) with ~M_2 = i_4 at {6}
+
+new ska: SecretKey creating ska_2 at {7}
+
+new sku: SecretKey creating sku_2 at {8}
+
+new ski: SecretKey creating ski_2 at {9}
+
+out(c, ~M_3) with ~M_3 = pk(ska_2) at {10}
+
+out(c, ~M_4) with ~M_4 = pk(sku_2) at {11}
+
+out(c, ~M_5) with ~M_5 = pk(ski_2) at {12}
+
+new password: bitstring creating password_3 at {13}
+
+in(c, a_5) at {22} in copy a_6
+
+in(c, a_7) at {23} in copy a_6
+
+in(c, a_8) at {165} in copy a_6
+
+in(c, a_9) at {166} in copy a_6
+
+in(c, ~M) with ~M = a_4 at {221} in copy a_10
+
+in(c, ~M_2) with ~M_2 = i_4 at {222} in copy a_10
+
+new n_4: bitstring creating n_12 at {225} in copy a_10
+
+new sskI: SecretKey creating sskI_8 at {226} in copy a_10
+
+out(c, ~M_6) with ~M_6 = aenc((tag1,n_12,pk(sskI_8)),pk(ska_2)) at {228} in copy a_10
+
+in(c, ~M_6) with ~M_6 = aenc((tag1,n_12,pk(sskI_8)),pk(ska_2)) at {168} in copy a_6
+
+new k1_3: SymmetricKey creating k1_8 at {171} in copy a_6
+
+out(c, ~M_7) with ~M_7 = aenc((tag2,n_12,k1_8),pk(sskI_8)) at {173} in copy a_6
+
+new scope_3: bitstring creating scope_12 at {174} in copy a_6
+
+event appSendsLastMessageToUser(aenc((tag1,n_12,pk(sskI_8)),pk(ska_2)),aenc((tag2,n_12,k1_8),pk(sskI_8)),enc((tag3,a_4,scope_12),k1_8)) at {176} in copy a_6
+
+out(c, ~M_8) with ~M_8 = enc((tag3,a_4,scope_12),k1_8) at {177} in copy a_6
+
+in(c, ~M_7) with ~M_7 = aenc((tag2,n_12,k1_8),pk(sskI_8)) at {229} in copy a_10
+
+in(c, ~M_8) with ~M_8 = enc((tag3,a_4,scope_12),k1_8) at {233} in copy a_10
+
+new n2_4: bitstring creating n2_12 at {237} in copy a_10
+
+new sskI_1: SecretKey creating sskI_9 at {238} in copy a_10
+
+out(c, ~M_9) with ~M_9 = aenc((tag4,n2_12,pk(sskI_9)),pk(ski_2)) at {240} in copy a_10
+
+in(c, ~M) with ~M = a_4 at {386} in copy a_11
+
+in(c, ~M_1) with ~M_1 = u_4 at {387} in copy a_11
+
+in(c, ~M_9) with ~M_9 = aenc((tag4,n2_12,pk(sskI_9)),pk(ski_2)) at {390} in copy a_11
+
+new k2_4: SymmetricKey creating k2_8 at {393} in copy a_11
+
+out(c, ~M_10) with ~M_10 = aenc((tag5,n2_12,k2_8),pk(sskI_9)) at {395} in copy a_11
+
+in(c, ~M_10) with ~M_10 = aenc((tag5,n2_12,k2_8),pk(sskI_9)) at {241} in copy a_10
+
+event userSendsLastMessageToIssuer(aenc((tag4,n2_12,pk(sskI_9)),pk(ski_2)),aenc((tag5,n2_12,k2_8),pk(sskI_9)),enc((tag6,a_4,scope_12,u_4,password_3),k2_8)) at {246} in copy a_10
+
+out(c, ~M_11) with ~M_11 = enc((tag6,a_4,scope_12,u_4,password_3),k2_8) at {247} in copy a_10
+
+in(c, ~M_11) with ~M_11 = enc((tag6,a_4,scope_12,u_4,password_3),k2_8) at {396} in copy a_11
+
+new code_8: bitstring creating code_12 at {402} in copy a_11
+
+event issuerSendsLastMessageToUser(aenc((tag4,n2_12,pk(sskI_9)),pk(ski_2)),aenc((tag5,n2_12,k2_8),pk(sskI_9)),enc((tag6,a_4,scope_12,u_4,password_3),k2_8),enc((tag7,code_12,i_4),k2_8)) at {404} in copy a_11
+
+out(c, ~M_12) with ~M_12 = enc((tag7,code_12,i_4),k2_8) at {405} in copy a_11
+
+in(c, ~M_12) with ~M_12 = enc((tag7,code_12,i_4),k2_8) at {248} in copy a_10
+
+event userSendsLastMessageToApp(aenc((tag1,n_12,pk(sskI_8)),pk(ska_2)),aenc((tag2,n_12,k1_8),pk(sskI_8)),enc((tag3,a_4,scope_12),k1_8),enc((tag8,code_12,i_4),k1_8)) at {253} in copy a_10
+
+out(c, ~M_13) with ~M_13 = enc((tag8,code_12,i_4),k1_8) at {254} in copy a_10
+
+out(c, ~M_14) with ~M_14 = check_reach_user at {256} in copy a_10
+
+event userCompletesProtocol(aenc((tag1,n_12,pk(sskI_8)),pk(ska_2)),aenc((tag2,n_12,k1_8),pk(sskI_8)),enc((tag3,a_4,scope_12),k1_8),aenc((tag4,n2_12,pk(sskI_9)),pk(ski_2)),aenc((tag5,n2_12,k2_8),pk(sskI_9)),enc((tag6,a_4,scope_12,u_4,password_3),k2_8),enc((tag7,code_12,i_4),k2_8)) at {257} in copy a_10
+
+The attacker has the message ~M_14 = check_reach_user.
+A trace has been found.
+RESULT not attacker(check_reach_user[]) is false.
+-- Query not attacker(check_reach_issuer[]) in process 1.
+Translating the process into Horn clauses...
+Completing...
+select attacker(pk(sk))/-5000
+200 rules inserted. Base: 170 rules (45 with conclusion selected). Queue: 66 rules.
+400 rules inserted. Base: 316 rules (92 with conclusion selected). Queue: 117 rules.
+600 rules inserted. Base: 467 rules (110 with conclusion selected). Queue: 100 rules.
+800 rules inserted. Base: 575 rules (134 with conclusion selected). Queue: 176 rules.
+1000 rules inserted. Base: 661 rules (149 with conclusion selected). Queue: 196 rules.
+1200 rules inserted. Base: 711 rules (165 with conclusion selected). Queue: 211 rules.
+1400 rules inserted. Base: 797 rules (182 with conclusion selected). Queue: 217 rules.
+1600 rules inserted. Base: 868 rules (194 with conclusion selected). Queue: 192 rules.
+1800 rules inserted. Base: 989 rules (215 with conclusion selected). Queue: 146 rules.
+2000 rules inserted. Base: 1091 rules (245 with conclusion selected). Queue: 163 rules.
+2200 rules inserted. Base: 1173 rules (263 with conclusion selected). Queue: 184 rules.
+2400 rules inserted. Base: 1264 rules (277 with conclusion selected). Queue: 167 rules.
+2600 rules inserted. Base: 1361 rules (294 with conclusion selected). Queue: 147 rules.
+2800 rules inserted. Base: 1445 rules (303 with conclusion selected). Queue: 99 rules.
+3000 rules inserted. Base: 1433 rules (324 with conclusion selected). Queue: 126 rules.
+3200 rules inserted. Base: 1503 rules (357 with conclusion selected). Queue: 134 rules.
+3400 rules inserted. Base: 1584 rules (369 with conclusion selected). Queue: 146 rules.
+3600 rules inserted. Base: 1659 rules (389 with conclusion selected). Queue: 132 rules.
+3800 rules inserted. Base: 1750 rules (406 with conclusion selected). Queue: 152 rules.
+4000 rules inserted. Base: 1845 rules (431 with conclusion selected). Queue: 175 rules.
+4200 rules inserted. Base: 1939 rules (451 with conclusion selected). Queue: 137 rules.
+4400 rules inserted. Base: 2064 rules (470 with conclusion selected). Queue: 100 rules.
+4600 rules inserted. Base: 2159 rules (488 with conclusion selected). Queue: 59 rules.
+4800 rules inserted. Base: 2242 rules (511 with conclusion selected). Queue: 44 rules.
+Starting query not attacker(check_reach_issuer[])
+goal reachable: attacker(check_reach_issuer[])
+
+Derivation:
+Abbreviations:
+n_12 = n_4[e2_1 = i[],e1_1 = a[],!1 = @sid]
+sskI_8 = sskI[e2_1 = i[],e1_1 = a[],!1 = @sid]
+scope_12 = scope_1[m = aenc((tag1,n_12,pk(sskI_8)),pk(ska[])),pke1 = pke1_6,e2 = i[],e1 = e1_3,!1 = @sid_1]
+k1_8 = k1_1[m = aenc((tag1,n_12,pk(sskI_8)),pk(ska[])),pke1 = pke1_6,e2 = i[],e1 = e1_3,!1 = @sid_1]
+n2_12 = n2_4[m_34 = enc((tag3,a[],scope_12),k1_8),m_33 = aenc((tag2,n_12,k1_8),pk(sskI_8)),e2_1 = i[],e1_1 = a[],!1 = @sid]
+sskI_9 = sskI_1[m_34 = enc((tag3,a[],scope_12),k1_8),m_33 = aenc((tag2,n_12,k1_8),pk(sskI_8)),e2_1 = i[],e1_1 = a[],!1 = @sid]
+k2_8 = k2_4[m_64 = aenc((tag4,n2_12,pk(sskI_9)),pk(ski[])),e2_2 = u[],e1_2 = a[],!1 = @sid_2]
+code_12 = code_8[m_66 = enc((tag6,a[],scope_12,u[],password[]),k2_8),m_64 = aenc((tag4,n2_12,pk(sskI_9)),pk(ski[])),e2_2 = u[],e1_2 = a[],!1 = @sid_2]
+n2_13 = n2_1[m_6 = enc((tag8,code_12,i[]),k1_8),m = aenc((tag1,n_12,pk(sskI_8)),pk(ska[])),pke1 = pke1_6,e2 = i[],e1 = e1_3,!1 = @sid_1]
+sskI2_4 = sskI2_1[m_6 = enc((tag8,code_12,i[]),k1_8),m = aenc((tag1,n_12,pk(sskI_8)),pk(ska[])),pke1 = pke1_6,e2 = i[],e1 = e1_3,!1 = @sid_1]
+k3_8 = k3_4[m_68 = aenc((tag9,n2_13,pk(sskI2_4)),pk(ski[])),m_66 = enc((tag6,a[],scope_12,u[],password[]),k2_8),m_64 = aenc((tag4,n2_12,pk(sskI_9)),pk(ski[])),e2_2 = u[],e1_2 = a[],!1 = @sid_2]
+sks_4 = sks_1[m_13 = aenc((tag10,n2_13,k3_8),pk(sskI2_4)),m_6 = enc((tag8,code_12,i[]),k1_8),m = aenc((tag1,n_12,pk(sskI_8)),pk(ska[])),pke1 = pke1_6,e2 = i[],e1 = e1_3,!1 = @sid_1]
+jti_8 = jti_1[m_13 = aenc((tag10,n2_13,k3_8),pk(sskI2_4)),m_6 = enc((tag8,code_12,i[]),k1_8),m = aenc((tag1,n_12,pk(sskI_8)),pk(ska[])),pke1 = pke1_6,e2 = i[],e1 = e1_3,!1 = @sid_1]
+
+1. The message a[] may be sent to the attacker at output {4}.
+attacker(a[]).
+
+2. The message u[] may be sent to the attacker at output {5}.
+attacker(u[]).
+
+3. The message i[] may be sent to the attacker at output {6}.
+attacker(i[]).
+
+4. The attacker has some term e1_3.
+attacker(e1_3).
+
+5. The attacker has some term pke1_6.
+attacker(pke1_6).
+
+6. The message a[] that the attacker may have by 1 may be received at input {221}.
+The message i[] that the attacker may have by 3 may be received at input {222}.
+So the message aenc((tag1,n_12,pk(sskI_8)),pk(ska[])) may be sent to the attacker at output {228}.
+attacker(aenc((tag1,n_12,pk(sskI_8)),pk(ska[]))).
+
+7. The message e1_3 that the attacker may have by 4 may be received at input {22}.
+The message i[] that the attacker may have by 3 may be received at input {23}.
+The message pke1_6 that the attacker may have by 5 may be received at input {71}.
+The message aenc((tag1,n_12,pk(sskI_8)),pk(ska[])) that the attacker may have by 6 may be received at input {73}.
+We have e1_3 ≠ u[].
+So the message aenc((tag2,n_12,k1_8),pk(sskI_8)) may be sent to the attacker at output {78}.
+attacker(aenc((tag2,n_12,k1_8),pk(sskI_8))).
+
+8. The message e1_3 that the attacker may have by 4 may be received at input {22}.
+The message i[] that the attacker may have by 3 may be received at input {23}.
+The message pke1_6 that the attacker may have by 5 may be received at input {71}.
+The message aenc((tag1,n_12,pk(sskI_8)),pk(ska[])) that the attacker may have by 6 may be received at input {73}.
+We have e1_3 ≠ u[].
+So the message enc((tag3,a[],scope_12),k1_8) may be sent to the attacker at output {82}.
+attacker(enc((tag3,a[],scope_12),k1_8)).
+
+9. The message a[] that the attacker may have by 1 may be received at input {221}.
+The message i[] that the attacker may have by 3 may be received at input {222}.
+The message aenc((tag2,n_12,k1_8),pk(sskI_8)) that the attacker may have by 7 may be received at input {229}.
+The message enc((tag3,a[],scope_12),k1_8) that the attacker may have by 8 may be received at input {233}.
+So the message aenc((tag4,n2_12,pk(sskI_9)),pk(ski[])) may be sent to the attacker at output {240}.
+attacker(aenc((tag4,n2_12,pk(sskI_9)),pk(ski[]))).
+
+10. The message a[] that the attacker may have by 1 may be received at input {386}.
+The message u[] that the attacker may have by 2 may be received at input {387}.
+The message aenc((tag4,n2_12,pk(sskI_9)),pk(ski[])) that the attacker may have by 9 may be received at input {390}.
+So the message aenc((tag5,n2_12,k2_8),pk(sskI_9)) may be sent to the attacker at output {395}.
+attacker(aenc((tag5,n2_12,k2_8),pk(sskI_9))).
+
+11. The message a[] that the attacker may have by 1 may be received at input {221}.
+The message i[] that the attacker may have by 3 may be received at input {222}.
+The message aenc((tag2,n_12,k1_8),pk(sskI_8)) that the attacker may have by 7 may be received at input {229}.
+The message enc((tag3,a[],scope_12),k1_8) that the attacker may have by 8 may be received at input {233}.
+The message aenc((tag5,n2_12,k2_8),pk(sskI_9)) that the attacker may have by 10 may be received at input {241}.
+So the message enc((tag6,a[],scope_12,u[],password[]),k2_8) may be sent to the attacker at output {247}.
+attacker(enc((tag6,a[],scope_12,u[],password[]),k2_8)).
+
+12. The message a[] that the attacker may have by 1 may be received at input {386}.
+The message u[] that the attacker may have by 2 may be received at input {387}.
+The message aenc((tag4,n2_12,pk(sskI_9)),pk(ski[])) that the attacker may have by 9 may be received at input {390}.
+The message enc((tag6,a[],scope_12,u[],password[]),k2_8) that the attacker may have by 11 may be received at input {396}.
+So the message enc((tag7,code_12,i[]),k2_8) may be sent to the attacker at output {405}.
+attacker(enc((tag7,code_12,i[]),k2_8)).
+
+13. The message a[] that the attacker may have by 1 may be received at input {221}.
+The message i[] that the attacker may have by 3 may be received at input {222}.
+The message aenc((tag2,n_12,k1_8),pk(sskI_8)) that the attacker may have by 7 may be received at input {229}.
+The message enc((tag3,a[],scope_12),k1_8) that the attacker may have by 8 may be received at input {233}.
+The message aenc((tag5,n2_12,k2_8),pk(sskI_9)) that the attacker may have by 10 may be received at input {241}.
+The message enc((tag7,code_12,i[]),k2_8) that the attacker may have by 12 may be received at input {248}.
+So the message enc((tag8,code_12,i[]),k1_8) may be sent to the attacker at output {254}.
+attacker(enc((tag8,code_12,i[]),k1_8)).
+
+14. The message e1_3 that the attacker may have by 4 may be received at input {22}.
+The message i[] that the attacker may have by 3 may be received at input {23}.
+The message pke1_6 that the attacker may have by 5 may be received at input {71}.
+The message aenc((tag1,n_12,pk(sskI_8)),pk(ska[])) that the attacker may have by 6 may be received at input {73}.
+The message enc((tag8,code_12,i[]),k1_8) that the attacker may have by 13 may be received at input {83}.
+We have e1_3 ≠ u[].
+So the message aenc((tag9,n2_13,pk(sskI2_4)),pk(ski[])) may be sent to the attacker at output {90}.
+attacker(aenc((tag9,n2_13,pk(sskI2_4)),pk(ski[]))).
+
+15. The message a[] that the attacker may have by 1 may be received at input {386}.
+The message u[] that the attacker may have by 2 may be received at input {387}.
+The message aenc((tag4,n2_12,pk(sskI_9)),pk(ski[])) that the attacker may have by 9 may be received at input {390}.
+The message enc((tag6,a[],scope_12,u[],password[]),k2_8) that the attacker may have by 11 may be received at input {396}.
+The message aenc((tag9,n2_13,pk(sskI2_4)),pk(ski[])) that the attacker may have by 14 may be received at input {406}.
+So the message aenc((tag10,n2_13,k3_8),pk(sskI2_4)) may be sent to the attacker at output {411}.
+attacker(aenc((tag10,n2_13,k3_8),pk(sskI2_4))).
+
+16. The message e1_3 that the attacker may have by 4 may be received at input {22}.
+The message i[] that the attacker may have by 3 may be received at input {23}.
+The message pke1_6 that the attacker may have by 5 may be received at input {71}.
+The message aenc((tag1,n_12,pk(sskI_8)),pk(ska[])) that the attacker may have by 6 may be received at input {73}.
+The message enc((tag8,code_12,i[]),k1_8) that the attacker may have by 13 may be received at input {83}.
+The message aenc((tag10,n2_13,k3_8),pk(sskI2_4)) that the attacker may have by 15 may be received at input {91}.
+We have e1_3 ≠ u[].
+So the message enc((tag11,pk(sks_4),sign((a[],jti_8,code_12),sks_4)),k3_8) may be sent to the attacker at output {100}.
+attacker(enc((tag11,pk(sks_4),sign((a[],jti_8,code_12),sks_4)),k3_8)).
+
+17. The message a[] that the attacker may have by 1 may be received at input {386}.
+The message u[] that the attacker may have by 2 may be received at input {387}.
+The message aenc((tag4,n2_12,pk(sskI_9)),pk(ski[])) that the attacker may have by 9 may be received at input {390}.
+The message enc((tag6,a[],scope_12,u[],password[]),k2_8) that the attacker may have by 11 may be received at input {396}.
+The message aenc((tag9,n2_13,pk(sskI2_4)),pk(ski[])) that the attacker may have by 14 may be received at input {406}.
+The message enc((tag11,pk(sks_4),sign((a[],jti_8,code_12),sks_4)),k3_8) that the attacker may have by 16 may be received at input {412}.
+So the message check_reach_issuer[] may be sent to the attacker at output {424}.
+attacker(check_reach_issuer[]).
+
+18. By 17, attacker(check_reach_issuer[]).
+The goal is reached, represented in the following fact:
+attacker(check_reach_issuer[]).
+
+
+A more detailed output of the traces is available with
+  set traceDisplay = long.
+
+new a: bitstring creating a_4 at {1}
+
+new u: bitstring creating u_4 at {2}
+
+new i: bitstring creating i_4 at {3}
+
+out(c, ~M) with ~M = a_4 at {4}
+
+out(c, ~M_1) with ~M_1 = u_4 at {5}
+
+out(c, ~M_2) with ~M_2 = i_4 at {6}
+
+new ska: SecretKey creating ska_2 at {7}
+
+new sku: SecretKey creating sku_2 at {8}
+
+new ski: SecretKey creating ski_2 at {9}
+
+out(c, ~M_3) with ~M_3 = pk(ska_2) at {10}
+
+out(c, ~M_4) with ~M_4 = pk(sku_2) at {11}
+
+out(c, ~M_5) with ~M_5 = pk(ski_2) at {12}
+
+new password: bitstring creating password_3 at {13}
+
+in(c, a_5) at {22} in copy a_6
+
+in(c, ~M_2) with ~M_2 = i_4 at {23} in copy a_6
+
+in(c, a_7) at {71} in copy a_6
+
+in(c, ~M) with ~M = a_4 at {221} in copy a_8
+
+in(c, ~M_2) with ~M_2 = i_4 at {222} in copy a_8
+
+new n_4: bitstring creating n_12 at {225} in copy a_8
+
+new sskI: SecretKey creating sskI_8 at {226} in copy a_8
+
+out(c, ~M_6) with ~M_6 = aenc((tag1,n_12,pk(sskI_8)),pk(ska_2)) at {228} in copy a_8
+
+in(c, ~M_6) with ~M_6 = aenc((tag1,n_12,pk(sskI_8)),pk(ska_2)) at {73} in copy a_6
+
+new k1_1: SymmetricKey creating k1_8 at {76} in copy a_6
+
+out(c, ~M_7) with ~M_7 = aenc((tag2,n_12,k1_8),pk(sskI_8)) at {78} in copy a_6
+
+new scope_1: bitstring creating scope_12 at {79} in copy a_6
+
+event appSendsLastMessageToUser(aenc((tag1,n_12,pk(sskI_8)),pk(ska_2)),aenc((tag2,n_12,k1_8),pk(sskI_8)),enc((tag3,a_4,scope_12),k1_8)) at {81} in copy a_6
+
+out(c, ~M_8) with ~M_8 = enc((tag3,a_4,scope_12),k1_8) at {82} in copy a_6
+
+in(c, ~M_7) with ~M_7 = aenc((tag2,n_12,k1_8),pk(sskI_8)) at {229} in copy a_8
+
+in(c, ~M_8) with ~M_8 = enc((tag3,a_4,scope_12),k1_8) at {233} in copy a_8
+
+new n2_4: bitstring creating n2_12 at {237} in copy a_8
+
+new sskI_1: SecretKey creating sskI_9 at {238} in copy a_8
+
+out(c, ~M_9) with ~M_9 = aenc((tag4,n2_12,pk(sskI_9)),pk(ski_2)) at {240} in copy a_8
+
+in(c, ~M) with ~M = a_4 at {386} in copy a_9
+
+in(c, ~M_1) with ~M_1 = u_4 at {387} in copy a_9
+
+in(c, ~M_9) with ~M_9 = aenc((tag4,n2_12,pk(sskI_9)),pk(ski_2)) at {390} in copy a_9
+
+new k2_4: SymmetricKey creating k2_8 at {393} in copy a_9
+
+out(c, ~M_10) with ~M_10 = aenc((tag5,n2_12,k2_8),pk(sskI_9)) at {395} in copy a_9
+
+in(c, ~M_10) with ~M_10 = aenc((tag5,n2_12,k2_8),pk(sskI_9)) at {241} in copy a_8
+
+event userSendsLastMessageToIssuer(aenc((tag4,n2_12,pk(sskI_9)),pk(ski_2)),aenc((tag5,n2_12,k2_8),pk(sskI_9)),enc((tag6,a_4,scope_12,u_4,password_3),k2_8)) at {246} in copy a_8
+
+out(c, ~M_11) with ~M_11 = enc((tag6,a_4,scope_12,u_4,password_3),k2_8) at {247} in copy a_8
+
+in(c, ~M_11) with ~M_11 = enc((tag6,a_4,scope_12,u_4,password_3),k2_8) at {396} in copy a_9
+
+new code_8: bitstring creating code_12 at {402} in copy a_9
+
+event issuerSendsLastMessageToUser(aenc((tag4,n2_12,pk(sskI_9)),pk(ski_2)),aenc((tag5,n2_12,k2_8),pk(sskI_9)),enc((tag6,a_4,scope_12,u_4,password_3),k2_8),enc((tag7,code_12,i_4),k2_8)) at {404} in copy a_9
+
+out(c, ~M_12) with ~M_12 = enc((tag7,code_12,i_4),k2_8) at {405} in copy a_9
+
+in(c, ~M_12) with ~M_12 = enc((tag7,code_12,i_4),k2_8) at {248} in copy a_8
+
+event userSendsLastMessageToApp(aenc((tag1,n_12,pk(sskI_8)),pk(ska_2)),aenc((tag2,n_12,k1_8),pk(sskI_8)),enc((tag3,a_4,scope_12),k1_8),enc((tag8,code_12,i_4),k1_8)) at {253} in copy a_8
+
+out(c, ~M_13) with ~M_13 = enc((tag8,code_12,i_4),k1_8) at {254} in copy a_8
+
+out(c, ~M_14) with ~M_14 = check_reach_user at {256} in copy a_8
+
+event userCompletesProtocol(aenc((tag1,n_12,pk(sskI_8)),pk(ska_2)),aenc((tag2,n_12,k1_8),pk(sskI_8)),enc((tag3,a_4,scope_12),k1_8),aenc((tag4,n2_12,pk(sskI_9)),pk(ski_2)),aenc((tag5,n2_12,k2_8),pk(sskI_9)),enc((tag6,a_4,scope_12,u_4,password_3),k2_8),enc((tag7,code_12,i_4),k2_8)) at {257} in copy a_8
+
+in(c, ~M_13) with ~M_13 = enc((tag8,code_12,i_4),k1_8) at {83} in copy a_6
+
+new n2_1: bitstring creating n2_13 at {87} in copy a_6
+
+new sskI2_1: SecretKey creating sskI2_4 at {88} in copy a_6
+
+out(c, ~M_15) with ~M_15 = aenc((tag9,n2_13,pk(sskI2_4)),pk(ski_2)) at {90} in copy a_6
+
+in(c, ~M_15) with ~M_15 = aenc((tag9,n2_13,pk(sskI2_4)),pk(ski_2)) at {406} in copy a_9
+
+new k3_4: SymmetricKey creating k3_8 at {409} in copy a_9
+
+out(c, ~M_16) with ~M_16 = aenc((tag10,n2_13,k3_8),pk(sskI2_4)) at {411} in copy a_9
+
+in(c, ~M_16) with ~M_16 = aenc((tag10,n2_13,k3_8),pk(sskI2_4)) at {91} in copy a_6
+
+new sks_1: SecretKey creating sks_4 at {95} in copy a_6
+
+new jti_1: bitstring creating jti_8 at {96} in copy a_6
+
+event appSendsLastMessageToIssuer(aenc((tag9,n2_13,pk(sskI2_4)),pk(ski_2)),aenc((tag10,n2_13,k3_8),pk(sskI2_4)),enc((tag11,pk(sks_4),sign((a_4,jti_8,code_12),sks_4)),k3_8)) at {99} in copy a_6
+
+out(c, ~M_17) with ~M_17 = enc((tag11,pk(sks_4),sign((a_4,jti_8,code_12),sks_4)),k3_8) at {100} in copy a_6
+
+in(c, ~M_17) with ~M_17 = enc((tag11,pk(sks_4),sign((a_4,jti_8,code_12),sks_4)),k3_8) at {412} in copy a_9
+
+event issuerSendsLastMessageToApp(aenc((tag9,n2_13,pk(sskI2_4)),pk(ski_2)),aenc((tag10,n2_13,k3_8),pk(sskI2_4)),enc((tag11,pk(sks_4),sign((a_4,jti_8,code_12),sks_4)),k3_8),enc((tag12,sign((hash_pk(pk(sks_4)),jti_8,scope_12,a_4,i_4,u_4),ski_2)),k3_8)) at {421} in copy a_9
+
+out(c, ~M_18) with ~M_18 = enc((tag12,sign((hash_pk(pk(sks_4)),jti_8,scope_12,a_4,i_4,u_4),ski_2)),k3_8) at {422} in copy a_9
+
+out(c, ~M_19) with ~M_19 = check_reach_issuer at {424} in copy a_9
+
+event issuerCompletesProtocol(aenc((tag4,n2_12,pk(sskI_9)),pk(ski_2)),aenc((tag5,n2_12,k2_8),pk(sskI_9)),enc((tag6,a_4,scope_12,u_4,password_3),k2_8),aenc((tag9,n2_13,pk(sskI2_4)),pk(ski_2)),aenc((tag10,n2_13,k3_8),pk(sskI2_4)),enc((tag11,pk(sks_4),sign((a_4,jti_8,code_12),sks_4)),k3_8)) at {425} in copy a_9
+
+The attacker has the message ~M_19 = check_reach_issuer.
+A trace has been found.
+RESULT not attacker(check_reach_issuer[]) is false.
+-- Query not attacker(free_code[]) in process 1.
+Translating the process into Horn clauses...
+Completing...
+select attacker(pk(sk))/-5000
+200 rules inserted. Base: 170 rules (45 with conclusion selected). Queue: 66 rules.
+400 rules inserted. Base: 316 rules (92 with conclusion selected). Queue: 117 rules.
+600 rules inserted. Base: 467 rules (110 with conclusion selected). Queue: 100 rules.
+800 rules inserted. Base: 575 rules (134 with conclusion selected). Queue: 176 rules.
+1000 rules inserted. Base: 661 rules (149 with conclusion selected). Queue: 196 rules.
+1200 rules inserted. Base: 711 rules (165 with conclusion selected). Queue: 211 rules.
+1400 rules inserted. Base: 797 rules (182 with conclusion selected). Queue: 217 rules.
+1600 rules inserted. Base: 868 rules (194 with conclusion selected). Queue: 192 rules.
+1800 rules inserted. Base: 989 rules (215 with conclusion selected). Queue: 146 rules.
+2000 rules inserted. Base: 1091 rules (245 with conclusion selected). Queue: 163 rules.
+2200 rules inserted. Base: 1173 rules (263 with conclusion selected). Queue: 184 rules.
+2400 rules inserted. Base: 1264 rules (277 with conclusion selected). Queue: 167 rules.
+2600 rules inserted. Base: 1361 rules (294 with conclusion selected). Queue: 147 rules.
+2800 rules inserted. Base: 1445 rules (303 with conclusion selected). Queue: 99 rules.
+3000 rules inserted. Base: 1433 rules (324 with conclusion selected). Queue: 126 rules.
+3200 rules inserted. Base: 1503 rules (357 with conclusion selected). Queue: 134 rules.
+3400 rules inserted. Base: 1584 rules (369 with conclusion selected). Queue: 146 rules.
+3600 rules inserted. Base: 1659 rules (389 with conclusion selected). Queue: 132 rules.
+3800 rules inserted. Base: 1750 rules (406 with conclusion selected). Queue: 152 rules.
+4000 rules inserted. Base: 1845 rules (431 with conclusion selected). Queue: 175 rules.
+4200 rules inserted. Base: 1939 rules (451 with conclusion selected). Queue: 137 rules.
+4400 rules inserted. Base: 2064 rules (470 with conclusion selected). Queue: 100 rules.
+4600 rules inserted. Base: 2159 rules (488 with conclusion selected). Queue: 59 rules.
+4800 rules inserted. Base: 2242 rules (511 with conclusion selected). Queue: 44 rules.
+Starting query not attacker(free_code[])
+RESULT not attacker(free_code[]) is true.
+-- Query not attacker(free_password[]) in process 1.
+Translating the process into Horn clauses...
+Completing...
+select attacker(pk(sk))/-5000
+200 rules inserted. Base: 170 rules (45 with conclusion selected). Queue: 66 rules.
+400 rules inserted. Base: 316 rules (92 with conclusion selected). Queue: 117 rules.
+600 rules inserted. Base: 467 rules (110 with conclusion selected). Queue: 100 rules.
+800 rules inserted. Base: 575 rules (134 with conclusion selected). Queue: 176 rules.
+1000 rules inserted. Base: 661 rules (149 with conclusion selected). Queue: 196 rules.
+1200 rules inserted. Base: 711 rules (165 with conclusion selected). Queue: 211 rules.
+1400 rules inserted. Base: 797 rules (182 with conclusion selected). Queue: 217 rules.
+1600 rules inserted. Base: 868 rules (194 with conclusion selected). Queue: 192 rules.
+1800 rules inserted. Base: 989 rules (215 with conclusion selected). Queue: 146 rules.
+2000 rules inserted. Base: 1091 rules (245 with conclusion selected). Queue: 163 rules.
+2200 rules inserted. Base: 1173 rules (263 with conclusion selected). Queue: 184 rules.
+2400 rules inserted. Base: 1264 rules (277 with conclusion selected). Queue: 167 rules.
+2600 rules inserted. Base: 1361 rules (294 with conclusion selected). Queue: 147 rules.
+2800 rules inserted. Base: 1445 rules (303 with conclusion selected). Queue: 99 rules.
+3000 rules inserted. Base: 1433 rules (324 with conclusion selected). Queue: 126 rules.
+3200 rules inserted. Base: 1503 rules (357 with conclusion selected). Queue: 134 rules.
+3400 rules inserted. Base: 1584 rules (369 with conclusion selected). Queue: 146 rules.
+3600 rules inserted. Base: 1659 rules (389 with conclusion selected). Queue: 132 rules.
+3800 rules inserted. Base: 1750 rules (406 with conclusion selected). Queue: 152 rules.
+4000 rules inserted. Base: 1845 rules (431 with conclusion selected). Queue: 175 rules.
+4200 rules inserted. Base: 1939 rules (451 with conclusion selected). Queue: 137 rules.
+4400 rules inserted. Base: 2064 rules (470 with conclusion selected). Queue: 100 rules.
+4600 rules inserted. Base: 2159 rules (488 with conclusion selected). Queue: 59 rules.
+4800 rules inserted. Base: 2242 rules (511 with conclusion selected). Queue: 44 rules.
+Starting query not attacker(free_password[])
+RESULT not attacker(free_password[]) is true.
+-- Query inj-event(appCompletesProtocol(m_96,m_97,m_98,m_99,m_100,m_101,m_102,m_103)) ==> inj-event(userSendsLastMessageToApp(m_96,m_97,m_98,m_99)) && inj-event(issuerSendsLastMessageToApp(m_100,m_101,m_102,m_103)) in process 1.
+Translating the process into Horn clauses...
+Completing...
+select attacker(pk(sk))/-5000
+200 rules inserted. Base: 171 rules (45 with conclusion selected). Queue: 68 rules.
+400 rules inserted. Base: 318 rules (88 with conclusion selected). Queue: 112 rules.
+600 rules inserted. Base: 476 rules (110 with conclusion selected). Queue: 116 rules.
+800 rules inserted. Base: 578 rules (130 with conclusion selected). Queue: 176 rules.
+1000 rules inserted. Base: 664 rules (147 with conclusion selected). Queue: 208 rules.
+1200 rules inserted. Base: 765 rules (162 with conclusion selected). Queue: 219 rules.
+1400 rules inserted. Base: 826 rules (175 with conclusion selected). Queue: 220 rules.
+1600 rules inserted. Base: 903 rules (192 with conclusion selected). Queue: 210 rules.
+1800 rules inserted. Base: 998 rules (210 with conclusion selected). Queue: 154 rules.
+2000 rules inserted. Base: 1108 rules (234 with conclusion selected). Queue: 137 rules.
+2200 rules inserted. Base: 1189 rules (255 with conclusion selected). Queue: 186 rules.
+2400 rules inserted. Base: 1275 rules (270 with conclusion selected). Queue: 185 rules.
+2600 rules inserted. Base: 1380 rules (286 with conclusion selected). Queue: 145 rules.
+2800 rules inserted. Base: 1468 rules (297 with conclusion selected). Queue: 112 rules.
+3000 rules inserted. Base: 1535 rules (314 with conclusion selected). Queue: 104 rules.
+3200 rules inserted. Base: 1613 rules (345 with conclusion selected). Queue: 136 rules.
+3400 rules inserted. Base: 1706 rules (366 with conclusion selected). Queue: 193 rules.
+3600 rules inserted. Base: 1810 rules (381 with conclusion selected). Queue: 210 rules.
+3800 rules inserted. Base: 1885 rules (392 with conclusion selected). Queue: 182 rules.
+4000 rules inserted. Base: 1979 rules (405 with conclusion selected). Queue: 177 rules.
+4200 rules inserted. Base: 2090 rules (425 with conclusion selected). Queue: 215 rules.
+4400 rules inserted. Base: 2201 rules (443 with conclusion selected). Queue: 229 rules.
+4600 rules inserted. Base: 2317 rules (457 with conclusion selected). Queue: 204 rules.
+4800 rules inserted. Base: 2458 rules (470 with conclusion selected). Queue: 172 rules.
+5000 rules inserted. Base: 2566 rules (486 with conclusion selected). Queue: 118 rules.
+5200 rules inserted. Base: 2655 rules (496 with conclusion selected). Queue: 80 rules.
+5400 rules inserted. Base: 2754 rules (518 with conclusion selected). Queue: 45 rules.
+Starting query inj-event(appCompletesProtocol(m_96,m_97,m_98,m_99,m_100,m_101,m_102,m_103)) ==> inj-event(userSendsLastMessageToApp(m_96,m_97,m_98,m_99)) && inj-event(issuerSendsLastMessageToApp(m_100,m_101,m_102,m_103))
+goal reachable: begin(issuerSendsLastMessageToApp(aenc((tag9,n2_12,pk(sskI2_4)),pk(ski[])),aenc((tag10,n2_12,k3_8),pk(sskI2_4)),enc((tag11,pk(sks_4),sign((a[],jti_8,code_12),sks_4)),k3_8),enc((tag12,sign((hash_pk(pk(sks_4)),jti_8,scope_12,a[],i[],u[]),ski[])),k3_8)),@occ421_1) && begin(userSendsLastMessageToApp(aenc((tag1,n_12,pk(sskI_8)),pk(ska[])),aenc((tag2,n_12,k1_8),pk(sskI_8)),enc((tag3,a[],scope_12),k1_8),enc((tag8,code_12,i[]),k1_8)),@occ253_1) -> end(@occ68_1,appCompletesProtocol(aenc((tag1,n_12,pk(sskI_8)),pk(ska[])),aenc((tag2,n_12,k1_8),pk(sskI_8)),enc((tag3,a[],scope_12),k1_8),enc((tag8,code_12,i[]),k1_8),aenc((tag9,n2_12,pk(sskI2_4)),pk(ski[])),aenc((tag10,n2_12,k3_8),pk(sskI2_4)),enc((tag11,pk(sks_4),sign((a[],jti_8,code_12),sks_4)),k3_8),enc((tag12,sign((hash_pk(pk(sks_4)),jti_8,scope_12,a[],i[],u[]),ski[])),k3_8)))
+The 1st, 2nd hypotheses occur strictly before the conclusion.
+Abbreviations:
+n_12 = n_4[e2_1 = i[],e1_1 = a[],!1 = @sid]
+sskI_8 = sskI[e2_1 = i[],e1_1 = a[],!1 = @sid]
+scope_12 = scope[m_1 = aenc((tag1,n_12,pk(sskI_8)),pk(ska[])),e2 = i[],e1 = u[],!1 = @sid_1]
+k1_8 = k1[m_1 = aenc((tag1,n_12,pk(sskI_8)),pk(ska[])),e2 = i[],e1 = u[],!1 = @sid_1]
+n2_13 = n2_4[m_34 = enc((tag3,a[],scope_12),k1_8),m_33 = aenc((tag2,n_12,k1_8),pk(sskI_8)),e2_1 = i[],e1_1 = a[],!1 = @sid]
+sskI_9 = sskI_1[m_34 = enc((tag3,a[],scope_12),k1_8),m_33 = aenc((tag2,n_12,k1_8),pk(sskI_8)),e2_1 = i[],e1_1 = a[],!1 = @sid]
+k2_8 = k2_4[m_64 = aenc((tag4,n2_13,pk(sskI_9)),pk(ski[])),e2_2 = u[],e1_2 = a[],!1 = @sid_2]
+code_12 = code_8[m_66 = enc((tag6,a[],scope_12,u[],password[]),k2_8),m_64 = aenc((tag4,n2_13,pk(sskI_9)),pk(ski[])),e2_2 = u[],e1_2 = a[],!1 = @sid_2]
+n2_12 = n2[m_8 = enc((tag8,code_12,i[]),k1_8),m_1 = aenc((tag1,n_12,pk(sskI_8)),pk(ska[])),e2 = i[],e1 = u[],!1 = @sid_1]
+sskI2_4 = sskI2[m_8 = enc((tag8,code_12,i[]),k1_8),m_1 = aenc((tag1,n_12,pk(sskI_8)),pk(ska[])),e2 = i[],e1 = u[],!1 = @sid_1]
+k3_8 = k3_4[m_68 = aenc((tag9,n2_12,pk(sskI2_4)),pk(ski[])),m_66 = enc((tag6,a[],scope_12,u[],password[]),k2_8),m_64 = aenc((tag4,n2_13,pk(sskI_9)),pk(ski[])),e2_2 = u[],e1_2 = a[],!1 = @sid_2]
+sks_4 = sks[m_10 = aenc((tag10,n2_12,k3_8),pk(sskI2_4)),m_8 = enc((tag8,code_12,i[]),k1_8),m_1 = aenc((tag1,n_12,pk(sskI_8)),pk(ska[])),e2 = i[],e1 = u[],!1 = @sid_1]
+jti_8 = jti[m_10 = aenc((tag10,n2_12,k3_8),pk(sskI2_4)),m_8 = enc((tag8,code_12,i[]),k1_8),m_1 = aenc((tag1,n_12,pk(sskI_8)),pk(ska[])),e2 = i[],e1 = u[],!1 = @sid_1]
+@occ68_1 = @occ68[m_12 = enc((tag12,sign((hash_pk(pk(sks_4)),jti_8,scope_12,a[],i[],u[]),ski[])),k3_8),m_10 = aenc((tag10,n2_12,k3_8),pk(sskI2_4)),m_8 = enc((tag8,code_12,i[]),k1_8),m_1 = aenc((tag1,n_12,pk(sskI_8)),pk(ska[])),e2 = i[],e1 = u[],!1 = @sid_1]
+@occ421_1 = @occ421[m_70 = enc((tag11,pk(sks_4),sign((a[],jti_8,code_12),sks_4)),k3_8),m_68 = aenc((tag9,n2_12,pk(sskI2_4)),pk(ski[])),m_66 = enc((tag6,a[],scope_12,u[],password[]),k2_8),m_64 = aenc((tag4,n2_13,pk(sskI_9)),pk(ski[])),e2_2 = u[],e1_2 = a[],!1 = @sid_2]
+@occ253_1 = @occ253[m_38 = enc((tag7,code_12,i[]),k2_8),m_36 = aenc((tag5,n2_13,k2_8),pk(sskI_9)),m_34 = enc((tag3,a[],scope_12),k1_8),m_33 = aenc((tag2,n_12,k1_8),pk(sskI_8)),e2_1 = i[],e1_1 = a[],!1 = @sid]
+RESULT inj-event(appCompletesProtocol(m_96,m_97,m_98,m_99,m_100,m_101,m_102,m_103)) ==> inj-event(userSendsLastMessageToApp(m_96,m_97,m_98,m_99)) && inj-event(issuerSendsLastMessageToApp(m_100,m_101,m_102,m_103)) is true.
+-- Query inj-event(userCompletesProtocol(m_96,m_97,m_98,m_99,m_100,m_101,m_102)) ==> inj-event(appSendsLastMessageToUser(m_96,m_97,m_98)) && inj-event(issuerSendsLastMessageToUser(m_99,m_100,m_101,m_102)) in process 1.
+Translating the process into Horn clauses...
+Completing...
+select attacker(pk(sk))/-5000
+200 rules inserted. Base: 171 rules (45 with conclusion selected). Queue: 68 rules.
+400 rules inserted. Base: 318 rules (89 with conclusion selected). Queue: 117 rules.
+600 rules inserted. Base: 475 rules (109 with conclusion selected). Queue: 107 rules.
+800 rules inserted. Base: 578 rules (133 with conclusion selected). Queue: 177 rules.
+1000 rules inserted. Base: 660 rules (149 with conclusion selected). Queue: 208 rules.
+1200 rules inserted. Base: 758 rules (165 with conclusion selected). Queue: 231 rules.
+1400 rules inserted. Base: 828 rules (178 with conclusion selected). Queue: 250 rules.
+1600 rules inserted. Base: 911 rules (192 with conclusion selected). Queue: 237 rules.
+1800 rules inserted. Base: 992 rules (210 with conclusion selected). Queue: 186 rules.
+2000 rules inserted. Base: 1125 rules (230 with conclusion selected). Queue: 167 rules.
+2200 rules inserted. Base: 1191 rules (253 with conclusion selected). Queue: 194 rules.
+2400 rules inserted. Base: 1271 rules (269 with conclusion selected). Queue: 207 rules.
+2600 rules inserted. Base: 1364 rules (284 with conclusion selected). Queue: 184 rules.
+2800 rules inserted. Base: 1462 rules (301 with conclusion selected). Queue: 156 rules.
+3000 rules inserted. Base: 1539 rules (310 with conclusion selected). Queue: 135 rules.
+3200 rules inserted. Base: 1613 rules (330 with conclusion selected). Queue: 129 rules.
+3400 rules inserted. Base: 1669 rules (354 with conclusion selected). Queue: 159 rules.
+3600 rules inserted. Base: 1778 rules (382 with conclusion selected). Queue: 206 rules.
+3800 rules inserted. Base: 1864 rules (398 with conclusion selected). Queue: 232 rules.
+4000 rules inserted. Base: 1941 rules (412 with conclusion selected). Queue: 238 rules.
+4200 rules inserted. Base: 2009 rules (430 with conclusion selected). Queue: 215 rules.
+4400 rules inserted. Base: 2083 rules (447 with conclusion selected). Queue: 187 rules.
+4600 rules inserted. Base: 2179 rules (473 with conclusion selected). Queue: 193 rules.
+4800 rules inserted. Base: 2283 rules (500 with conclusion selected). Queue: 218 rules.
+5000 rules inserted. Base: 2379 rules (520 with conclusion selected). Queue: 184 rules.
+5200 rules inserted. Base: 2520 rules (541 with conclusion selected). Queue: 154 rules.
+5400 rules inserted. Base: 2628 rules (563 with conclusion selected). Queue: 130 rules.
+5600 rules inserted. Base: 2702 rules (571 with conclusion selected). Queue: 116 rules.
+5800 rules inserted. Base: 2775 rules (592 with conclusion selected). Queue: 79 rules.
+6000 rules inserted. Base: 2893 rules (632 with conclusion selected). Queue: 37 rules.
+Starting query inj-event(userCompletesProtocol(m_96,m_97,m_98,m_99,m_100,m_101,m_102)) ==> inj-event(appSendsLastMessageToUser(m_96,m_97,m_98)) && inj-event(issuerSendsLastMessageToUser(m_99,m_100,m_101,m_102))
+goal reachable: e2_3 ≠ i[] && e1_3 ≠ u[] && begin(issuerSendsLastMessageToUser(aenc((tag4,n2_12,pk(sskI_8)),pk(ski[])),aenc((tag5,n2_12,k2_8),pk(sskI_8)),enc((tag6,a[],scope_12,u[],password[]),k2_8),enc((tag7,code_12,i[]),k2_8)),@occ404_1) && begin(appSendsLastMessageToUser(aenc((tag1,n_12,pk(sskI_9)),pk(ska[])),aenc((tag2,n_12,k1_8),pk(sskI_9)),enc((tag3,a[],scope_12),k1_8)),@occ176_1) && attacker(pke2_6) && attacker(pke1_6) && attacker(e2_3) && attacker(e1_3) -> end(@occ257_1,userCompletesProtocol(aenc((tag1,n_12,pk(sskI_9)),pk(ska[])),aenc((tag2,n_12,k1_8),pk(sskI_9)),enc((tag3,a[],scope_12),k1_8),aenc((tag4,n2_12,pk(sskI_8)),pk(ski[])),aenc((tag5,n2_12,k2_8),pk(sskI_8)),enc((tag6,a[],scope_12,u[],password[]),k2_8),enc((tag7,code_12,i[]),k2_8)))
+The 1st, 2nd hypotheses occur strictly before the conclusion.
+The 3rd, 4th, 5th, 6th hypotheses occur before the conclusion.
+Abbreviations:
+n_12 = n_4[e2_1 = i[],e1_1 = a[],!1 = @sid]
+sskI_9 = sskI[e2_1 = i[],e1_1 = a[],!1 = @sid]
+scope_12 = scope_3[m_24 = aenc((tag1,n_12,pk(sskI_9)),pk(ska[])),pke2_1 = pke2_6,pke1_1 = pke1_6,e2 = e2_3,e1 = e1_3,!1 = @sid_1]
+k1_8 = k1_3[m_24 = aenc((tag1,n_12,pk(sskI_9)),pk(ska[])),pke2_1 = pke2_6,pke1_1 = pke1_6,e2 = e2_3,e1 = e1_3,!1 = @sid_1]
+n2_12 = n2_4[m_34 = enc((tag3,a[],scope_12),k1_8),m_33 = aenc((tag2,n_12,k1_8),pk(sskI_9)),e2_1 = i[],e1_1 = a[],!1 = @sid]
+sskI_8 = sskI_1[m_34 = enc((tag3,a[],scope_12),k1_8),m_33 = aenc((tag2,n_12,k1_8),pk(sskI_9)),e2_1 = i[],e1_1 = a[],!1 = @sid]
+k2_8 = k2_4[m_64 = aenc((tag4,n2_12,pk(sskI_8)),pk(ski[])),e2_2 = u[],e1_2 = a[],!1 = @sid_2]
+code_12 = code_8[m_66 = enc((tag6,a[],scope_12,u[],password[]),k2_8),m_64 = aenc((tag4,n2_12,pk(sskI_8)),pk(ski[])),e2_2 = u[],e1_2 = a[],!1 = @sid_2]
+@occ257_1 = @occ257[m_38 = enc((tag7,code_12,i[]),k2_8),m_36 = aenc((tag5,n2_12,k2_8),pk(sskI_8)),m_34 = enc((tag3,a[],scope_12),k1_8),m_33 = aenc((tag2,n_12,k1_8),pk(sskI_9)),e2_1 = i[],e1_1 = a[],!1 = @sid]
+@occ404_1 = @occ404[m_66 = enc((tag6,a[],scope_12,u[],password[]),k2_8),m_64 = aenc((tag4,n2_12,pk(sskI_8)),pk(ski[])),e2_2 = u[],e1_2 = a[],!1 = @sid_2]
+@occ176_1 = @occ176[m_24 = aenc((tag1,n_12,pk(sskI_9)),pk(ska[])),pke2_1 = pke2_6,pke1_1 = pke1_6,e2 = e2_3,e1 = e1_3,!1 = @sid_1]
+goal reachable: e2_3 ≠ i[] && begin(issuerSendsLastMessageToUser(aenc((tag4,n2_12,pk(sskI_8)),pk(ski[])),aenc((tag5,n2_12,k2_8),pk(sskI_8)),enc((tag6,a[],scope_12,u[],password[]),k2_8),enc((tag7,code_12,i[]),k2_8)),@occ404_1) && begin(appSendsLastMessageToUser(aenc((tag1,n_12,pk(sskI_9)),pk(ska[])),aenc((tag2,n_12,k1_8),pk(sskI_9)),enc((tag3,a[],scope_12),k1_8)),@occ128_1) && attacker(pke2_6) && attacker(e2_3) -> end(@occ257_1,userCompletesProtocol(aenc((tag1,n_12,pk(sskI_9)),pk(ska[])),aenc((tag2,n_12,k1_8),pk(sskI_9)),enc((tag3,a[],scope_12),k1_8),aenc((tag4,n2_12,pk(sskI_8)),pk(ski[])),aenc((tag5,n2_12,k2_8),pk(sskI_8)),enc((tag6,a[],scope_12,u[],password[]),k2_8),enc((tag7,code_12,i[]),k2_8)))
+The 1st, 2nd hypotheses occur strictly before the conclusion.
+The 3rd, 4th hypotheses occur before the conclusion.
+Abbreviations:
+n_12 = n_4[e2_1 = i[],e1_1 = a[],!1 = @sid]
+sskI_9 = sskI[e2_1 = i[],e1_1 = a[],!1 = @sid]
+scope_12 = scope_2[m_16 = aenc((tag1,n_12,pk(sskI_9)),pk(ska[])),pke2 = pke2_6,e2 = e2_3,e1 = u[],!1 = @sid_1]
+k1_8 = k1_2[m_16 = aenc((tag1,n_12,pk(sskI_9)),pk(ska[])),pke2 = pke2_6,e2 = e2_3,e1 = u[],!1 = @sid_1]
+n2_12 = n2_4[m_34 = enc((tag3,a[],scope_12),k1_8),m_33 = aenc((tag2,n_12,k1_8),pk(sskI_9)),e2_1 = i[],e1_1 = a[],!1 = @sid]
+sskI_8 = sskI_1[m_34 = enc((tag3,a[],scope_12),k1_8),m_33 = aenc((tag2,n_12,k1_8),pk(sskI_9)),e2_1 = i[],e1_1 = a[],!1 = @sid]
+k2_8 = k2_4[m_64 = aenc((tag4,n2_12,pk(sskI_8)),pk(ski[])),e2_2 = u[],e1_2 = a[],!1 = @sid_2]
+code_12 = code_8[m_66 = enc((tag6,a[],scope_12,u[],password[]),k2_8),m_64 = aenc((tag4,n2_12,pk(sskI_8)),pk(ski[])),e2_2 = u[],e1_2 = a[],!1 = @sid_2]
+@occ257_1 = @occ257[m_38 = enc((tag7,code_12,i[]),k2_8),m_36 = aenc((tag5,n2_12,k2_8),pk(sskI_8)),m_34 = enc((tag3,a[],scope_12),k1_8),m_33 = aenc((tag2,n_12,k1_8),pk(sskI_9)),e2_1 = i[],e1_1 = a[],!1 = @sid]
+@occ404_1 = @occ404[m_66 = enc((tag6,a[],scope_12,u[],password[]),k2_8),m_64 = aenc((tag4,n2_12,pk(sskI_8)),pk(ski[])),e2_2 = u[],e1_2 = a[],!1 = @sid_2]
+@occ128_1 = @occ128[m_16 = aenc((tag1,n_12,pk(sskI_9)),pk(ska[])),pke2 = pke2_6,e2 = e2_3,e1 = u[],!1 = @sid_1]
+goal reachable: e1_3 ≠ u[] && begin(issuerSendsLastMessageToUser(aenc((tag4,n2_12,pk(sskI_8)),pk(ski[])),aenc((tag5,n2_12,k2_8),pk(sskI_8)),enc((tag6,a[],scope_12,u[],password[]),k2_8),enc((tag7,code_12,i[]),k2_8)),@occ404_1) && begin(appSendsLastMessageToUser(aenc((tag1,n_12,pk(sskI_9)),pk(ska[])),aenc((tag2,n_12,k1_8),pk(sskI_9)),enc((tag3,a[],scope_12),k1_8)),@occ81_1) && attacker(pke1_6) && attacker(e1_3) -> end(@occ257_1,userCompletesProtocol(aenc((tag1,n_12,pk(sskI_9)),pk(ska[])),aenc((tag2,n_12,k1_8),pk(sskI_9)),enc((tag3,a[],scope_12),k1_8),aenc((tag4,n2_12,pk(sskI_8)),pk(ski[])),aenc((tag5,n2_12,k2_8),pk(sskI_8)),enc((tag6,a[],scope_12,u[],password[]),k2_8),enc((tag7,code_12,i[]),k2_8)))
+The 1st, 2nd hypotheses occur strictly before the conclusion.
+The 3rd, 4th hypotheses occur before the conclusion.
+Abbreviations:
+n_12 = n_4[e2_1 = i[],e1_1 = a[],!1 = @sid]
+sskI_9 = sskI[e2_1 = i[],e1_1 = a[],!1 = @sid]
+scope_12 = scope_1[m = aenc((tag1,n_12,pk(sskI_9)),pk(ska[])),pke1 = pke1_6,e2 = i[],e1 = e1_3,!1 = @sid_1]
+k1_8 = k1_1[m = aenc((tag1,n_12,pk(sskI_9)),pk(ska[])),pke1 = pke1_6,e2 = i[],e1 = e1_3,!1 = @sid_1]
+n2_12 = n2_4[m_34 = enc((tag3,a[],scope_12),k1_8),m_33 = aenc((tag2,n_12,k1_8),pk(sskI_9)),e2_1 = i[],e1_1 = a[],!1 = @sid]
+sskI_8 = sskI_1[m_34 = enc((tag3,a[],scope_12),k1_8),m_33 = aenc((tag2,n_12,k1_8),pk(sskI_9)),e2_1 = i[],e1_1 = a[],!1 = @sid]
+k2_8 = k2_4[m_64 = aenc((tag4,n2_12,pk(sskI_8)),pk(ski[])),e2_2 = u[],e1_2 = a[],!1 = @sid_2]
+code_12 = code_8[m_66 = enc((tag6,a[],scope_12,u[],password[]),k2_8),m_64 = aenc((tag4,n2_12,pk(sskI_8)),pk(ski[])),e2_2 = u[],e1_2 = a[],!1 = @sid_2]
+@occ257_1 = @occ257[m_38 = enc((tag7,code_12,i[]),k2_8),m_36 = aenc((tag5,n2_12,k2_8),pk(sskI_8)),m_34 = enc((tag3,a[],scope_12),k1_8),m_33 = aenc((tag2,n_12,k1_8),pk(sskI_9)),e2_1 = i[],e1_1 = a[],!1 = @sid]
+@occ404_1 = @occ404[m_66 = enc((tag6,a[],scope_12,u[],password[]),k2_8),m_64 = aenc((tag4,n2_12,pk(sskI_8)),pk(ski[])),e2_2 = u[],e1_2 = a[],!1 = @sid_2]
+@occ81_1 = @occ81[m = aenc((tag1,n_12,pk(sskI_9)),pk(ska[])),pke1 = pke1_6,e2 = i[],e1 = e1_3,!1 = @sid_1]
+goal reachable: begin(issuerSendsLastMessageToUser(aenc((tag4,n2_12,pk(sskI_8)),pk(ski[])),aenc((tag5,n2_12,k2_8),pk(sskI_8)),enc((tag6,a[],scope_12,u[],password[]),k2_8),enc((tag7,code_12,i[]),k2_8)),@occ404_1) && begin(appSendsLastMessageToUser(aenc((tag1,n_12,pk(sskI_9)),pk(ska[])),aenc((tag2,n_12,k1_8),pk(sskI_9)),enc((tag3,a[],scope_12),k1_8)),@occ34_1) -> end(@occ257_1,userCompletesProtocol(aenc((tag1,n_12,pk(sskI_9)),pk(ska[])),aenc((tag2,n_12,k1_8),pk(sskI_9)),enc((tag3,a[],scope_12),k1_8),aenc((tag4,n2_12,pk(sskI_8)),pk(ski[])),aenc((tag5,n2_12,k2_8),pk(sskI_8)),enc((tag6,a[],scope_12,u[],password[]),k2_8),enc((tag7,code_12,i[]),k2_8)))
+The 1st, 2nd hypotheses occur strictly before the conclusion.
+Abbreviations:
+n_12 = n_4[e2_1 = i[],e1_1 = a[],!1 = @sid]
+sskI_9 = sskI[e2_1 = i[],e1_1 = a[],!1 = @sid]
+scope_12 = scope[m_1 = aenc((tag1,n_12,pk(sskI_9)),pk(ska[])),e2 = i[],e1 = u[],!1 = @sid_1]
+k1_8 = k1[m_1 = aenc((tag1,n_12,pk(sskI_9)),pk(ska[])),e2 = i[],e1 = u[],!1 = @sid_1]
+n2_12 = n2_4[m_34 = enc((tag3,a[],scope_12),k1_8),m_33 = aenc((tag2,n_12,k1_8),pk(sskI_9)),e2_1 = i[],e1_1 = a[],!1 = @sid]
+sskI_8 = sskI_1[m_34 = enc((tag3,a[],scope_12),k1_8),m_33 = aenc((tag2,n_12,k1_8),pk(sskI_9)),e2_1 = i[],e1_1 = a[],!1 = @sid]
+k2_8 = k2_4[m_64 = aenc((tag4,n2_12,pk(sskI_8)),pk(ski[])),e2_2 = u[],e1_2 = a[],!1 = @sid_2]
+code_12 = code_8[m_66 = enc((tag6,a[],scope_12,u[],password[]),k2_8),m_64 = aenc((tag4,n2_12,pk(sskI_8)),pk(ski[])),e2_2 = u[],e1_2 = a[],!1 = @sid_2]
+@occ257_1 = @occ257[m_38 = enc((tag7,code_12,i[]),k2_8),m_36 = aenc((tag5,n2_12,k2_8),pk(sskI_8)),m_34 = enc((tag3,a[],scope_12),k1_8),m_33 = aenc((tag2,n_12,k1_8),pk(sskI_9)),e2_1 = i[],e1_1 = a[],!1 = @sid]
+@occ404_1 = @occ404[m_66 = enc((tag6,a[],scope_12,u[],password[]),k2_8),m_64 = aenc((tag4,n2_12,pk(sskI_8)),pk(ski[])),e2_2 = u[],e1_2 = a[],!1 = @sid_2]
+@occ34_1 = @occ34[m_1 = aenc((tag1,n_12,pk(sskI_9)),pk(ska[])),e2 = i[],e1 = u[],!1 = @sid_1]
+RESULT inj-event(userCompletesProtocol(m_96,m_97,m_98,m_99,m_100,m_101,m_102)) ==> inj-event(appSendsLastMessageToUser(m_96,m_97,m_98)) && inj-event(issuerSendsLastMessageToUser(m_99,m_100,m_101,m_102)) is true.
+-- Query inj-event(issuerCompletesProtocol(m_96,m_97,m_98,m_99,m_100,m_101)) ==> inj-event(appSendsLastMessageToIssuer(m_99,m_100,m_101)) && inj-event(userSendsLastMessageToIssuer(m_96,m_97,m_98)) in process 1.
+Translating the process into Horn clauses...
+Completing...
+select attacker(pk(sk))/-5000
+200 rules inserted. Base: 171 rules (45 with conclusion selected). Queue: 67 rules.
+400 rules inserted. Base: 317 rules (91 with conclusion selected). Queue: 117 rules.
+600 rules inserted. Base: 471 rules (110 with conclusion selected). Queue: 115 rules.
+800 rules inserted. Base: 576 rules (130 with conclusion selected). Queue: 179 rules.
+1000 rules inserted. Base: 665 rules (147 with conclusion selected). Queue: 213 rules.
+1200 rules inserted. Base: 765 rules (162 with conclusion selected). Queue: 234 rules.
+1400 rules inserted. Base: 821 rules (175 with conclusion selected). Queue: 241 rules.
+1600 rules inserted. Base: 896 rules (191 with conclusion selected). Queue: 237 rules.
+1800 rules inserted. Base: 976 rules (206 with conclusion selected). Queue: 179 rules.
+2000 rules inserted. Base: 1117 rules (230 with conclusion selected). Queue: 176 rules.
+2200 rules inserted. Base: 1185 rules (252 with conclusion selected). Queue: 193 rules.
+2400 rules inserted. Base: 1265 rules (267 with conclusion selected). Queue: 226 rules.
+2600 rules inserted. Base: 1345 rules (280 with conclusion selected). Queue: 221 rules.
+2800 rules inserted. Base: 1450 rules (295 with conclusion selected). Queue: 186 rules.
+3000 rules inserted. Base: 1534 rules (306 with conclusion selected). Queue: 147 rules.
+3200 rules inserted. Base: 1630 rules (322 with conclusion selected). Queue: 128 rules.
+3400 rules inserted. Base: 1683 rules (336 with conclusion selected). Queue: 139 rules.
+3600 rules inserted. Base: 1771 rules (368 with conclusion selected). Queue: 208 rules.
+3800 rules inserted. Base: 1871 rules (384 with conclusion selected). Queue: 257 rules.
+4000 rules inserted. Base: 1958 rules (398 with conclusion selected). Queue: 248 rules.
+4200 rules inserted. Base: 2021 rules (411 with conclusion selected). Queue: 244 rules.
+4400 rules inserted. Base: 2083 rules (427 with conclusion selected). Queue: 223 rules.
+4600 rules inserted. Base: 2161 rules (446 with conclusion selected). Queue: 229 rules.
+4800 rules inserted. Base: 2269 rules (470 with conclusion selected). Queue: 254 rules.
+5000 rules inserted. Base: 2387 rules (496 with conclusion selected). Queue: 295 rules.
+5200 rules inserted. Base: 2497 rules (514 with conclusion selected). Queue: 269 rules.
+5400 rules inserted. Base: 2619 rules (531 with conclusion selected). Queue: 253 rules.
+5600 rules inserted. Base: 2760 rules (547 with conclusion selected). Queue: 199 rules.
+5800 rules inserted. Base: 2856 rules (559 with conclusion selected). Queue: 160 rules.
+6000 rules inserted. Base: 2945 rules (567 with conclusion selected). Queue: 134 rules.
+6200 rules inserted. Base: 3009 rules (578 with conclusion selected). Queue: 92 rules.
+6400 rules inserted. Base: 3098 rules (608 with conclusion selected). Queue: 57 rules.
+Starting query inj-event(issuerCompletesProtocol(m_96,m_97,m_98,m_99,m_100,m_101)) ==> inj-event(appSendsLastMessageToIssuer(m_99,m_100,m_101)) && inj-event(userSendsLastMessageToIssuer(m_96,m_97,m_98))
+goal reachable: e1_3 ≠ u[] && begin(appSendsLastMessageToIssuer(aenc((tag9,n2_12,pk(sskI2_4)),pk(ski[])),aenc((tag10,n2_12,k3_8),pk(sskI2_4)),enc((tag11,pk(sks_4),sign((a[],jti_8,code_12),sks_4)),k3_8)),@occ99_1) && begin(@p_act(@occ248_1,enc((tag7,code_12,i[]),k2_8))) && begin(userSendsLastMessageToIssuer(aenc((tag4,n2_13,pk(sskI_8)),pk(ski[])),aenc((tag5,n2_13,k2_8),pk(sskI_8)),enc((tag6,a[],scope_12,u[],password[]),k2_8)),@occ246_1) && attacker(pke1_6) && attacker(e1_3) -> end(@occ425_1,issuerCompletesProtocol(aenc((tag4,n2_13,pk(sskI_8)),pk(ski[])),aenc((tag5,n2_13,k2_8),pk(sskI_8)),enc((tag6,a[],scope_12,u[],password[]),k2_8),aenc((tag9,n2_12,pk(sskI2_4)),pk(ski[])),aenc((tag10,n2_12,k3_8),pk(sskI2_4)),enc((tag11,pk(sks_4),sign((a[],jti_8,code_12),sks_4)),k3_8)))
+The 1st, 2nd, 3rd hypotheses occur strictly before the conclusion.
+The 4th, 5th hypotheses occur before the conclusion.
+Abbreviations:
+n_12 = n_4[e2_1 = i[],e1_1 = a[],!1 = @sid]
+sskI_9 = sskI[e2_1 = i[],e1_1 = a[],!1 = @sid]
+scope_12 = scope_1[m = aenc((tag1,n_12,pk(sskI_9)),pk(ska[])),pke1 = pke1_6,e2 = i[],e1 = e1_3,!1 = @sid_1]
+k1_8 = k1_1[m = aenc((tag1,n_12,pk(sskI_9)),pk(ska[])),pke1 = pke1_6,e2 = i[],e1 = e1_3,!1 = @sid_1]
+n2_13 = n2_4[m_34 = enc((tag3,a[],scope_12),k1_8),m_33 = aenc((tag2,n_12,k1_8),pk(sskI_9)),e2_1 = i[],e1_1 = a[],!1 = @sid]
+sskI_8 = sskI_1[m_34 = enc((tag3,a[],scope_12),k1_8),m_33 = aenc((tag2,n_12,k1_8),pk(sskI_9)),e2_1 = i[],e1_1 = a[],!1 = @sid]
+k2_8 = k2_4[m_64 = aenc((tag4,n2_13,pk(sskI_8)),pk(ski[])),e2_2 = u[],e1_2 = a[],!1 = @sid_2]
+code_12 = code_8[m_66 = enc((tag6,a[],scope_12,u[],password[]),k2_8),m_64 = aenc((tag4,n2_13,pk(sskI_8)),pk(ski[])),e2_2 = u[],e1_2 = a[],!1 = @sid_2]
+n2_12 = n2_1[m_6 = enc((tag8,code_12,i[]),k1_8),m = aenc((tag1,n_12,pk(sskI_9)),pk(ska[])),pke1 = pke1_6,e2 = i[],e1 = e1_3,!1 = @sid_1]
+sskI2_4 = sskI2_1[m_6 = enc((tag8,code_12,i[]),k1_8),m = aenc((tag1,n_12,pk(sskI_9)),pk(ska[])),pke1 = pke1_6,e2 = i[],e1 = e1_3,!1 = @sid_1]
+k3_8 = k3_4[m_68 = aenc((tag9,n2_12,pk(sskI2_4)),pk(ski[])),m_66 = enc((tag6,a[],scope_12,u[],password[]),k2_8),m_64 = aenc((tag4,n2_13,pk(sskI_8)),pk(ski[])),e2_2 = u[],e1_2 = a[],!1 = @sid_2]
+sks_4 = sks_1[m_13 = aenc((tag10,n2_12,k3_8),pk(sskI2_4)),m_6 = enc((tag8,code_12,i[]),k1_8),m = aenc((tag1,n_12,pk(sskI_9)),pk(ska[])),pke1 = pke1_6,e2 = i[],e1 = e1_3,!1 = @sid_1]
+jti_8 = jti_1[m_13 = aenc((tag10,n2_12,k3_8),pk(sskI2_4)),m_6 = enc((tag8,code_12,i[]),k1_8),m = aenc((tag1,n_12,pk(sskI_9)),pk(ska[])),pke1 = pke1_6,e2 = i[],e1 = e1_3,!1 = @sid_1]
+@occ425_1 = @occ425[m_70 = enc((tag11,pk(sks_4),sign((a[],jti_8,code_12),sks_4)),k3_8),m_68 = aenc((tag9,n2_12,pk(sskI2_4)),pk(ski[])),m_66 = enc((tag6,a[],scope_12,u[],password[]),k2_8),m_64 = aenc((tag4,n2_13,pk(sskI_8)),pk(ski[])),e2_2 = u[],e1_2 = a[],!1 = @sid_2]
+@occ99_1 = @occ99[m_13 = aenc((tag10,n2_12,k3_8),pk(sskI2_4)),m_6 = enc((tag8,code_12,i[]),k1_8),m = aenc((tag1,n_12,pk(sskI_9)),pk(ska[])),pke1 = pke1_6,e2 = i[],e1 = e1_3,!1 = @sid_1]
+@occ248_1 = @occ248[!1 = @sid]
+@occ246_1 = @occ246[m_36 = aenc((tag5,n2_13,k2_8),pk(sskI_8)),m_34 = enc((tag3,a[],scope_12),k1_8),m_33 = aenc((tag2,n_12,k1_8),pk(sskI_9)),e2_1 = i[],e1_1 = a[],!1 = @sid]
+goal reachable: begin(appSendsLastMessageToIssuer(aenc((tag9,n2_12,pk(sskI2_4)),pk(ski[])),aenc((tag10,n2_12,k3_8),pk(sskI2_4)),enc((tag11,pk(sks_4),sign((a[],jti_8,code_12),sks_4)),k3_8)),@occ52_1) && begin(@p_act(@occ248_1,enc((tag7,code_12,i[]),k2_8))) && begin(userSendsLastMessageToIssuer(aenc((tag4,n2_13,pk(sskI_8)),pk(ski[])),aenc((tag5,n2_13,k2_8),pk(sskI_8)),enc((tag6,a[],scope_12,u[],password[]),k2_8)),@occ246_1) -> end(@occ425_1,issuerCompletesProtocol(aenc((tag4,n2_13,pk(sskI_8)),pk(ski[])),aenc((tag5,n2_13,k2_8),pk(sskI_8)),enc((tag6,a[],scope_12,u[],password[]),k2_8),aenc((tag9,n2_12,pk(sskI2_4)),pk(ski[])),aenc((tag10,n2_12,k3_8),pk(sskI2_4)),enc((tag11,pk(sks_4),sign((a[],jti_8,code_12),sks_4)),k3_8)))
+The 1st, 2nd, 3rd hypotheses occur strictly before the conclusion.
+Abbreviations:
+n_12 = n_4[e2_1 = i[],e1_1 = a[],!1 = @sid]
+sskI_9 = sskI[e2_1 = i[],e1_1 = a[],!1 = @sid]
+scope_12 = scope[m_1 = aenc((tag1,n_12,pk(sskI_9)),pk(ska[])),e2 = i[],e1 = u[],!1 = @sid_1]
+k1_8 = k1[m_1 = aenc((tag1,n_12,pk(sskI_9)),pk(ska[])),e2 = i[],e1 = u[],!1 = @sid_1]
+n2_13 = n2_4[m_34 = enc((tag3,a[],scope_12),k1_8),m_33 = aenc((tag2,n_12,k1_8),pk(sskI_9)),e2_1 = i[],e1_1 = a[],!1 = @sid]
+sskI_8 = sskI_1[m_34 = enc((tag3,a[],scope_12),k1_8),m_33 = aenc((tag2,n_12,k1_8),pk(sskI_9)),e2_1 = i[],e1_1 = a[],!1 = @sid]
+k2_8 = k2_4[m_64 = aenc((tag4,n2_13,pk(sskI_8)),pk(ski[])),e2_2 = u[],e1_2 = a[],!1 = @sid_2]
+code_12 = code_8[m_66 = enc((tag6,a[],scope_12,u[],password[]),k2_8),m_64 = aenc((tag4,n2_13,pk(sskI_8)),pk(ski[])),e2_2 = u[],e1_2 = a[],!1 = @sid_2]
+n2_12 = n2[m_8 = enc((tag8,code_12,i[]),k1_8),m_1 = aenc((tag1,n_12,pk(sskI_9)),pk(ska[])),e2 = i[],e1 = u[],!1 = @sid_1]
+sskI2_4 = sskI2[m_8 = enc((tag8,code_12,i[]),k1_8),m_1 = aenc((tag1,n_12,pk(sskI_9)),pk(ska[])),e2 = i[],e1 = u[],!1 = @sid_1]
+k3_8 = k3_4[m_68 = aenc((tag9,n2_12,pk(sskI2_4)),pk(ski[])),m_66 = enc((tag6,a[],scope_12,u[],password[]),k2_8),m_64 = aenc((tag4,n2_13,pk(sskI_8)),pk(ski[])),e2_2 = u[],e1_2 = a[],!1 = @sid_2]
+sks_4 = sks[m_10 = aenc((tag10,n2_12,k3_8),pk(sskI2_4)),m_8 = enc((tag8,code_12,i[]),k1_8),m_1 = aenc((tag1,n_12,pk(sskI_9)),pk(ska[])),e2 = i[],e1 = u[],!1 = @sid_1]
+jti_8 = jti[m_10 = aenc((tag10,n2_12,k3_8),pk(sskI2_4)),m_8 = enc((tag8,code_12,i[]),k1_8),m_1 = aenc((tag1,n_12,pk(sskI_9)),pk(ska[])),e2 = i[],e1 = u[],!1 = @sid_1]
+@occ425_1 = @occ425[m_70 = enc((tag11,pk(sks_4),sign((a[],jti_8,code_12),sks_4)),k3_8),m_68 = aenc((tag9,n2_12,pk(sskI2_4)),pk(ski[])),m_66 = enc((tag6,a[],scope_12,u[],password[]),k2_8),m_64 = aenc((tag4,n2_13,pk(sskI_8)),pk(ski[])),e2_2 = u[],e1_2 = a[],!1 = @sid_2]
+@occ52_1 = @occ52[m_10 = aenc((tag10,n2_12,k3_8),pk(sskI2_4)),m_8 = enc((tag8,code_12,i[]),k1_8),m_1 = aenc((tag1,n_12,pk(sskI_9)),pk(ska[])),e2 = i[],e1 = u[],!1 = @sid_1]
+@occ248_1 = @occ248[!1 = @sid]
+@occ246_1 = @occ246[m_36 = aenc((tag5,n2_13,k2_8),pk(sskI_8)),m_34 = enc((tag3,a[],scope_12),k1_8),m_33 = aenc((tag2,n_12,k1_8),pk(sskI_9)),e2_1 = i[],e1_1 = a[],!1 = @sid]
+RESULT inj-event(issuerCompletesProtocol(m_96,m_97,m_98,m_99,m_100,m_101)) ==> inj-event(appSendsLastMessageToIssuer(m_99,m_100,m_101)) && inj-event(userSendsLastMessageToIssuer(m_96,m_97,m_98)) is true.
+
+--------------------------------------------------------------
+Verification summary:
+
+Query not attacker(check_reach_app[]) is false.
+
+Query not attacker(check_reach_user[]) is false.
+
+Query not attacker(check_reach_issuer[]) is false.
+
+Query not attacker(free_code[]) is true.
+
+Query not attacker(free_password[]) is true.
+
+Query inj-event(appCompletesProtocol(m_96,m_97,m_98,m_99,m_100,m_101,m_102,m_103)) ==> inj-event(userSendsLastMessageToApp(m_96,m_97,m_98,m_99)) && inj-event(issuerSendsLastMessageToApp(m_100,m_101,m_102,m_103)) is true.
+
+Query inj-event(userCompletesProtocol(m_96,m_97,m_98,m_99,m_100,m_101,m_102)) ==> inj-event(appSendsLastMessageToUser(m_96,m_97,m_98)) && inj-event(issuerSendsLastMessageToUser(m_99,m_100,m_101,m_102)) is true.
+
+Query inj-event(issuerCompletesProtocol(m_96,m_97,m_98,m_99,m_100,m_101)) ==> inj-event(appSendsLastMessageToIssuer(m_99,m_100,m_101)) && inj-event(userSendsLastMessageToIssuer(m_96,m_97,m_98)) is true.
+
+--------------------------------------------------------------
+
