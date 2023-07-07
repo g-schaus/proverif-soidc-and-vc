@@ -4,11 +4,11 @@ All accessible and verified models are listed below:
 
 | Variant  | Vulnerable | Note |
 | ------------- | ------------- | ------------- |
-| HTTPS  | NO  | HTTPS should only authenticate in one direction. |
-| HTTPS using DH  | NO  | HTTPS should only authenticate in one direction. |
-| SOIDC  | YES  | Attack is provided. |
+| HTTPS  | No  | HTTPS should only authenticate in one direction. |
+| HTTPS using DH  | No  | HTTPS should only authenticate in one direction. |
+| SOIDC  | Yes  | Attack is provided. |
 | SOIDC using DH  | ?  | Verification termination issues. |
-| SOIDC with late HS  | YES  | Attack is provided. |
-| SOIDC proposed FIX  | NO  | Fix is working. |
-| STS  | NO  | |
-| VC Based Version  | YES  | |
+| SOIDC with late HS  | Yes  | Attack is provided. |
+| SOIDC proposed fix  | No  | Fix is working. |
+| STS  | No  | |
+| VC Based Version  | No  | |
