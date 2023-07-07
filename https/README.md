@@ -16,3 +16,8 @@ The second model...
 ## Results
 
 Both models have the following properties...
+
+| First Header  | Second Header |
+| ------------- | ------------- |
+| Content Cell  | Content Cell  |
+| Content Cell  | Content Cell  |
