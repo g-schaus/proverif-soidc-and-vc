@@ -1,28 +1,31 @@
 
 # HTTPS Handshake
 
+Its goal is to provide uni-directional authentication between initiator and responder, while sharing a secret communication key.
+
 ## Simple Variant
 
-The first model...
+The first model uses a simple structure aiming at providing the targted properties.
 
 ![MSC of ...](/msc/msc_https.png)
 
 ## With Modified Diffie Hellman Key Exchange
 
-The second model uses a modified Diffie Hellman Key Exchange.
+The second model uses a Diffie Hellman Key Exchange (DHKE) with added signatures to prevent man in the middle attacks. 
+The DHKE is deliberately cut in half to only provide uni-directional authentication.
 
 ![MSC of ...](/msc/msc_https_dh.png)
 
 ## Results
 
-| Property  | Holds |
-| ------------- | ------------- |
-| Finish Initiator | Yes  |
-| Finish Responder | Yes  |
-| Secret k from Initiator | Yes  |
-| Secret k from Responder | No  |
-| Authentication Initiator  | Yes  |
-| Authentication Responder  | No  |
+| Property  | Holds | Note |
+| ------------- | ------------- | ------------- |
+| Finish Initiator | Yes  | The initiator finishes the protocol. |
+| Finish Responder | Yes  | The responder finishes the protocol. |
+| Secret k from Initiator | Yes  | The established communication key k remains secret if talking to the responder. |
+| Secret k from Responder | No  | The established communication key k is revealed by the responder if talking to an attacker. |
+| Authentication Initiator  | Yes  | The initiator is able to authenticate the responder. |
+| Authentication Responder  | No  | The responder is unable to authenticate the initiator. |
 
 As the responder is not able to authenticate the initiator, a secret key may be established with an attacker.
 This fact is shown in the results as expected and completely normal for a uni-directional authentication protocol like https.
