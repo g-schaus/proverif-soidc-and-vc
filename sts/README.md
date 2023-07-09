@@ -7,8 +7,6 @@ This model uses a Diffie Hellman Key Exhange with added signatures to prevent ma
 
 # Results
 
-The following properties...
-
 | Property  | Holds |
 | ------------- | ------------- |
 | Finish Initiator | Yes  |
