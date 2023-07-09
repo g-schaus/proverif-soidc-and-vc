@@ -28,7 +28,7 @@ The lack of issuer authentication leads to a possible mixup attack explained in 
 
 ## Proposed Version
 
-Fixing the code leak and issuer authentication may be achieved by adding the issuer identity to the code during its transfer to the browser. 
+Fixing the code leak and issuer authentication may be achieved by adding the issuer identity to the code during its transfer through the browser. 
 By using the fix, the code verifier is no longer needed.
 
 ![MSC of ...](/msc/msc_soidc_fix_nopkce.png)
