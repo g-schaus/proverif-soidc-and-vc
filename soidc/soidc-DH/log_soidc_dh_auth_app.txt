@@ -66,7 +66,7 @@ Process 0 (that is, the initial process):
         {35}new pkce: bitstring;
         {36}new scope: bitstring;
         {37}let m_3: bitstring = enc((tag3,a_1,hash(pkce),scope),k1) in
-        {38}event appSendsLastMessageToUser(m_1,m_2,m_3);
+        {38}event appSendsLastMessageToBrowser(m_1,m_2,m_3);
         {39}out(c_1, m_3);
         {40}in(c_1, m_8: bitstring);
         {41}let (tag8': bitstring,code: bitstring) = dec(m_8,k1) in
@@ -121,7 +121,7 @@ Process 0 (that is, the initial process):
             {87}new pkce_1: bitstring;
             {88}new scope_1: bitstring;
             {89}let m_5: bitstring = enc((tag3,a_1,hash(pkce_1),scope_1),k1_1) in
-            {90}event appSendsLastMessageToUser(m,m_4,m_5);
+            {90}event appSendsLastMessageToBrowser(m,m_4,m_5);
             {91}out(c_1, m_5);
             {92}in(c_1, m_6: bitstring);
             {93}let (tag8'_1: bitstring,code_1: bitstring) = dec(m_6,k1_1) in
@@ -176,7 +176,7 @@ Process 0 (that is, the initial process):
                 {139}new pkce_2: bitstring;
                 {140}new scope_2: bitstring;
                 {141}let m_18: bitstring = enc((tag3,a_1,hash(pkce_2),scope_2),k1_2) in
-                {142}event appSendsLastMessageToUser(m_16,m_17,m_18);
+                {142}event appSendsLastMessageToBrowser(m_16,m_17,m_18);
                 {143}out(c_1, m_18);
                 {144}in(c_1, m_19: bitstring);
                 {145}let (tag8'_2: bitstring,code_2: bitstring) = dec(m_19,k1_2) in
@@ -231,7 +231,7 @@ Process 0 (that is, the initial process):
                 {192}new pkce_3: bitstring;
                 {193}new scope_3: bitstring;
                 {194}let m_26: bitstring = enc((tag3,a_1,hash(pkce_3),scope_3),k1_3) in
-                {195}event appSendsLastMessageToUser(m_24,m_25,m_26);
+                {195}event appSendsLastMessageToBrowser(m_24,m_25,m_26);
                 {196}out(c_1, m_26);
                 {197}in(c_1, m_27: bitstring);
                 {198}let (tag8'_3: bitstring,code_3: bitstring) = dec(m_27,k1_3) in
@@ -308,17 +308,17 @@ Process 0 (that is, the initial process):
         {267}let k2: SymmetricKey = GtoSymK(exp(gy_9,x_5)) in
         {268}if ((gy_9,gx_9) = check(dec(enc_signature_5,k2),pki_1)) then
         {269}let m_37: bitstring = enc((tag6,a_2,h_pkce,scope_4,u_2,password_1),k2) in
-        {270}event userSendsLastMessageToIssuer(m_35,m_36,m_37);
+        {270}event browserSendsLastMessageToIssuer(m_35,m_36,m_37);
         {271}out(c_2, m_37);
         {272}in(c_2, m_38: bitstring);
         {273}let (tag7': bitstring,code_4: bitstring) = dec(m_38,k2) in
         {274}if (tag7 = tag7') then
         {275}let m_39: bitstring = enc((tag8,code_4),k1_4) in
-        {276}event userSendsLastMessageToApp(m_32,m_33,m_34,m_39);
+        {276}event browserSendsLastMessageToApp(m_32,m_33,m_34,m_39);
         {277}out(c_2, m_39);
         {278}if talksOnlyToHonest_4 then
-        {279}out(c_2, check_reach_user);
-        {280}event userCompletesProtocol(m_32,m_33,m_34,m_35,m_36,m_37,m_38);
+        {279}out(c_2, check_reach_browser);
+        {280}event browserCompletesProtocol(m_32,m_33,m_34,m_35,m_36,m_37,m_38);
         {281}out(ch(code_4), free_code);
         {282}out(ch(password_1), free_password)
     )
@@ -352,17 +352,17 @@ Process 0 (that is, the initial process):
             {308}let k2_1: SymmetricKey = GtoSymK(exp(gy_11,x_7)) in
             {309}if ((gy_11,gx_11) = check(dec(enc_signature_7,k2_1),pki_1)) then
             {310}let m_45: bitstring = enc((tag6,e1_1,h_pkce_1,scope_5,u_2,password_1),k2_1) in
-            {311}event userSendsLastMessageToIssuer(m_43,m_44,m_45);
+            {311}event browserSendsLastMessageToIssuer(m_43,m_44,m_45);
             {312}out(c_2, m_45);
             {313}in(c_2, m_46: bitstring);
             {314}let (tag7'_1: bitstring,code_5: bitstring) = dec(m_46,k2_1) in
             {315}if (tag7 = tag7'_1) then
             {316}let m_47: bitstring = enc((tag8,code_5),k1_5) in
-            {317}event userSendsLastMessageToApp(m_40,m_41,m_42,m_47);
+            {317}event browserSendsLastMessageToApp(m_40,m_41,m_42,m_47);
             {318}out(c_2, m_47);
             {319}if talksOnlyToHonest_5 then
-            {320}out(c_2, check_reach_user);
-            {321}event userCompletesProtocol(m_40,m_41,m_42,m_43,m_44,m_45,m_46);
+            {320}out(c_2, check_reach_browser);
+            {321}event browserCompletesProtocol(m_40,m_41,m_42,m_43,m_44,m_45,m_46);
             {322}out(ch(code_5), free_code);
             {323}out(ch(password_1), free_password)
         )
@@ -397,17 +397,17 @@ Process 0 (that is, the initial process):
                 {350}let k2_2: SymmetricKey = GtoSymK(exp(gy_13,x_9)) in
                 {351}if ((gy_13,gx_13) = check(dec(enc_signature_9,k2_2),pke2_2)) then
                 {352}let m_53: bitstring = enc((tag6,a_2,h_pkce_2,scope_6,u_2,wrong_pw),k2_2) in
-                {353}event userSendsLastMessageToIssuer(m_51,m_52,m_53);
+                {353}event browserSendsLastMessageToIssuer(m_51,m_52,m_53);
                 {354}out(c_2, m_53);
                 {355}in(c_2, m_54: bitstring);
                 {356}let (tag7'_2: bitstring,code_6: bitstring) = dec(m_54,k2_2) in
                 {357}if (tag7 = tag7'_2) then
                 {358}let m_55: bitstring = enc((tag8,code_6),k1_6) in
-                {359}event userSendsLastMessageToApp(m_48,m_49,m_50,m_55);
+                {359}event browserSendsLastMessageToApp(m_48,m_49,m_50,m_55);
                 {360}out(c_2, m_55);
                 {361}if talksOnlyToHonest_6 then
-                {362}out(c_2, check_reach_user);
-                {363}event userCompletesProtocol(m_48,m_49,m_50,m_51,m_52,m_53,m_54);
+                {362}out(c_2, check_reach_browser);
+                {363}event browserCompletesProtocol(m_48,m_49,m_50,m_51,m_52,m_53,m_54);
                 {364}out(ch(code_6), free_code);
                 {365}out(ch(wrong_pw), free_password)
             )
@@ -442,17 +442,17 @@ Process 0 (that is, the initial process):
                 {393}let k2_3: SymmetricKey = GtoSymK(exp(gy_15,x_11)) in
                 {394}if ((gy_15,gx_15) = check(dec(enc_signature_11,k2_3),pke2_3)) then
                 {395}let m_61: bitstring = enc((tag6,e1_1,h_pkce_3,scope_7,u_2,wrong_pw_1),k2_3) in
-                {396}event userSendsLastMessageToIssuer(m_59,m_60,m_61);
+                {396}event browserSendsLastMessageToIssuer(m_59,m_60,m_61);
                 {397}out(c_2, m_61);
                 {398}in(c_2, m_62: bitstring);
                 {399}let (tag7'_3: bitstring,code_7: bitstring) = dec(m_62,k2_3) in
                 {400}if (tag7 = tag7'_3) then
                 {401}let m_63: bitstring = enc((tag8,code_7),k1_7) in
-                {402}event userSendsLastMessageToApp(m_56,m_57,m_58,m_63);
+                {402}event browserSendsLastMessageToApp(m_56,m_57,m_58,m_63);
                 {403}out(c_2, m_63);
                 {404}if talksOnlyToHonest_7 then
-                {405}out(c_2, check_reach_user);
-                {406}event userCompletesProtocol(m_56,m_57,m_58,m_59,m_60,m_61,m_62);
+                {405}out(c_2, check_reach_browser);
+                {406}event browserCompletesProtocol(m_56,m_57,m_58,m_59,m_60,m_61,m_62);
                 {407}out(ch(code_7), free_code);
                 {408}out(ch(wrong_pw_1), free_password)
 ) | (
@@ -487,7 +487,7 @@ Process 0 (that is, the initial process):
         {436}if (password_2 = password') then
         {437}new code_8: bitstring;
         {438}let m_67: bitstring = enc((tag7,code_8),k2_4) in
-        {439}event issuerSendsLastMessageToUser(m_64,m_65,m_66,m_67);
+        {439}event issuerSendsLastMessageToBrowser(m_64,m_65,m_66,m_67);
         {440}out(c_3, m_67);
         {441}in(c_3, m_68: bitstring);
         {442}let (tag9': bitstring,bitgx_5: bitstring) = m_68 in
@@ -538,7 +538,7 @@ Process 0 (that is, the initial process):
             {484}if (password_2 = password'_1) then
             {485}new code_9: bitstring;
             {486}let m_75: bitstring = enc((tag7,code_9),k2_5) in
-            {487}event issuerSendsLastMessageToUser(m_72,m_73,m_74,m_75);
+            {487}event issuerSendsLastMessageToBrowser(m_72,m_73,m_74,m_75);
             {488}out(c_3, m_75);
             {489}in(c_3, m_76: bitstring);
             {490}let (tag9'_1: bitstring,bitgx_7: bitstring) = m_76 in
@@ -590,7 +590,7 @@ Process 0 (that is, the initial process):
                 {533}if (wrong_pw_2 = password'_2) then
                 {534}new code_10: bitstring;
                 {535}let m_83: bitstring = enc((tag7,code_10),k2_6) in
-                {536}event issuerSendsLastMessageToUser(m_80,m_81,m_82,m_83);
+                {536}event issuerSendsLastMessageToBrowser(m_80,m_81,m_82,m_83);
                 {537}out(c_3, m_83);
                 {538}in(c_3, m_84: bitstring);
                 {539}let (tag9'_2: bitstring,bitgx_9: bitstring) = m_84 in
@@ -642,7 +642,7 @@ Process 0 (that is, the initial process):
                 {583}if (wrong_pw_3 = password'_3) then
                 {584}new code_11: bitstring;
                 {585}let m_91: bitstring = enc((tag7,code_11),k2_7) in
-                {586}event issuerSendsLastMessageToUser(m_88,m_89,m_90,m_91);
+                {586}event issuerSendsLastMessageToBrowser(m_88,m_89,m_90,m_91);
                 {587}out(c_3, m_91);
                 {588}in(c_3, m_92: bitstring);
                 {589}let (tag9'_3: bitstring,bitgx_11: bitstring) = m_92 in
@@ -710,7 +710,7 @@ Process 0 (that is, the initial process):
         {35}new pkce: bitstring;
         {36}new scope: bitstring;
         {37}let m_3: bitstring = enc((tag3,a_1,hash(pkce),scope),k1) in
-        {38}event appSendsLastMessageToUser(m_1,m_2,m_3);
+        {38}event appSendsLastMessageToBrowser(m_1,m_2,m_3);
         {39}out(c_1, m_3);
         {40}in(c_1, m_8: bitstring);
         {41}let (tag8': bitstring,code: bitstring) = dec(m_8,k1) in
@@ -765,7 +765,7 @@ Process 0 (that is, the initial process):
             {87}new pkce_1: bitstring;
             {88}new scope_1: bitstring;
             {89}let m_5: bitstring = enc((tag3,a_1,hash(pkce_1),scope_1),k1_1) in
-            {90}event appSendsLastMessageToUser(m,m_4,m_5);
+            {90}event appSendsLastMessageToBrowser(m,m_4,m_5);
             {91}out(c_1, m_5);
             {92}in(c_1, m_6: bitstring);
             {93}let (tag8'_1: bitstring,code_1: bitstring) = dec(m_6,k1_1) in
@@ -820,7 +820,7 @@ Process 0 (that is, the initial process):
                 {139}new pkce_2: bitstring;
                 {140}new scope_2: bitstring;
                 {141}let m_18: bitstring = enc((tag3,a_1,hash(pkce_2),scope_2),k1_2) in
-                {142}event appSendsLastMessageToUser(m_16,m_17,m_18);
+                {142}event appSendsLastMessageToBrowser(m_16,m_17,m_18);
                 {143}out(c_1, m_18);
                 {144}in(c_1, m_19: bitstring);
                 {145}let (tag8'_2: bitstring,code_2: bitstring) = dec(m_19,k1_2) in
@@ -875,7 +875,7 @@ Process 0 (that is, the initial process):
                 {192}new pkce_3: bitstring;
                 {193}new scope_3: bitstring;
                 {194}let m_26: bitstring = enc((tag3,a_1,hash(pkce_3),scope_3),k1_3) in
-                {195}event appSendsLastMessageToUser(m_24,m_25,m_26);
+                {195}event appSendsLastMessageToBrowser(m_24,m_25,m_26);
                 {196}out(c_1, m_26);
                 {197}in(c_1, m_27: bitstring);
                 {198}let (tag8'_3: bitstring,code_3: bitstring) = dec(m_27,k1_3) in
@@ -951,18 +951,18 @@ Process 0 (that is, the initial process):
         {267}let k2: SymmetricKey = GtoSymK(exp(gy_9,x_5)) in
         {268}if ((gy_9,gx_9) = check(dec(enc_signature_5,k2),pki_1)) then
         {269}let m_37: bitstring = enc((tag6,a_2,h_pkce,scope_4,u_2,password_1),k2) in
-        {270}event userSendsLastMessageToIssuer(m_35,m_36,m_37);
+        {270}event browserSendsLastMessageToIssuer(m_35,m_36,m_37);
         {271}out(c_2, m_37);
         {272}in(c_2, m_38: bitstring);
         {273}let (tag7': bitstring,code_4: bitstring) = dec(m_38,k2) in
         {274}if (tag7 = tag7') then
         {275}let m_39: bitstring = enc((tag8,code_4),k1_4) in
-        {276}event userSendsLastMessageToApp(m_32,m_33,m_34,m_39);
+        {276}event browserSendsLastMessageToApp(m_32,m_33,m_34,m_39);
         {277}out(c_2, m_39);
         {244}let talksOnlyToHonest_4: bool = true in
         {278}if talksOnlyToHonest_4 then
-        {279}out(c_2, check_reach_user);
-        {280}event userCompletesProtocol(m_32,m_33,m_34,m_35,m_36,m_37,m_38);
+        {279}out(c_2, check_reach_browser);
+        {280}event browserCompletesProtocol(m_32,m_33,m_34,m_35,m_36,m_37,m_38);
         {281}out(ch(code_4), free_code);
         {282}out(ch(password_1), free_password)
     )
@@ -995,18 +995,18 @@ Process 0 (that is, the initial process):
             {308}let k2_1: SymmetricKey = GtoSymK(exp(gy_11,x_7)) in
             {309}if ((gy_11,gx_11) = check(dec(enc_signature_7,k2_1),pki_1)) then
             {310}let m_45: bitstring = enc((tag6,e1_1,h_pkce_1,scope_5,u_2,password_1),k2_1) in
-            {311}event userSendsLastMessageToIssuer(m_43,m_44,m_45);
+            {311}event browserSendsLastMessageToIssuer(m_43,m_44,m_45);
             {312}out(c_2, m_45);
             {313}in(c_2, m_46: bitstring);
             {314}let (tag7'_1: bitstring,code_5: bitstring) = dec(m_46,k2_1) in
             {315}if (tag7 = tag7'_1) then
             {316}let m_47: bitstring = enc((tag8,code_5),k1_5) in
-            {317}event userSendsLastMessageToApp(m_40,m_41,m_42,m_47);
+            {317}event browserSendsLastMessageToApp(m_40,m_41,m_42,m_47);
             {318}out(c_2, m_47);
             {285}let talksOnlyToHonest_5: bool = false in
             {319}if talksOnlyToHonest_5 then
-            {320}out(c_2, check_reach_user);
-            {321}event userCompletesProtocol(m_40,m_41,m_42,m_43,m_44,m_45,m_46);
+            {320}out(c_2, check_reach_browser);
+            {321}event browserCompletesProtocol(m_40,m_41,m_42,m_43,m_44,m_45,m_46);
             {322}out(ch(code_5), free_code);
             {323}out(ch(password_1), free_password)
         )
@@ -1040,18 +1040,18 @@ Process 0 (that is, the initial process):
                 {350}let k2_2: SymmetricKey = GtoSymK(exp(gy_13,x_9)) in
                 {351}if ((gy_13,gx_13) = check(dec(enc_signature_9,k2_2),pke2_2)) then
                 {352}let m_53: bitstring = enc((tag6,a_2,h_pkce_2,scope_6,u_2,wrong_pw),k2_2) in
-                {353}event userSendsLastMessageToIssuer(m_51,m_52,m_53);
+                {353}event browserSendsLastMessageToIssuer(m_51,m_52,m_53);
                 {354}out(c_2, m_53);
                 {355}in(c_2, m_54: bitstring);
                 {356}let (tag7'_2: bitstring,code_6: bitstring) = dec(m_54,k2_2) in
                 {357}if (tag7 = tag7'_2) then
                 {358}let m_55: bitstring = enc((tag8,code_6),k1_6) in
-                {359}event userSendsLastMessageToApp(m_48,m_49,m_50,m_55);
+                {359}event browserSendsLastMessageToApp(m_48,m_49,m_50,m_55);
                 {360}out(c_2, m_55);
                 {327}let talksOnlyToHonest_6: bool = false in
                 {361}if talksOnlyToHonest_6 then
-                {362}out(c_2, check_reach_user);
-                {363}event userCompletesProtocol(m_48,m_49,m_50,m_51,m_52,m_53,m_54);
+                {362}out(c_2, check_reach_browser);
+                {363}event browserCompletesProtocol(m_48,m_49,m_50,m_51,m_52,m_53,m_54);
                 {364}out(ch(code_6), free_code);
                 {365}out(ch(wrong_pw), free_password)
             )
@@ -1085,18 +1085,18 @@ Process 0 (that is, the initial process):
                 {393}let k2_3: SymmetricKey = GtoSymK(exp(gy_15,x_11)) in
                 {394}if ((gy_15,gx_15) = check(dec(enc_signature_11,k2_3),pke2_3)) then
                 {395}let m_61: bitstring = enc((tag6,e1_1,h_pkce_3,scope_7,u_2,wrong_pw_1),k2_3) in
-                {396}event userSendsLastMessageToIssuer(m_59,m_60,m_61);
+                {396}event browserSendsLastMessageToIssuer(m_59,m_60,m_61);
                 {397}out(c_2, m_61);
                 {398}in(c_2, m_62: bitstring);
                 {399}let (tag7'_3: bitstring,code_7: bitstring) = dec(m_62,k2_3) in
                 {400}if (tag7 = tag7'_3) then
                 {401}let m_63: bitstring = enc((tag8,code_7),k1_7) in
-                {402}event userSendsLastMessageToApp(m_56,m_57,m_58,m_63);
+                {402}event browserSendsLastMessageToApp(m_56,m_57,m_58,m_63);
                 {403}out(c_2, m_63);
                 {370}let talksOnlyToHonest_7: bool = false in
                 {404}if talksOnlyToHonest_7 then
-                {405}out(c_2, check_reach_user);
-                {406}event userCompletesProtocol(m_56,m_57,m_58,m_59,m_60,m_61,m_62);
+                {405}out(c_2, check_reach_browser);
+                {406}event browserCompletesProtocol(m_56,m_57,m_58,m_59,m_60,m_61,m_62);
                 {407}out(ch(code_7), free_code);
                 {408}out(ch(wrong_pw_1), free_password)
 ) | (
@@ -1128,7 +1128,7 @@ Process 0 (that is, the initial process):
         {436}if (password_2 = password') then
         {437}new code_8: bitstring;
         {438}let m_67: bitstring = enc((tag7,code_8),k2_4) in
-        {439}event issuerSendsLastMessageToUser(m_64,m_65,m_66,m_67);
+        {439}event issuerSendsLastMessageToBrowser(m_64,m_65,m_66,m_67);
         {440}out(c_3, m_67);
         {441}in(c_3, m_68: bitstring);
         {442}let (tag9': bitstring,bitgx_5: bitstring) = m_68 in
@@ -1179,7 +1179,7 @@ Process 0 (that is, the initial process):
             {484}if (password_2 = password'_1) then
             {485}new code_9: bitstring;
             {486}let m_75: bitstring = enc((tag7,code_9),k2_5) in
-            {487}event issuerSendsLastMessageToUser(m_72,m_73,m_74,m_75);
+            {487}event issuerSendsLastMessageToBrowser(m_72,m_73,m_74,m_75);
             {488}out(c_3, m_75);
             {489}in(c_3, m_76: bitstring);
             {490}let (tag9'_1: bitstring,bitgx_7: bitstring) = m_76 in
@@ -1231,7 +1231,7 @@ Process 0 (that is, the initial process):
                 {533}if (wrong_pw_2 = password'_2) then
                 {534}new code_10: bitstring;
                 {535}let m_83: bitstring = enc((tag7,code_10),k2_6) in
-                {536}event issuerSendsLastMessageToUser(m_80,m_81,m_82,m_83);
+                {536}event issuerSendsLastMessageToBrowser(m_80,m_81,m_82,m_83);
                 {537}out(c_3, m_83);
                 {538}in(c_3, m_84: bitstring);
                 {539}let (tag9'_2: bitstring,bitgx_9: bitstring) = m_84 in
@@ -1283,7 +1283,7 @@ Process 0 (that is, the initial process):
                 {583}if (wrong_pw_3 = password'_3) then
                 {584}new code_11: bitstring;
                 {585}let m_91: bitstring = enc((tag7,code_11),k2_7) in
-                {586}event issuerSendsLastMessageToUser(m_88,m_89,m_90,m_91);
+                {586}event issuerSendsLastMessageToBrowser(m_88,m_89,m_90,m_91);
                 {587}out(c_3, m_91);
                 {588}in(c_3, m_92: bitstring);
                 {589}let (tag9'_3: bitstring,bitgx_11: bitstring) = m_92 in
@@ -1314,7 +1314,7 @@ Process 0 (that is, the initial process):
                 {613}out(ch(wrong_pw_3), free_password)
 )
 
--- Query inj-event(appCompletesProtocol(m_96,m_97,m_98,m_99,m_100,m_101,m_102,m_103)) ==> inj-event(userSendsLastMessageToApp(m_96,m_97,m_98,m_99)) && inj-event(issuerSendsLastMessageToApp(m_100,m_101,m_102,m_103)) in process 1.
+-- Query inj-event(appCompletesProtocol(m_96,m_97,m_98,m_99,m_100,m_101,m_102,m_103)) ==> inj-event(browserSendsLastMessageToApp(m_96,m_97,m_98,m_99)) && inj-event(issuerSendsLastMessageToApp(m_100,m_101,m_102,m_103)) in process 1.
 Translating the process into Horn clauses...
 select attacker(bitG(gx_24))/-5000
 Completing...
@@ -2288,8 +2288,8 @@ select attacker(pk(sk))/-5000
 192800 rules inserted. Base: 69821 rules (6349 with conclusion selected). Queue: 117 rules.
 193000 rules inserted. Base: 69913 rules (6368 with conclusion selected). Queue: 128 rules.
 193200 rules inserted. Base: 69909 rules (6374 with conclusion selected). Queue: 36 rules.
-Starting query inj-event(appCompletesProtocol(m_96,m_97,m_98,m_99,m_100,m_101,m_102,m_103)) ==> inj-event(userSendsLastMessageToApp(m_96,m_97,m_98,m_99)) && inj-event(issuerSendsLastMessageToApp(m_100,m_101,m_102,m_103))
-goal reachable: begin(issuerSendsLastMessageToApp((tag9,bitG(g(x_12))),(tag10,bitG(g(y_12)),enc(sign((g(y_12),g(x_12)),ski[]),GtoSymK(exp(g(x_12),y_12)))),enc((tag11,pk(sks_4),sign((a[],jti_8,code_12,pkce_8),sks_4)),GtoSymK(exp(g(x_12),y_12))),enc((tag12,sign((hash_pk(pk(sks_4)),jti_8,scope_12,a[],i[],u[]),ski[])),GtoSymK(exp(g(x_12),y_12)))),@occ460_1) && begin(userSendsLastMessageToApp((tag1,bitG(g(x_13))),(tag2,bitG(g(y_13)),enc(sign((g(y_13),g(x_13)),ska[]),GtoSymK(exp(g(y_13),x_13)))),enc((tag3,a[],hash(pkce_8),scope_12),GtoSymK(exp(g(y_13),x_13))),enc((tag8,code_12),GtoSymK(exp(g(y_13),x_13)))),@occ276_1) -> end(@occ73_1,appCompletesProtocol((tag1,bitG(g(x_13))),(tag2,bitG(g(y_13)),enc(sign((g(y_13),g(x_13)),ska[]),GtoSymK(exp(g(y_13),x_13)))),enc((tag3,a[],hash(pkce_8),scope_12),GtoSymK(exp(g(y_13),x_13))),enc((tag8,code_12),GtoSymK(exp(g(y_13),x_13))),(tag9,bitG(g(x_12))),(tag10,bitG(g(y_12)),enc(sign((g(y_12),g(x_12)),ski[]),GtoSymK(exp(g(x_12),y_12)))),enc((tag11,pk(sks_4),sign((a[],jti_8,code_12,pkce_8),sks_4)),GtoSymK(exp(g(x_12),y_12))),enc((tag12,sign((hash_pk(pk(sks_4)),jti_8,scope_12,a[],i[],u[]),ski[])),GtoSymK(exp(g(x_12),y_12)))))
+Starting query inj-event(appCompletesProtocol(m_96,m_97,m_98,m_99,m_100,m_101,m_102,m_103)) ==> inj-event(browserSendsLastMessageToApp(m_96,m_97,m_98,m_99)) && inj-event(issuerSendsLastMessageToApp(m_100,m_101,m_102,m_103))
+goal reachable: begin(issuerSendsLastMessageToApp((tag9,bitG(g(x_12))),(tag10,bitG(g(y_12)),enc(sign((g(y_12),g(x_12)),ski[]),GtoSymK(exp(g(x_12),y_12)))),enc((tag11,pk(sks_4),sign((a[],jti_8,code_12,pkce_8),sks_4)),GtoSymK(exp(g(x_12),y_12))),enc((tag12,sign((hash_pk(pk(sks_4)),jti_8,scope_12,a[],i[],u[]),ski[])),GtoSymK(exp(g(x_12),y_12)))),@occ460_1) && begin(browserSendsLastMessageToApp((tag1,bitG(g(x_13))),(tag2,bitG(g(y_13)),enc(sign((g(y_13),g(x_13)),ska[]),GtoSymK(exp(g(y_13),x_13)))),enc((tag3,a[],hash(pkce_8),scope_12),GtoSymK(exp(g(y_13),x_13))),enc((tag8,code_12),GtoSymK(exp(g(y_13),x_13)))),@occ276_1) -> end(@occ73_1,appCompletesProtocol((tag1,bitG(g(x_13))),(tag2,bitG(g(y_13)),enc(sign((g(y_13),g(x_13)),ska[]),GtoSymK(exp(g(y_13),x_13)))),enc((tag3,a[],hash(pkce_8),scope_12),GtoSymK(exp(g(y_13),x_13))),enc((tag8,code_12),GtoSymK(exp(g(y_13),x_13))),(tag9,bitG(g(x_12))),(tag10,bitG(g(y_12)),enc(sign((g(y_12),g(x_12)),ski[]),GtoSymK(exp(g(x_12),y_12)))),enc((tag11,pk(sks_4),sign((a[],jti_8,code_12,pkce_8),sks_4)),GtoSymK(exp(g(x_12),y_12))),enc((tag12,sign((hash_pk(pk(sks_4)),jti_8,scope_12,a[],i[],u[]),ski[])),GtoSymK(exp(g(x_12),y_12)))))
 The 1st, 2nd hypotheses occur strictly before the conclusion.
 Abbreviations:
 x_13 = x_4[e2_1 = i[],e1_1 = a[],!1 = @sid]
@@ -2306,12 +2306,12 @@ jti_8 = jti[m_10 = (tag10,bitG(g(y_12)),enc(sign((g(y_12),g(x_12)),ski[]),GtoSym
 @occ73_1 = @occ73[m_12 = enc((tag12,sign((hash_pk(pk(sks_4)),jti_8,scope_12,a[],i[],u[]),ski[])),GtoSymK(exp(g(x_12),y_12))),m_10 = (tag10,bitG(g(y_12)),enc(sign((g(y_12),g(x_12)),ski[]),GtoSymK(exp(g(x_12),y_12)))),m_8 = enc((tag8,code_12),GtoSymK(exp(g(y_13),x_13))),m_1 = (tag1,bitG(g(x_13))),e2 = i[],e1 = u[],!1 = @sid_1]
 @occ460_1 = @occ460[m_70 = enc((tag11,pk(sks_4),sign((a[],jti_8,code_12,pkce_8),sks_4)),GtoSymK(exp(g(x_12),y_12))),m_68 = (tag9,bitG(g(x_12))),m_66 = enc((tag6,a[],hash(pkce_8),scope_12,u[],password[]),GtoSymK(exp(g(y_14),x_14))),m_64 = (tag4,bitG(g(x_14))),e2_2 = u[],e1_2 = a[],!1 = @sid_2]
 @occ276_1 = @occ276[m_38 = enc((tag7,code_12),GtoSymK(exp(g(y_14),x_14))),m_36 = (tag5,bitG(g(y_14)),enc(sign((g(y_14),g(x_14)),ski[]),GtoSymK(exp(g(y_14),x_14)))),m_34 = enc((tag3,a[],hash(pkce_8),scope_12),GtoSymK(exp(g(y_13),x_13))),m_33 = (tag2,bitG(g(y_13)),enc(sign((g(y_13),g(x_13)),ska[]),GtoSymK(exp(g(y_13),x_13)))),e2_1 = i[],e1_1 = a[],!1 = @sid]
-RESULT inj-event(appCompletesProtocol(m_96,m_97,m_98,m_99,m_100,m_101,m_102,m_103)) ==> inj-event(userSendsLastMessageToApp(m_96,m_97,m_98,m_99)) && inj-event(issuerSendsLastMessageToApp(m_100,m_101,m_102,m_103)) is true.
+RESULT inj-event(appCompletesProtocol(m_96,m_97,m_98,m_99,m_100,m_101,m_102,m_103)) ==> inj-event(browserSendsLastMessageToApp(m_96,m_97,m_98,m_99)) && inj-event(issuerSendsLastMessageToApp(m_100,m_101,m_102,m_103)) is true.
 
 --------------------------------------------------------------
 Verification summary:
 
-Query inj-event(appCompletesProtocol(m_96,m_97,m_98,m_99,m_100,m_101,m_102,m_103)) ==> inj-event(userSendsLastMessageToApp(m_96,m_97,m_98,m_99)) && inj-event(issuerSendsLastMessageToApp(m_100,m_101,m_102,m_103)) is true.
+Query inj-event(appCompletesProtocol(m_96,m_97,m_98,m_99,m_100,m_101,m_102,m_103)) ==> inj-event(browserSendsLastMessageToApp(m_96,m_97,m_98,m_99)) && inj-event(issuerSendsLastMessageToApp(m_100,m_101,m_102,m_103)) is true.
 
 --------------------------------------------------------------
 
