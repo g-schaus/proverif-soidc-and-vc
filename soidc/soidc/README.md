@@ -2,7 +2,7 @@
 
 ## SOIDC - Vulnerability Proof
 
-The first model...
+The model...
 
 ![MSC of ...](/msc/msc_soidc.png)
 
@@ -10,7 +10,14 @@ The first model...
 
 ## Results
 
-Both models have the following properties...
+| Property  | Holds | Note |
+| ------------- | ------------- | ------------- |
+| Finish Initiator | Yes  | The initiator finishes the protocol. |
+| Finish Responder | Yes  | The responder finishes the protocol. |
+| Secret k from Initiator | Yes  | The established communication key k remains secret if talking to the responder. |
+| Secret k from Responder | No  | The established communication key k is revealed by the responder if talking to an attacker. |
+| Authentication Initiator  | Yes  | The initiator is able to authenticate the responder. |
+| Authentication Responder  | No  | The responder is unable to authenticate the initiator. |
 
 The attack...
 
@@ -25,5 +32,14 @@ Fix...
 ![MSC of ...](/msc/msc_soidc_fix_nopkce.png)
 
 ## Results
+
+| Property  | Holds | Note |
+| ------------- | ------------- | ------------- |
+| Finish Initiator | Yes  | The initiator finishes the protocol. |
+| Finish Responder | Yes  | The responder finishes the protocol. |
+| Secret k from Initiator | Yes  | The established communication key k remains secret if talking to the responder. |
+| Secret k from Responder | No  | The established communication key k is revealed by the responder if talking to an attacker. |
+| Authentication Initiator  | Yes  | The initiator is able to authenticate the responder. |
+| Authentication Responder  | No  | The responder is unable to authenticate the initiator. |
 
 
