@@ -2,7 +2,8 @@
 
 ## SOIDC - Vulnerability Proof
 
-The model...
+The model is based on the message flow provided in the official Solid OIDC Primer. 
+It uses a special handshake designed to mimic HTTPS connections, which can be found [here](https/README.md).
 
 ![MSC of ...](/msc/msc_soidc.png)
 
