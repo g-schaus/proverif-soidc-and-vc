@@ -1,4 +1,4 @@
-# SOIDC - Authorisation Code Grant - With Late Handshake
+# SOIDC - Authorisation Code Grant With Late Handshake
 
 ## Vulnerability Proof
 
