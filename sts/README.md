@@ -11,8 +11,8 @@ The following properties...
 
 | Property  | Holds |
 | ------------- | ------------- |
-| Reach Initiator | Yes  |
-| Reach Responder | Yes  |
+| Initiator Finishes | Yes  |
+| Responder Finishes | Yes  |
 | Secret k | Yes  |
-| Authentication Initiator | Yes  |
-| Authentication Responder  | Yes  |
+| Initiator Authenticates  | Yes  |
+| Responder Authenticates  | Yes  |
