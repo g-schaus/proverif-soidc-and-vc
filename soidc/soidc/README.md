@@ -20,7 +20,7 @@ It uses a special handshake designed to mimic HTTPS connections, which can be fo
 | Authentication Browser  | Yes  | The browser is able to authenticate the app and the issuer. |
 | Authentication Issuer  | No  | The issuer is unable to authenticate the app and the browser. |
 
-The attack...
+The lack of issuer authentication leads to a possible mixup attack explained in the following msc.
 
 ![MSC of ...](/msc/msc_attack_issuer_auth.png)
 
@@ -28,7 +28,8 @@ The attack...
 
 ## Proposed Version
 
-Fix...
+Fixing the code leak and issuer authentication may be achieved by adding the issuer identity to the code during its transfer to the browser. 
+By using the fix, the code verifier is no longer needed.
 
 ![MSC of ...](/msc/msc_soidc_fix_nopkce.png)
 
