@@ -151,15 +151,6 @@ let pod(talksOnlyToHonest:bool, c:channel, p:bitstring, skp:SecretKey, u:bitstri
     let (claims:bitstring, signed_claims:bitstring) = VC in
     let (u':bitstring, i':bitstring, attr':bitstring) = check(signed_claims, pki) in
 
-    (* 
-    reduc forall msg:bitstring,sk:SecretKey; check(msg,sig(msg,sk),pk(sk))=true (*check(msg,sigVal,pk)*).
-
-    let (((gx':G,gy':G),n'_c:bitstring,DID'_V:DID,((DID'_P:DID,attr':bitstring,DID'_I:DID), sigVal_I:bitstring)), sigVal_P:bitstring) = dec(m_8,K) in
-    if check(((gx',gy'),n'_c,DID'_V,((DID'_P,attr',DID'_I), sigVal_I)), sigVal_P ,pk_P) then
-    if check((DID'_P,attr',DID'_I), sigVal_I,pk_I) then
-    if ((gx',gy'),n'_c,DID'_V,(DID'_P,attr',DID'_I)) = ((gx,gy),n_c,DID_V,(DID_P,attr,DID_I)) then 
-    *)
-
     if (i = i') then
     if (u = u') then
     if (scope = scope') then
