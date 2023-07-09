@@ -1,17 +1,27 @@
-# SOIDC - With Late Handshake
+# SOIDC - Authorisation Code Grant
+
+## SOIDC With Late Handshake - Vulnerability Proof
 
 The first model...
 
 ![MSC of ...](/msc/msc_soidc_lateHS.png)
 
+
+
+## Results
+
+Both models have the following properties...
+
 The attack...
 
 ![MSC of ...](/msc/msc_attack_app_auth.png)
 
-# Results
+# SOIDC - Proposed Fix
 
-Verification Time
+## Proposed Version
 
-Both models have the following properties...
+Fix...
+
+## Results
 
 
