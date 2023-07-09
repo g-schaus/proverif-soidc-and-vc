@@ -1,6 +1,6 @@
 # SOIDC - Authorisation Code Grant
 
-## SOIDC - Vulnerability Proof
+## Vulnerability Proof
 
 The model is based on the message flow provided in the official Solid OIDC Primer. 
 It uses a special handshake designed to mimic HTTPS connections, which can be found [here](/https).
