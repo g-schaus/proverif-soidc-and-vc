@@ -17,6 +17,22 @@ The model is based on the version found [here](/soidc/soidc) and simulates an im
 | Authentication Initiator  | Yes  | The initiator is able to authenticate the responder. |
 | Authentication Responder  | No  | The responder is unable to authenticate the initiator. |
 
+Query not attacker(check_reach_app[]) is false.
+
+Query not attacker(check_reach_user[]) is false.
+
+Query not attacker(check_reach_issuer[]) is false.
+
+Query not attacker(free_code[]) is false.
+
+Query not attacker(free_password[]) is true.
+
+Query inj-event(appCompletesProtocol(m_96,m_97,m_98,m_99,m_100,m_101,m_102)) ==> inj-event(userSendsLastMessageToApp(m_96,m_97,m_98)) && inj-event(issuerSendsLastMessageToApp(m_99,m_100,m_101,m_102)) is false.
+
+Query inj-event(userCompletesProtocol(m_96,m_97,m_98,m_99,m_100,m_101)) ==> inj-event(appSendsLastMessageToUser(m_100,m_101)) && inj-event(issuerSendsLastMessageToUser(m_96,m_97,m_98,m_99)) is true.
+
+Query inj-event(issuerCompletesProtocol(m_96,m_97,m_98,m_99,m_100,m_101)) ==> inj-event(appSendsLastMessageToIssuer(m_99,m_100,m_101)) && inj-event(userSendsLastMessageToIssuer(m_96,m_97,m_98)) is false.
+
 Both models have the following properties...
 
 The attack...
