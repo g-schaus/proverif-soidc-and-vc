@@ -15,9 +15,11 @@ The second model...
 
 ## Results
 
-Both models have the following properties...
-
-| First Header  | Second Header |
+| Property  | Holds |
 | ------------- | ------------- |
-| Content Cell  | Content Cell  |
-| Content Cell  | Content Cell  |
+| Finish Initiator | Yes  |
+| Finish Responder | Yes  |
+| Secret k from Initiator | Yes  |
+| Secret k from Responder | No  |
+| Authentication Initiator  | Yes  |
+| Authentication Responder  | No  |
