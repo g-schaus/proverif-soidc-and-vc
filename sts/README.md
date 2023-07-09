@@ -13,6 +13,6 @@ The following properties...
 | ------------- | ------------- |
 | Reach Initiator | Yes  |
 | Reach Responder | No  |
-| Secret K | Content Yes  |
+| Secret K | Yes  |
 | Authentication Initiator | Yes  |
 | Authentication Responder  | No  |
