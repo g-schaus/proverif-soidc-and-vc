@@ -16,7 +16,7 @@ The DHKE is deliberately cut in half to only provide uni-directional authenticat
 
 ![MSC of ...](/msc/msc_https_dh.png)
 
-## Results
+## Results (For Both Models)
 
 | Property  | Holds | Note |
 | ------------- | ------------- | ------------- |
