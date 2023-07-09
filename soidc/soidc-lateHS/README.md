@@ -1,6 +1,6 @@
-# SOIDC - Authorisation Code Grant
+# SOIDC - Authorisation Code Grant - With Late Handshake
 
-## With Late Handshake - Vulnerability Proof
+## Vulnerability Proof
 
 The model is based on the version found [here](/soidc/soidc) and simulates an implementation error leading to a delay in the handshake timing.
 
