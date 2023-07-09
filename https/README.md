@@ -3,7 +3,7 @@
 
 Its goal is to provide uni-directional authentication between initiator and responder, while sharing a secret communication key.
 
-## Simple Variant
+## Simple Variant With Nonce
 
 The first model uses a simple structure utilizing a nonce _n_ for authentication purposes and a session key _ski_ for forward secrecy.
 
