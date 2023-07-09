@@ -5,7 +5,7 @@ Its goal is to provide uni-directional authentication between initiator and resp
 
 ## Simple Variant
 
-The first model uses a simple structure utilizing a nonce n for authentication purposes and a session key ski for forward secrecy.
+The first model uses a simple structure utilizing a nonce _n_ for authentication purposes and a session key _ski_ for forward secrecy.
 
 ![MSC of ...](/msc/msc_https.png)
 
