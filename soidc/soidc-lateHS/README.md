@@ -27,7 +27,7 @@ The attack...
 
 ## Proposed Version
 
-Fix...
+Fixing the code leak and issuer authentication may be achieved by adding the issuer identity to the code during its transfer through the browser. By using the fix, the code verifier is no longer needed.
 
 ## Results
 
