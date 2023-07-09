@@ -1,5 +1,7 @@
 # SOIDC - With Diffie Hellman Key Exchange
 
+[here](/soidc/soidc).
+
 The first model...
 
 # Results
