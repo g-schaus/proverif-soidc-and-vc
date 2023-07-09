@@ -1,7 +1,7 @@
 
 # STS Handshake
 
-This model...
+This model uses a Diffie Hellman Key Exhange with added signatures to prevent man in the middle attacks.
 
 ![MSC of ...](/msc/msc_sts.png)
 
@@ -12,7 +12,7 @@ The following properties...
 | Property  | Holds |
 | ------------- | ------------- |
 | Reach Initiator | Yes  |
-| Reach Responder | No  |
+| Reach Responder | Yes  |
 | Secret k | Yes  |
 | Authentication Initiator | Yes  |
-| Authentication Responder  | No  |
+| Authentication Responder  | Yes  |
