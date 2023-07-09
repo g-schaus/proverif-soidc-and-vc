@@ -7,8 +7,6 @@ It uses a special handshake designed to mimic HTTPS connections, which can be fo
 
 ![MSC of ...](/msc/msc_soidc.png)
 
-
-
 ## Results
 
 | Property  | Holds | Note |
