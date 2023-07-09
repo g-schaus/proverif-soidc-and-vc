@@ -8,12 +8,12 @@ Its goal is to provide mutual authentication between initiator and responder, wh
 
 # Results
 
-| Property  | Holds |
-| ------------- | ------------- |
-| Finish Initiator | Yes  |
-| Finish Responder | Yes  |
-| Secret k | Yes  |
-| Authentication Initiator  | Yes  |
-| Authentication Responder  | Yes  |
+| Property  | Holds | Note |
+| ------------- | ------------- | ------------- |
+| Finish Initiator | Yes  | The initiator finishes the protocol. |
+| Finish Responder | Yes  | The responder finishes the protocol. |
+| Secret k | Yes  | The established communication key k remains secret. |
+| Authentication Initiator  | Yes  | The initiator is able to authenticate the responder. |
+| Authentication Responder  | Yes  | The responder is able to authenticate the initiator. |
 
 As seen above, all properties provide the expected outcome.
