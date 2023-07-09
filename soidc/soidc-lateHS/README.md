@@ -2,11 +2,9 @@
 
 ## SOIDC With Late Handshake - Vulnerability Proof
 
-The first model...
+The model is based on the version found [here](/soidc/soidc) and simulates an implementation error leading to a delay in the handshake timing.
 
 ![MSC of ...](/msc/msc_soidc_lateHS.png)
-
-
 
 ## Results
 
