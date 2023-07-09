@@ -16,4 +16,4 @@ Its goal is to provide mutual authentication between initiator and responder, wh
 | Authentication Initiator  | Yes  | The initiator is able to authenticate the responder. |
 | Authentication Responder  | Yes  | The responder is able to authenticate the initiator. |
 
-As seen above, all properties provide the expected outcome.
+All properties provide the expected outcome.
