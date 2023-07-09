@@ -1,7 +1,7 @@
 
 # VC-Based Third Party Authentication Protocol
 
-The VC-based protocol is divided into two different parts: The issuance of the VC by the issuer and its use to access private resources in a pod. Both parts are divided by a fictive sovereignty line, depicting the breaking point at which the issuer loses sight of the users targeted pod, thus increasing their privacy.
+The VC-based protocol is divided into two different parts: The issuance of the VC by the issuer and its use to access private resources in a pod. Both parts are divided by a fictive sovereignty line, depicting the breaking point at which the issuer loses sight of the users targeted pod, thus increasing their privacy. The handshake used in the model can be found [here](/sts).
 
 ![MSC of ...](/msc/msc_vc_based.png)
 
