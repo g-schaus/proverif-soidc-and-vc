@@ -5,7 +5,7 @@ Its goal is to provide uni-directional authentication between initiator and resp
 
 ## Simple Variant
 
-The first model uses a simple structure aiming at providing the targted properties.
+The first model uses a simple structure aiming at providing the targeted properties.
 
 ![MSC of ...](/msc/msc_https.png)
 
