@@ -9,3 +9,10 @@ This model...
 
 The following properties...
 
+| Property  | Holds |
+| ------------- | ------------- |
+| Reach Initiator | Yes  |
+| Reach Responder | No  |
+| Secret K | Content Yes  |
+| Authentication Initiator | Yes  |
+| Authentication Responder  | No  |
