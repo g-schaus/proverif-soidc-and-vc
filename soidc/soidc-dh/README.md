@@ -19,7 +19,7 @@ The model is based on the version found [here](/soidc/soidc) and uses the HTTPS 
 | ------------- | ------------- | ------------- | ------------- | ------------- |
 | Finish App | Yes  | Yes | 0h30 | The app finishes the protocol. |
 | Finish Browser | Yes  | Yes | 0h30 | The browser finishes the protocol. |
-| Finish Issuer | Yes  | Yes | 1h30 | The issuer finishes the protocol. |
+| Finish Issuer | Yes  | Yes | 0h30 | The issuer finishes the protocol. |
 | Authentication App | Yes | Yes  | 0h30 | The app is able to authenticate the browser and the issuer. |
 | Authentication Browser | Yes | Yes | 0h30 | The browser is able to authenticate the app and the issuer. |
 | Authentication Issuer  | Yes | Yes | 1h30 | The issuer is able to authenticate the app and the browser. |
@@ -30,7 +30,7 @@ The model is based on the version found [here](/soidc/soidc) and uses the HTTPS 
 | ------------- | ------------- | ------------- | ------------- | ------------- |
 | Finish App | Yes  | Yes | 0h30 | The app finishes the protocol. |
 | Finish Browser | Yes  | Yes | 0h30 | The browser finishes the protocol. |
-| Finish Issuer | Yes  | Yes | 1h30 | The issuer finishes the protocol. |
+| Finish Issuer | Yes  | Yes | 0h30 | The issuer finishes the protocol. |
 | Authentication App | Yes | Yes  | 0h30 | The app is able to authenticate the browser and the issuer. |
 | Authentication Browser | Yes | Yes | 0h30 | The browser is able to authenticate the app and the issuer. |
 | Authentication Issuer  | Yes | Yes | 1h30 | The issuer is able to authenticate the app and the browser. |
