@@ -1,0 +1,597 @@
+﻿Process 0 (that is, the initial process):
+{1}new i: bitstring;
+{2}new r: bitstring;
+{3}out(c, i);
+{4}out(c, r);
+{5}new ski: SecretKey;
+{6}new skr: SecretKey;
+{7}out(c, pk(ski));
+{8}out(c, pk(skr));
+(
+    {9}!
+    {10}let c_1: channel = c in
+    {11}let i_1: bitstring = i in
+    {12}let ski_1: SecretKey = ski in
+    {13}let r_1: bitstring = r in
+    {14}let pkr: PublicKey = pk(skr) in
+    {15}in(c_1, e: bitstring);
+    {16}if (e = r_1) then
+    (
+        {17}let talksOnlyToHonest: bool = true in
+        {18}new n: bitstring;
+        {19}new sskI: SecretKey;
+        {20}let m_1: bitstring = aenc((n,pk(sskI)),pkr) in
+        {21}event initiatorSendsLastMessageToResponder(m_1);
+        {22}out(c_1, m_1);
+        {23}in(c_1, m_2: bitstring);
+        {24}let (n': bitstring,k: SymmetricKey) = adec(m_2,sskI) in
+        {25}if (n = n') then
+        {26}if talksOnlyToHonest then
+        {27}out(c_1, check_reach_initiator);
+        (
+            {28}event initiatorCompletesProtocol(m_1,m_2)
+        ) | (
+            {29}out(chSymK(k), free_k_from_initiator)
+        )
+    )
+    else
+        {30}in(c_1, pke: PublicKey);
+        {31}let talksOnlyToHonest_1: bool = false in
+        {32}new n_1: bitstring;
+        {33}new sskI_1: SecretKey;
+        {34}let m: bitstring = aenc((n_1,pk(sskI_1)),pke) in
+        {35}event initiatorSendsLastMessageToResponder(m);
+        {36}out(c_1, m);
+        {37}in(c_1, m_3: bitstring);
+        {38}let (n'_1: bitstring,k_1: SymmetricKey) = adec(m_3,sskI_1) in
+        {39}if (n_1 = n'_1) then
+        {40}if talksOnlyToHonest_1 then
+        {41}out(c_1, check_reach_initiator);
+        (
+            {42}event initiatorCompletesProtocol(m,m_3)
+        ) | (
+            {43}out(chSymK(k_1), free_k_from_initiator)
+        )
+) | (
+    {44}!
+    {45}let c_2: channel = c in
+    {46}let r_2: bitstring = r in
+    {47}let skr_1: SecretKey = skr in
+    {48}let i_2: bitstring = i in
+    {49}let pki: PublicKey = pk(ski) in
+    {50}in(c_2, e_1: bitstring);
+    {51}if (e_1 = i_2) then
+    (
+        {52}let talksOnlyToHonest_2: bool = true in
+        {53}in(c_2, m_4: bitstring);
+        {54}let (n_2: bitstring,spkI: PublicKey) = adec(m_4,skr_1) in
+        {55}new k_2: SymmetricKey;
+        {56}let m_5: bitstring = aenc((n_2,k_2),spkI) in
+        {57}event responderSendsLastMessageToInitiator(m_4,m_5);
+        {58}out(c_2, m_5);
+        {59}if talksOnlyToHonest_2 then
+        {60}out(c_2, check_reach_responder);
+        (
+            {61}event responderCompletesProtocol(m_4)
+        ) | (
+            {62}out(chSymK(k_2), free_k_from_responder)
+        )
+    )
+    else
+        {63}in(c_2, pke_1: PublicKey);
+        {64}let talksOnlyToHonest_3: bool = false in
+        {65}in(c_2, m_6: bitstring);
+        {66}let (n_3: bitstring,spkI_1: PublicKey) = adec(m_6,skr_1) in
+        {67}new k_3: SymmetricKey;
+        {68}let m_7: bitstring = aenc((n_3,k_3),spkI_1) in
+        {69}event responderSendsLastMessageToInitiator(m_6,m_7);
+        {70}out(c_2, m_7);
+        {71}if talksOnlyToHonest_3 then
+        {72}out(c_2, check_reach_responder);
+        (
+            {73}event responderCompletesProtocol(m_6)
+        ) | (
+            {74}out(chSymK(k_3), free_k_from_responder)
+        )
+)
+
+--  Process 1 (that is, process 0, with let moved downwards):
+{1}new i: bitstring;
+{2}new r: bitstring;
+{3}out(c, i);
+{4}out(c, r);
+{5}new ski: SecretKey;
+{6}new skr: SecretKey;
+{7}out(c, pk(ski));
+{8}out(c, pk(skr));
+(
+    {9}!
+    {10}let c_1: channel = c in
+    {15}in(c_1, e: bitstring);
+    {13}let r_1: bitstring = r in
+    {16}if (e = r_1) then
+    (
+        {18}new n: bitstring;
+        {19}new sskI: SecretKey;
+        {14}let pkr: PublicKey = pk(skr) in
+        {20}let m_1: bitstring = aenc((n,pk(sskI)),pkr) in
+        {21}event initiatorSendsLastMessageToResponder(m_1);
+        {22}out(c_1, m_1);
+        {23}in(c_1, m_2: bitstring);
+        {24}let (n': bitstring,k: SymmetricKey) = adec(m_2,sskI) in
+        {25}if (n = n') then
+        {17}let talksOnlyToHonest: bool = true in
+        {26}if talksOnlyToHonest then
+        {27}out(c_1, check_reach_initiator);
+        (
+            {28}event initiatorCompletesProtocol(m_1,m_2)
+        ) | (
+            {29}out(chSymK(k), free_k_from_initiator)
+        )
+    )
+    else
+        {30}in(c_1, pke: PublicKey);
+        {32}new n_1: bitstring;
+        {33}new sskI_1: SecretKey;
+        {34}let m: bitstring = aenc((n_1,pk(sskI_1)),pke) in
+        {35}event initiatorSendsLastMessageToResponder(m);
+        {36}out(c_1, m);
+        {37}in(c_1, m_3: bitstring);
+        {38}let (n'_1: bitstring,k_1: SymmetricKey) = adec(m_3,sskI_1) in
+        {39}if (n_1 = n'_1) then
+        {31}let talksOnlyToHonest_1: bool = false in
+        {40}if talksOnlyToHonest_1 then
+        {41}out(c_1, check_reach_initiator);
+        (
+            {42}event initiatorCompletesProtocol(m,m_3)
+        ) | (
+            {43}out(chSymK(k_1), free_k_from_initiator)
+        )
+) | (
+    {44}!
+    {45}let c_2: channel = c in
+    {50}in(c_2, e_1: bitstring);
+    {48}let i_2: bitstring = i in
+    {47}let skr_1: SecretKey = skr in
+    {51}if (e_1 = i_2) then
+    (
+        {53}in(c_2, m_4: bitstring);
+        {54}let (n_2: bitstring,spkI: PublicKey) = adec(m_4,skr_1) in
+        {55}new k_2: SymmetricKey;
+        {56}let m_5: bitstring = aenc((n_2,k_2),spkI) in
+        {57}event responderSendsLastMessageToInitiator(m_4,m_5);
+        {58}out(c_2, m_5);
+        {52}let talksOnlyToHonest_2: bool = true in
+        {59}if talksOnlyToHonest_2 then
+        {60}out(c_2, check_reach_responder);
+        (
+            {61}event responderCompletesProtocol(m_4)
+        ) | (
+            {62}out(chSymK(k_2), free_k_from_responder)
+        )
+    )
+    else
+        {63}in(c_2, pke_1: PublicKey);
+        {65}in(c_2, m_6: bitstring);
+        {66}let (n_3: bitstring,spkI_1: PublicKey) = adec(m_6,skr_1) in
+        {67}new k_3: SymmetricKey;
+        {68}let m_7: bitstring = aenc((n_3,k_3),spkI_1) in
+        {69}event responderSendsLastMessageToInitiator(m_6,m_7);
+        {70}out(c_2, m_7);
+        {64}let talksOnlyToHonest_3: bool = false in
+        {71}if talksOnlyToHonest_3 then
+        {72}out(c_2, check_reach_responder);
+        (
+            {73}event responderCompletesProtocol(m_6)
+        ) | (
+            {74}out(chSymK(k_3), free_k_from_responder)
+        )
+)
+
+-- Query not attacker(check_reach_initiator[]) in process 1.
+Translating the process into Horn clauses...
+Completing...
+select attacker(pk(sk))/-5000
+Starting query not attacker(check_reach_initiator[])
+goal reachable: attacker(check_reach_initiator[])
+
+Derivation:
+Abbreviations:
+n_4 = n[e = r[],!1 = @sid]
+sskI_2 = sskI[e = r[],!1 = @sid]
+k_4 = k_3[m_6 = aenc((n_4,pk(sskI_2)),pk(skr[])),pke_1 = pke_2,e_1 = e_2,!1 = @sid_1]
+
+1. The message r[] may be sent to the attacker at output {4}.
+attacker(r[]).
+
+2. The attacker has some term e_2.
+attacker(e_2).
+
+3. The attacker has some term pke_2.
+attacker(pke_2).
+
+4. The message r[] that the attacker may have by 1 may be received at input {15}.
+So the message aenc((n_4,pk(sskI_2)),pk(skr[])) may be sent to the attacker at output {22}.
+attacker(aenc((n_4,pk(sskI_2)),pk(skr[]))).
+
+5. The message e_2 that the attacker may have by 2 may be received at input {50}.
+The message pke_2 that the attacker may have by 3 may be received at input {63}.
+The message aenc((n_4,pk(sskI_2)),pk(skr[])) that the attacker may have by 4 may be received at input {65}.
+We have e_2 Ôëá i[].
+So the message aenc((n_4,k_4),pk(sskI_2)) may be sent to the attacker at output {70}.
+attacker(aenc((n_4,k_4),pk(sskI_2))).
+
+6. The message r[] that the attacker may have by 1 may be received at input {15}.
+The message aenc((n_4,k_4),pk(sskI_2)) that the attacker may have by 5 may be received at input {23}.
+So the message check_reach_initiator[] may be sent to the attacker at output {27}.
+attacker(check_reach_initiator[]).
+
+7. By 6, attacker(check_reach_initiator[]).
+The goal is reached, represented in the following fact:
+attacker(check_reach_initiator[]).
+
+
+A more detailed output of the traces is available with
+  set traceDisplay = long.
+
+new i: bitstring creating i_3 at {1}
+
+new r: bitstring creating r_3 at {2}
+
+out(c, ~M) with ~M = i_3 at {3}
+
+out(c, ~M_1) with ~M_1 = r_3 at {4}
+
+new ski: SecretKey creating ski_2 at {5}
+
+new skr: SecretKey creating skr_2 at {6}
+
+out(c, ~M_2) with ~M_2 = pk(ski_2) at {7}
+
+out(c, ~M_3) with ~M_3 = pk(skr_2) at {8}
+
+in(c, ~M_1) with ~M_1 = r_3 at {15} in copy a
+
+new n: bitstring creating n_4 at {18} in copy a
+
+new sskI: SecretKey creating sskI_2 at {19} in copy a
+
+event initiatorSendsLastMessageToResponder(aenc((n_4,pk(sskI_2)),pk(skr_2))) at {21} in copy a
+
+out(c, ~M_4) with ~M_4 = aenc((n_4,pk(sskI_2)),pk(skr_2)) at {22} in copy a
+
+in(c, a_1) at {50} in copy a_2
+
+in(c, a_3) at {63} in copy a_2
+
+in(c, ~M_4) with ~M_4 = aenc((n_4,pk(sskI_2)),pk(skr_2)) at {65} in copy a_2
+
+new k_3: SymmetricKey creating k_4 at {67} in copy a_2
+
+event responderSendsLastMessageToInitiator(aenc((n_4,pk(sskI_2)),pk(skr_2)),aenc((n_4,k_4),pk(sskI_2))) at {69} in copy a_2
+
+out(c, ~M_5) with ~M_5 = aenc((n_4,k_4),pk(sskI_2)) at {70} in copy a_2
+
+in(c, ~M_5) with ~M_5 = aenc((n_4,k_4),pk(sskI_2)) at {23} in copy a
+
+out(c, ~M_6) with ~M_6 = check_reach_initiator at {27} in copy a
+
+event initiatorCompletesProtocol(aenc((n_4,pk(sskI_2)),pk(skr_2)),aenc((n_4,k_4),pk(sskI_2))) at {28} in copy a
+
+The attacker has the message ~M_6 = check_reach_initiator.
+A trace has been found.
+RESULT not attacker(check_reach_initiator[]) is false.
+-- Query not attacker(check_reach_responder[]) in process 1.
+Translating the process into Horn clauses...
+Completing...
+select attacker(pk(sk))/-5000
+Starting query not attacker(check_reach_responder[])
+goal reachable: attacker(check_reach_responder[])
+
+Derivation:
+Abbreviations:
+n_4 = n[e = r[],!1 = @sid]
+sskI_2 = sskI[e = r[],!1 = @sid]
+
+1. The message i[] may be sent to the attacker at output {3}.
+attacker(i[]).
+
+2. The message r[] may be sent to the attacker at output {4}.
+attacker(r[]).
+
+3. The message r[] that the attacker may have by 2 may be received at input {15}.
+So the message aenc((n_4,pk(sskI_2)),pk(skr[])) may be sent to the attacker at output {22}.
+attacker(aenc((n_4,pk(sskI_2)),pk(skr[]))).
+
+4. The message i[] that the attacker may have by 1 may be received at input {50}.
+The message aenc((n_4,pk(sskI_2)),pk(skr[])) that the attacker may have by 3 may be received at input {53}.
+So the message check_reach_responder[] may be sent to the attacker at output {60}.
+attacker(check_reach_responder[]).
+
+5. By 4, attacker(check_reach_responder[]).
+The goal is reached, represented in the following fact:
+attacker(check_reach_responder[]).
+
+
+A more detailed output of the traces is available with
+  set traceDisplay = long.
+
+new i: bitstring creating i_3 at {1}
+
+new r: bitstring creating r_3 at {2}
+
+out(c, ~M) with ~M = i_3 at {3}
+
+out(c, ~M_1) with ~M_1 = r_3 at {4}
+
+new ski: SecretKey creating ski_2 at {5}
+
+new skr: SecretKey creating skr_2 at {6}
+
+out(c, ~M_2) with ~M_2 = pk(ski_2) at {7}
+
+out(c, ~M_3) with ~M_3 = pk(skr_2) at {8}
+
+in(c, ~M_1) with ~M_1 = r_3 at {15} in copy a
+
+new n: bitstring creating n_4 at {18} in copy a
+
+new sskI: SecretKey creating sskI_2 at {19} in copy a
+
+event initiatorSendsLastMessageToResponder(aenc((n_4,pk(sskI_2)),pk(skr_2))) at {21} in copy a
+
+out(c, ~M_4) with ~M_4 = aenc((n_4,pk(sskI_2)),pk(skr_2)) at {22} in copy a
+
+in(c, ~M) with ~M = i_3 at {50} in copy a_1
+
+in(c, ~M_4) with ~M_4 = aenc((n_4,pk(sskI_2)),pk(skr_2)) at {53} in copy a_1
+
+new k_2: SymmetricKey creating k_4 at {55} in copy a_1
+
+event responderSendsLastMessageToInitiator(aenc((n_4,pk(sskI_2)),pk(skr_2)),aenc((n_4,k_4),pk(sskI_2))) at {57} in copy a_1
+
+out(c, ~M_5) with ~M_5 = aenc((n_4,k_4),pk(sskI_2)) at {58} in copy a_1
+
+out(c, ~M_6) with ~M_6 = check_reach_responder at {60} in copy a_1
+
+event responderCompletesProtocol(aenc((n_4,pk(sskI_2)),pk(skr_2))) at {61} in copy a_1
+
+The attacker has the message ~M_6 = check_reach_responder.
+A trace has been found.
+RESULT not attacker(check_reach_responder[]) is false.
+-- Query not attacker(free_k_from_initiator[]) in process 1.
+Translating the process into Horn clauses...
+Completing...
+select attacker(pk(sk))/-5000
+Starting query not attacker(free_k_from_initiator[])
+RESULT not attacker(free_k_from_initiator[]) is true.
+-- Query not attacker(free_k_from_responder[]) in process 1.
+Translating the process into Horn clauses...
+Completing...
+select attacker(pk(sk))/-5000
+Starting query not attacker(free_k_from_responder[])
+goal reachable: attacker(pk(sk)) && attacker(sk) -> attacker(free_k_from_responder[])
+
+Derivation:
+Abbreviations:
+k_4 = k_2[m_4 = aenc((n_4,pk(sk)),pk(skr[])),e_1 = i[],!1 = @sid]
+
+1. We assume as hypothesis that
+attacker(sk).
+
+2. The message i[] may be sent to the attacker at output {3}.
+attacker(i[]).
+
+3. The message pk(skr[]) may be sent to the attacker at output {8}.
+attacker(pk(skr[])).
+
+4. We assume as hypothesis that
+attacker(pk(sk)).
+
+5. The attacker has some term n_4.
+attacker(n_4).
+
+6. By 5, the attacker may know n_4.
+By 4, the attacker may know pk(sk).
+Using the function 2-tuple the attacker may obtain (n_4,pk(sk)).
+attacker((n_4,pk(sk))).
+
+7. By 6, the attacker may know (n_4,pk(sk)).
+By 3, the attacker may know pk(skr[]).
+Using the function aenc the attacker may obtain aenc((n_4,pk(sk)),pk(skr[])).
+attacker(aenc((n_4,pk(sk)),pk(skr[]))).
+
+8. The message i[] that the attacker may have by 2 may be received at input {50}.
+The message aenc((n_4,pk(sk)),pk(skr[])) that the attacker may have by 7 may be received at input {53}.
+So the message aenc((n_4,k_4),pk(sk)) may be sent to the attacker at output {58}.
+attacker(aenc((n_4,k_4),pk(sk))).
+
+9. By 8, the attacker may know aenc((n_4,k_4),pk(sk)).
+By 1, the attacker may know sk.
+Using the function adec the attacker may obtain (n_4,k_4).
+attacker((n_4,k_4)).
+
+10. By 9, the attacker may know (n_4,k_4).
+Using the function 2-proj-2-tuple the attacker may obtain k_4.
+attacker(k_4).
+
+11. By 10, the attacker may know k_4.
+Using the function chSymK the attacker may obtain chSymK(k_4).
+attacker(chSymK(k_4)).
+
+12. The message i[] that the attacker may have by 2 may be received at input {50}.
+The message aenc((n_4,pk(sk)),pk(skr[])) that the attacker may have by 7 may be received at input {53}.
+So the message free_k_from_responder[] may be sent on channel chSymK(k_4) at output {62}.
+mess(chSymK(k_4),free_k_from_responder[]).
+
+13. By 11, the attacker may have the channel chSymK(k_4).
+By 12, the message free_k_from_responder[] may be sent on this channel.
+So the attacker may obtain the message free_k_from_responder[] by listening on this channel.
+attacker(free_k_from_responder[]).
+
+14. By 13, attacker(free_k_from_responder[]).
+The goal is reached, represented in the following fact:
+attacker(free_k_from_responder[]).
+
+
+A more detailed output of the traces is available with
+  set traceDisplay = long.
+
+new i: bitstring creating i_3 at {1}
+
+new r: bitstring creating r_3 at {2}
+
+out(c, ~M) with ~M = i_3 at {3}
+
+out(c, ~M_1) with ~M_1 = r_3 at {4}
+
+new ski: SecretKey creating ski_2 at {5}
+
+new skr: SecretKey creating skr_2 at {6}
+
+out(c, ~M_2) with ~M_2 = pk(ski_2) at {7}
+
+out(c, ~M_3) with ~M_3 = pk(skr_2) at {8}
+
+in(c, ~M) with ~M = i_3 at {50} in copy a
+
+in(c, aenc((a_1,pk(a_2)),~M_3)) with aenc((a_1,pk(a_2)),~M_3) = aenc((a_1,pk(a_2)),pk(skr_2)) at {53} in copy a
+
+new k_2: SymmetricKey creating k_4 at {55} in copy a
+
+event responderSendsLastMessageToInitiator(aenc((a_1,pk(a_2)),pk(skr_2)),aenc((a_1,k_4),pk(a_2))) at {57} in copy a
+
+out(c, ~M_4) with ~M_4 = aenc((a_1,k_4),pk(a_2)) at {58} in copy a
+
+out(c, ~M_5) with ~M_5 = check_reach_responder at {60} in copy a
+
+out(chSymK(k_4), ~M_6) with ~M_6 = free_k_from_responder at {62} in copy a
+
+event responderCompletesProtocol(aenc((a_1,pk(a_2)),pk(skr_2))) at {61} in copy a
+
+The attacker has the message ~M_6 = free_k_from_responder.
+A trace has been found.
+RESULT not attacker(free_k_from_responder[]) is false.
+-- Query inj-event(initiatorCompletesProtocol(m_8,m_9)) ==> inj-event(responderSendsLastMessageToInitiator(m_8,m_9)) in process 1.
+Translating the process into Horn clauses...
+Completing...
+select attacker(pk(sk))/-5000
+Starting query inj-event(initiatorCompletesProtocol(m_8,m_9)) ==> inj-event(responderSendsLastMessageToInitiator(m_8,m_9))
+goal reachable: e_2 Ôëá i[] && begin(responderSendsLastMessageToInitiator(aenc((n_4,pk(sskI_2)),pk(skr[])),aenc((n_4,k_4),pk(sskI_2))),@occ69_1) && attacker(pke_2) && attacker(e_2) -> end(@occ28_1,initiatorCompletesProtocol(aenc((n_4,pk(sskI_2)),pk(skr[])),aenc((n_4,k_4),pk(sskI_2))))
+The 1st hypothesis occurs strictly before the conclusion.
+The 2nd, 3rd hypotheses occur before the conclusion.
+Abbreviations:
+n_4 = n[e = r[],!1 = @sid]
+sskI_2 = sskI[e = r[],!1 = @sid]
+k_4 = k_3[m_6 = aenc((n_4,pk(sskI_2)),pk(skr[])),pke_1 = pke_2,e_1 = e_2,!1 = @sid_1]
+@occ28_1 = @occ28[m_2 = aenc((n_4,k_4),pk(sskI_2)),e = r[],!1 = @sid]
+@occ69_1 = @occ69[m_6 = aenc((n_4,pk(sskI_2)),pk(skr[])),pke_1 = pke_2,e_1 = e_2,!1 = @sid_1]
+goal reachable: begin(responderSendsLastMessageToInitiator(aenc((n_4,pk(sskI_2)),pk(skr[])),aenc((n_4,k_4),pk(sskI_2))),@occ57_1) -> end(@occ28_1,initiatorCompletesProtocol(aenc((n_4,pk(sskI_2)),pk(skr[])),aenc((n_4,k_4),pk(sskI_2))))
+The hypothesis occurs strictly before the conclusion.
+Abbreviations:
+n_4 = n[e = r[],!1 = @sid]
+sskI_2 = sskI[e = r[],!1 = @sid]
+k_4 = k_2[m_4 = aenc((n_4,pk(sskI_2)),pk(skr[])),e_1 = i[],!1 = @sid_1]
+@occ28_1 = @occ28[m_2 = aenc((n_4,k_4),pk(sskI_2)),e = r[],!1 = @sid]
+@occ57_1 = @occ57[m_4 = aenc((n_4,pk(sskI_2)),pk(skr[])),e_1 = i[],!1 = @sid_1]
+RESULT inj-event(initiatorCompletesProtocol(m_8,m_9)) ==> inj-event(responderSendsLastMessageToInitiator(m_8,m_9)) is true.
+-- Query inj-event(responderCompletesProtocol(m_8)) ==> inj-event(initiatorSendsLastMessageToResponder(m_8)) in process 1.
+Translating the process into Horn clauses...
+Completing...
+select attacker(pk(sk))/-5000
+Starting query inj-event(responderCompletesProtocol(m_8)) ==> inj-event(initiatorSendsLastMessageToResponder(m_8))
+goal reachable: attacker(n_4) && attacker(spkI_2) -> end(@occ61_1,responderCompletesProtocol(aenc((n_4,spkI_2),pk(skr[]))))
+Abbreviations:
+@occ61_1 = @occ61[m_4 = aenc((n_4,spkI_2),pk(skr[])),e_1 = i[],!1 = @sid]
+
+Derivation:
+Abbreviations:
+@occ61_1 = @occ61[m_4 = aenc((n_4,spkI_2),pk(skr[])),e_1 = i[],!1 = @sid]
+
+1. The message i[] may be sent to the attacker at output {3}.
+attacker(i[]).
+
+2. The message pk(skr[]) may be sent to the attacker at output {8}.
+attacker(pk(skr[])).
+
+3. We assume as hypothesis that
+attacker(spkI_2).
+
+4. We assume as hypothesis that
+attacker(n_4).
+
+5. By 4, the attacker may know n_4.
+By 3, the attacker may know spkI_2.
+Using the function 2-tuple the attacker may obtain (n_4,spkI_2).
+attacker((n_4,spkI_2)).
+
+6. By 5, the attacker may know (n_4,spkI_2).
+By 2, the attacker may know pk(skr[]).
+Using the function aenc the attacker may obtain aenc((n_4,spkI_2),pk(skr[])).
+attacker(aenc((n_4,spkI_2),pk(skr[]))).
+
+7. The message i[] that the attacker may have by 1 may be received at input {50}.
+The message aenc((n_4,spkI_2),pk(skr[])) that the attacker may have by 6 may be received at input {53}.
+So event responderCompletesProtocol(aenc((n_4,spkI_2),pk(skr[]))) may be executed at {61} in session @sid.
+end(@occ61_1,responderCompletesProtocol(aenc((n_4,spkI_2),pk(skr[])))).
+
+8. By 7, end(@occ61_1,responderCompletesProtocol(aenc((n_4,spkI_2),pk(skr[])))).
+The goal is reached, represented in the following fact:
+end(@occ61_1,responderCompletesProtocol(aenc((n_4,spkI_2),pk(skr[])))).
+
+
+A more detailed output of the traces is available with
+  set traceDisplay = long.
+
+new i: bitstring creating i_3 at {1}
+
+new r: bitstring creating r_3 at {2}
+
+out(c, ~M) with ~M = i_3 at {3}
+
+out(c, ~M_1) with ~M_1 = r_3 at {4}
+
+new ski: SecretKey creating ski_2 at {5}
+
+new skr: SecretKey creating skr_2 at {6}
+
+out(c, ~M_2) with ~M_2 = pk(ski_2) at {7}
+
+out(c, ~M_3) with ~M_3 = pk(skr_2) at {8}
+
+in(c, ~M) with ~M = i_3 at {50} in copy a
+
+in(c, aenc((a_1,a_2),~M_3)) with aenc((a_1,a_2),~M_3) = aenc((a_1,a_2),pk(skr_2)) at {53} in copy a
+
+new k_2: SymmetricKey creating k_4 at {55} in copy a
+
+event responderSendsLastMessageToInitiator(aenc((a_1,a_2),pk(skr_2)),aenc((a_1,k_4),a_2)) at {57} in copy a
+
+out(c, ~M_4) with ~M_4 = aenc((a_1,k_4),a_2) at {58} in copy a
+
+out(c, ~M_5) with ~M_5 = check_reach_responder at {60} in copy a
+
+event responderCompletesProtocol(aenc((a_1,a_2),pk(skr_2))) at {61} in copy a (goal)
+
+The event responderCompletesProtocol(aenc((a_1,a_2),pk(skr_2))) is executed at {61} in copy a.
+A trace has been found.
+RESULT inj-event(responderCompletesProtocol(m_8)) ==> inj-event(initiatorSendsLastMessageToResponder(m_8)) is false.
+RESULT (even event(responderCompletesProtocol(m_8)) ==> event(initiatorSendsLastMessageToResponder(m_8)) is false.)
+
+--------------------------------------------------------------
+Verification summary:
+
+Query not attacker(check_reach_initiator[]) is false.
+
+Query not attacker(check_reach_responder[]) is false.
+
+Query not attacker(free_k_from_initiator[]) is true.
+
+Query not attacker(free_k_from_responder[]) is false.
+
+Query inj-event(initiatorCompletesProtocol(m_8,m_9)) ==> inj-event(responderSendsLastMessageToInitiator(m_8,m_9)) is true.
+
+Query inj-event(responderCompletesProtocol(m_8)) ==> inj-event(initiatorSendsLastMessageToResponder(m_8)) is false.
+
+--------------------------------------------------------------
+
