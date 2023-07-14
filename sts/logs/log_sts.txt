@@ -1,0 +1,532 @@
+﻿Linear part:
+exp(g(x),y) = exp(g(y),x)
+Completing equations...
+Completed equations:
+exp(g(x),y) = exp(g(y),x)
+Convergent part: No equation.
+Process 0 (that is, the initial process):
+{1}new i: bitstring;
+{2}new r: bitstring;
+{3}out(c, i);
+{4}out(c, r);
+{5}new ski: SecretKey;
+{6}new skr: SecretKey;
+{7}out(c, pk(ski));
+{8}out(c, pk(skr));
+(
+    {9}!
+    {10}let c_1: channel = c in
+    {11}let i_1: bitstring = i in
+    {12}let ski_1: SecretKey = ski in
+    {13}let r_1: bitstring = r in
+    {14}let pkr: PublicKey = pk(skr) in
+    {15}in(c_1, e: bitstring);
+    {16}if (e = r_1) then
+    (
+        {17}let talksOnlyToHonest: bool = true in
+        {18}new x: exponent;
+        {19}let gx: G = g(x) in
+        {20}let m_1: bitstring = bitG(gx) in
+        {21}out(c_1, m_1);
+        {22}in(c_1, m_2: bitstring);
+        {23}let (bit_gy: bitstring,enc_signature: bitstring) = m_2 in
+        {24}let gy: G = unbitG(bit_gy) in
+        {25}let k: SymmetricKey = GtoSymK(exp(gy,x)) in
+        {26}if ((gy,gx) = check(dec(enc_signature,k),pkr)) then
+        {27}let m_3: bitstring = enc(sign((gx,gy),ski_1),k) in
+        {28}event initiatorSendsLastMessageToResponder(m_1,m_2,m_3);
+        {29}out(c_1, m_3);
+        {30}if talksOnlyToHonest then
+        {31}out(c_1, check_reach_initiator);
+        (
+            {32}event initiatorCompletesProtocol(m_1,m_2)
+        ) | (
+            {33}out(chSymK(k), free_k)
+        )
+    )
+    else
+        {34}in(c_1, pke: PublicKey);
+        {35}let talksOnlyToHonest_1: bool = false in
+        {36}new x_1: exponent;
+        {37}let gx_1: G = g(x_1) in
+        {38}let m: bitstring = bitG(gx_1) in
+        {39}out(c_1, m);
+        {40}in(c_1, m_4: bitstring);
+        {41}let (bit_gy_1: bitstring,enc_signature_1: bitstring) = m_4 in
+        {42}let gy_1: G = unbitG(bit_gy_1) in
+        {43}let k_1: SymmetricKey = GtoSymK(exp(gy_1,x_1)) in
+        {44}if ((gy_1,gx_1) = check(dec(enc_signature_1,k_1),pke)) then
+        {45}let m_5: bitstring = enc(sign((gx_1,gy_1),ski_1),k_1) in
+        {46}event initiatorSendsLastMessageToResponder(m,m_4,m_5);
+        {47}out(c_1, m_5);
+        {48}if talksOnlyToHonest_1 then
+        {49}out(c_1, check_reach_initiator);
+        (
+            {50}event initiatorCompletesProtocol(m,m_4)
+        ) | (
+            {51}out(chSymK(k_1), free_k)
+        )
+) | (
+    {52}!
+    {53}let c_2: channel = c in
+    {54}let r_2: bitstring = r in
+    {55}let skr_1: SecretKey = skr in
+    {56}let i_2: bitstring = i in
+    {57}let pki: PublicKey = pk(ski) in
+    {58}in(c_2, e_1: bitstring);
+    {59}if (e_1 = i_2) then
+    (
+        {60}let talksOnlyToHonest_2: bool = true in
+        {61}in(c_2, m_6: bitstring);
+        {62}let gx_2: G = unbitG(m_6) in
+        {63}new y: exponent;
+        {64}let gy_2: G = g(y) in
+        {65}let k_2: SymmetricKey = GtoSymK(exp(gx_2,y)) in
+        {66}let m_7: bitstring = (bitG(gy_2),enc(sign((gy_2,gx_2),skr_1),k_2)) in
+        {67}event responderSendsLastMessageToInitiator(m_6,m_7);
+        {68}out(c_2, m_7);
+        {69}in(c_2, m_8: bitstring);
+        {70}if ((gx_2,gy_2) = check(dec(m_8,k_2),pki)) then
+        {71}if talksOnlyToHonest_2 then
+        {72}out(c_2, check_reach_responder);
+        (
+            {73}event responderCompletesProtocol(m_6,m_7,m_8)
+        ) | (
+            {74}out(chSymK(k_2), free_k)
+        )
+    )
+    else
+        {75}in(c_2, pke_1: PublicKey);
+        {76}let talksOnlyToHonest_3: bool = false in
+        {77}in(c_2, m_9: bitstring);
+        {78}let gx_3: G = unbitG(m_9) in
+        {79}new y_1: exponent;
+        {80}let gy_3: G = g(y_1) in
+        {81}let k_3: SymmetricKey = GtoSymK(exp(gx_3,y_1)) in
+        {82}let m_10: bitstring = (bitG(gy_3),enc(sign((gy_3,gx_3),skr_1),k_3)) in
+        {83}event responderSendsLastMessageToInitiator(m_9,m_10);
+        {84}out(c_2, m_10);
+        {85}in(c_2, m_11: bitstring);
+        {86}if ((gx_3,gy_3) = check(dec(m_11,k_3),pke_1)) then
+        {87}if talksOnlyToHonest_3 then
+        {88}out(c_2, check_reach_responder);
+        (
+            {89}event responderCompletesProtocol(m_9,m_10,m_11)
+        ) | (
+            {90}out(chSymK(k_3), free_k)
+        )
+)
+
+--  Process 1 (that is, process 0, with let moved downwards):
+{1}new i: bitstring;
+{2}new r: bitstring;
+{3}out(c, i);
+{4}out(c, r);
+{5}new ski: SecretKey;
+{6}new skr: SecretKey;
+{7}out(c, pk(ski));
+{8}out(c, pk(skr));
+(
+    {9}!
+    {10}let c_1: channel = c in
+    {15}in(c_1, e: bitstring);
+    {13}let r_1: bitstring = r in
+    {12}let ski_1: SecretKey = ski in
+    {16}if (e = r_1) then
+    (
+        {18}new x: exponent;
+        {19}let gx: G = g(x) in
+        {20}let m_1: bitstring = bitG(gx) in
+        {21}out(c_1, m_1);
+        {22}in(c_1, m_2: bitstring);
+        {23}let (bit_gy: bitstring,enc_signature: bitstring) = m_2 in
+        {24}let gy: G = unbitG(bit_gy) in
+        {25}let k: SymmetricKey = GtoSymK(exp(gy,x)) in
+        {14}let pkr: PublicKey = pk(skr) in
+        {26}if ((gy,gx) = check(dec(enc_signature,k),pkr)) then
+        {27}let m_3: bitstring = enc(sign((gx,gy),ski_1),k) in
+        {28}event initiatorSendsLastMessageToResponder(m_1,m_2,m_3);
+        {29}out(c_1, m_3);
+        {17}let talksOnlyToHonest: bool = true in
+        {30}if talksOnlyToHonest then
+        {31}out(c_1, check_reach_initiator);
+        (
+            {32}event initiatorCompletesProtocol(m_1,m_2)
+        ) | (
+            {33}out(chSymK(k), free_k)
+        )
+    )
+    else
+        {34}in(c_1, pke: PublicKey);
+        {36}new x_1: exponent;
+        {37}let gx_1: G = g(x_1) in
+        {38}let m: bitstring = bitG(gx_1) in
+        {39}out(c_1, m);
+        {40}in(c_1, m_4: bitstring);
+        {41}let (bit_gy_1: bitstring,enc_signature_1: bitstring) = m_4 in
+        {42}let gy_1: G = unbitG(bit_gy_1) in
+        {43}let k_1: SymmetricKey = GtoSymK(exp(gy_1,x_1)) in
+        {44}if ((gy_1,gx_1) = check(dec(enc_signature_1,k_1),pke)) then
+        {45}let m_5: bitstring = enc(sign((gx_1,gy_1),ski_1),k_1) in
+        {46}event initiatorSendsLastMessageToResponder(m,m_4,m_5);
+        {47}out(c_1, m_5);
+        {35}let talksOnlyToHonest_1: bool = false in
+        {48}if talksOnlyToHonest_1 then
+        {49}out(c_1, check_reach_initiator);
+        (
+            {50}event initiatorCompletesProtocol(m,m_4)
+        ) | (
+            {51}out(chSymK(k_1), free_k)
+        )
+) | (
+    {52}!
+    {53}let c_2: channel = c in
+    {58}in(c_2, e_1: bitstring);
+    {56}let i_2: bitstring = i in
+    {55}let skr_1: SecretKey = skr in
+    {59}if (e_1 = i_2) then
+    (
+        {61}in(c_2, m_6: bitstring);
+        {62}let gx_2: G = unbitG(m_6) in
+        {63}new y: exponent;
+        {65}let k_2: SymmetricKey = GtoSymK(exp(gx_2,y)) in
+        {64}let gy_2: G = g(y) in
+        {66}let m_7: bitstring = (bitG(gy_2),enc(sign((gy_2,gx_2),skr_1),k_2)) in
+        {67}event responderSendsLastMessageToInitiator(m_6,m_7);
+        {68}out(c_2, m_7);
+        {69}in(c_2, m_8: bitstring);
+        {57}let pki: PublicKey = pk(ski) in
+        {70}if ((gx_2,gy_2) = check(dec(m_8,k_2),pki)) then
+        {60}let talksOnlyToHonest_2: bool = true in
+        {71}if talksOnlyToHonest_2 then
+        {72}out(c_2, check_reach_responder);
+        (
+            {73}event responderCompletesProtocol(m_6,m_7,m_8)
+        ) | (
+            {74}out(chSymK(k_2), free_k)
+        )
+    )
+    else
+        {75}in(c_2, pke_1: PublicKey);
+        {77}in(c_2, m_9: bitstring);
+        {78}let gx_3: G = unbitG(m_9) in
+        {79}new y_1: exponent;
+        {81}let k_3: SymmetricKey = GtoSymK(exp(gx_3,y_1)) in
+        {80}let gy_3: G = g(y_1) in
+        {82}let m_10: bitstring = (bitG(gy_3),enc(sign((gy_3,gx_3),skr_1),k_3)) in
+        {83}event responderSendsLastMessageToInitiator(m_9,m_10);
+        {84}out(c_2, m_10);
+        {85}in(c_2, m_11: bitstring);
+        {86}if ((gx_3,gy_3) = check(dec(m_11,k_3),pke_1)) then
+        {76}let talksOnlyToHonest_3: bool = false in
+        {87}if talksOnlyToHonest_3 then
+        {88}out(c_2, check_reach_responder);
+        (
+            {89}event responderCompletesProtocol(m_9,m_10,m_11)
+        ) | (
+            {90}out(chSymK(k_3), free_k)
+        )
+)
+
+-- Query not attacker(check_reach_initiator[]) in process 1.
+Translating the process into Horn clauses...
+select attacker(bitG(gx_4))/-5000
+Completing...
+Termination warning: attacker(bitG(elem)) -> attacker(elem)
+Selecting 0
+200 rules inserted. Base: 130 rules (56 with conclusion selected). Queue: 59 rules.
+400 rules inserted. Base: 225 rules (78 with conclusion selected). Queue: 23 rules.
+Starting query not attacker(check_reach_initiator[])
+goal reachable: attacker(check_reach_initiator[])
+
+Derivation:
+Abbreviations:
+x_2 = x[e = r[],!1 = @sid]
+y_2 = y_1[m_9 = bitG(g(x_2)),pke_1 = pke_2,e_1 = e_2,!1 = @sid_1]
+
+1. The message r[] may be sent to the attacker at output {4}.
+attacker(r[]).
+
+2. The attacker has some term e_2.
+attacker(e_2).
+
+3. The attacker has some term pke_2.
+attacker(pke_2).
+
+4. The message r[] that the attacker may have by 1 may be received at input {15}.
+So the message bitG(g(x_2)) may be sent to the attacker at output {21}.
+attacker(bitG(g(x_2))).
+
+5. The message e_2 that the attacker may have by 2 may be received at input {58}.
+The message pke_2 that the attacker may have by 3 may be received at input {75}.
+The message bitG(g(x_2)) that the attacker may have by 4 may be received at input {77}.
+We have e_2 Ôëá i[].
+So the message (bitG(g(y_2)),enc(sign((g(y_2),g(x_2)),skr[]),GtoSymK(exp(g(x_2),y_2)))) may be sent to the attacker at output {84}.
+attacker((bitG(g(y_2)),enc(sign((g(y_2),g(x_2)),skr[]),GtoSymK(exp(g(x_2),y_2))))).
+
+6. By 5, the attacker may know (bitG(g(y_2)),enc(sign((g(y_2),g(x_2)),skr[]),GtoSymK(exp(g(x_2),y_2)))).
+Using the function 2-proj-2-tuple the attacker may obtain enc(sign((g(y_2),g(x_2)),skr[]),GtoSymK(exp(g(x_2),y_2))).
+attacker(enc(sign((g(y_2),g(x_2)),skr[]),GtoSymK(exp(g(x_2),y_2)))).
+
+7. By 5, the attacker may know (bitG(g(y_2)),enc(sign((g(y_2),g(x_2)),skr[]),GtoSymK(exp(g(x_2),y_2)))).
+Using the function 1-proj-2-tuple the attacker may obtain bitG(g(y_2)).
+attacker(bitG(g(y_2))).
+
+8. By 7, the attacker may know bitG(g(y_2)).
+By 6, the attacker may know enc(sign((g(y_2),g(x_2)),skr[]),GtoSymK(exp(g(x_2),y_2))).
+Using the function 2-tuple the attacker may obtain (bitG(g(y_2)),enc(sign((g(y_2),g(x_2)),skr[]),GtoSymK(exp(g(x_2),y_2)))).
+attacker((bitG(g(y_2)),enc(sign((g(y_2),g(x_2)),skr[]),GtoSymK(exp(g(x_2),y_2))))).
+
+9. The message r[] that the attacker may have by 1 may be received at input {15}.
+The message (bitG(g(y_2)),enc(sign((g(y_2),g(x_2)),skr[]),GtoSymK(exp(g(x_2),y_2)))) that the attacker may have by 8 may be received at input {22}.
+So the message check_reach_initiator[] may be sent to the attacker at output {31}.
+attacker(check_reach_initiator[]).
+
+10. By 9, attacker(check_reach_initiator[]).
+The goal is reached, represented in the following fact:
+attacker(check_reach_initiator[]).
+
+
+A more detailed output of the traces is available with
+  set traceDisplay = long.
+
+new i: bitstring creating i_3 at {1}
+
+new r: bitstring creating r_3 at {2}
+
+out(c, ~M) with ~M = i_3 at {3}
+
+out(c, ~M_1) with ~M_1 = r_3 at {4}
+
+new ski: SecretKey creating ski_2 at {5}
+
+new skr: SecretKey creating skr_2 at {6}
+
+out(c, ~M_2) with ~M_2 = pk(ski_2) at {7}
+
+out(c, ~M_3) with ~M_3 = pk(skr_2) at {8}
+
+in(c, ~M_1) with ~M_1 = r_3 at {15} in copy a
+
+new x: exponent creating x_2 at {18} in copy a
+
+out(c, ~M_4) with ~M_4 = bitG(g(x_2)) at {21} in copy a
+
+in(c, a_1) at {58} in copy a_2
+
+in(c, a_3) at {75} in copy a_2
+
+in(c, ~M_4) with ~M_4 = bitG(g(x_2)) at {77} in copy a_2
+
+new y_1: exponent creating y_2 at {79} in copy a_2
+
+event responderSendsLastMessageToInitiator(bitG(g(x_2)),(bitG(g(y_2)),enc(sign((g(y_2),g(x_2)),skr_2),GtoSymK(exp(g(x_2),y_2))))) at {83} in copy a_2
+
+out(c, (~M_5,~M_6)) with ~M_5 = bitG(g(y_2)), ~M_6 = enc(sign((g(y_2),g(x_2)),skr_2),GtoSymK(exp(g(x_2),y_2))) at {84} in copy a_2
+
+in(c, (~M_5,~M_6)) with ~M_5 = bitG(g(y_2)), ~M_6 = enc(sign((g(y_2),g(x_2)),skr_2),GtoSymK(exp(g(x_2),y_2))) at {22} in copy a
+
+event initiatorSendsLastMessageToResponder(bitG(g(x_2)),(bitG(g(y_2)),enc(sign((g(y_2),g(x_2)),skr_2),GtoSymK(exp(g(x_2),y_2)))),enc(sign((g(x_2),g(y_2)),ski_2),GtoSymK(exp(g(y_2),x_2)))) at {28} in copy a
+
+out(c, ~M_7) with ~M_7 = enc(sign((g(x_2),g(y_2)),ski_2),GtoSymK(exp(g(y_2),x_2))) at {29} in copy a
+
+out(c, ~M_8) with ~M_8 = check_reach_initiator at {31} in copy a
+
+event initiatorCompletesProtocol(bitG(g(x_2)),(bitG(g(y_2)),enc(sign((g(y_2),g(x_2)),skr_2),GtoSymK(exp(g(x_2),y_2))))) at {32} in copy a
+
+The attacker has the message ~M_8 = check_reach_initiator.
+A trace has been found.
+RESULT not attacker(check_reach_initiator[]) is false.
+-- Query not attacker(check_reach_responder[]) in process 1.
+Translating the process into Horn clauses...
+select attacker(bitG(gx_4))/-5000
+Completing...
+Termination warning: attacker(bitG(elem)) -> attacker(elem)
+Selecting 0
+200 rules inserted. Base: 130 rules (56 with conclusion selected). Queue: 59 rules.
+400 rules inserted. Base: 225 rules (78 with conclusion selected). Queue: 23 rules.
+Starting query not attacker(check_reach_responder[])
+goal reachable: attacker(check_reach_responder[])
+
+Derivation:
+Abbreviations:
+x_2 = x[e = r[],!1 = @sid]
+y_2 = y[m_6 = bitG(g(x_2)),e_1 = i[],!1 = @sid_1]
+
+1. The message i[] may be sent to the attacker at output {3}.
+attacker(i[]).
+
+2. The message r[] may be sent to the attacker at output {4}.
+attacker(r[]).
+
+3. The message r[] that the attacker may have by 2 may be received at input {15}.
+So the message bitG(g(x_2)) may be sent to the attacker at output {21}.
+attacker(bitG(g(x_2))).
+
+4. The message i[] that the attacker may have by 1 may be received at input {58}.
+The message bitG(g(x_2)) that the attacker may have by 3 may be received at input {61}.
+So the message (bitG(g(y_2)),enc(sign((g(y_2),g(x_2)),skr[]),GtoSymK(exp(g(x_2),y_2)))) may be sent to the attacker at output {68}.
+attacker((bitG(g(y_2)),enc(sign((g(y_2),g(x_2)),skr[]),GtoSymK(exp(g(x_2),y_2))))).
+
+5. By 4, the attacker may know (bitG(g(y_2)),enc(sign((g(y_2),g(x_2)),skr[]),GtoSymK(exp(g(x_2),y_2)))).
+Using the function 2-proj-2-tuple the attacker may obtain enc(sign((g(y_2),g(x_2)),skr[]),GtoSymK(exp(g(x_2),y_2))).
+attacker(enc(sign((g(y_2),g(x_2)),skr[]),GtoSymK(exp(g(x_2),y_2)))).
+
+6. By 4, the attacker may know (bitG(g(y_2)),enc(sign((g(y_2),g(x_2)),skr[]),GtoSymK(exp(g(x_2),y_2)))).
+Using the function 1-proj-2-tuple the attacker may obtain bitG(g(y_2)).
+attacker(bitG(g(y_2))).
+
+7. By 6, the attacker may know bitG(g(y_2)).
+By 5, the attacker may know enc(sign((g(y_2),g(x_2)),skr[]),GtoSymK(exp(g(x_2),y_2))).
+Using the function 2-tuple the attacker may obtain (bitG(g(y_2)),enc(sign((g(y_2),g(x_2)),skr[]),GtoSymK(exp(g(x_2),y_2)))).
+attacker((bitG(g(y_2)),enc(sign((g(y_2),g(x_2)),skr[]),GtoSymK(exp(g(x_2),y_2))))).
+
+8. The message r[] that the attacker may have by 2 may be received at input {15}.
+The message (bitG(g(y_2)),enc(sign((g(y_2),g(x_2)),skr[]),GtoSymK(exp(g(x_2),y_2)))) that the attacker may have by 7 may be received at input {22}.
+So the message enc(sign((g(x_2),g(y_2)),ski[]),GtoSymK(exp(g(x_2),y_2))) may be sent to the attacker at output {29}.
+attacker(enc(sign((g(x_2),g(y_2)),ski[]),GtoSymK(exp(g(x_2),y_2)))).
+
+9. The message i[] that the attacker may have by 1 may be received at input {58}.
+The message bitG(g(x_2)) that the attacker may have by 3 may be received at input {61}.
+The message enc(sign((g(x_2),g(y_2)),ski[]),GtoSymK(exp(g(x_2),y_2))) that the attacker may have by 8 may be received at input {69}.
+So the message check_reach_responder[] may be sent to the attacker at output {72}.
+attacker(check_reach_responder[]).
+
+10. By 9, attacker(check_reach_responder[]).
+The goal is reached, represented in the following fact:
+attacker(check_reach_responder[]).
+
+
+A more detailed output of the traces is available with
+  set traceDisplay = long.
+
+new i: bitstring creating i_3 at {1}
+
+new r: bitstring creating r_3 at {2}
+
+out(c, ~M) with ~M = i_3 at {3}
+
+out(c, ~M_1) with ~M_1 = r_3 at {4}
+
+new ski: SecretKey creating ski_2 at {5}
+
+new skr: SecretKey creating skr_2 at {6}
+
+out(c, ~M_2) with ~M_2 = pk(ski_2) at {7}
+
+out(c, ~M_3) with ~M_3 = pk(skr_2) at {8}
+
+in(c, ~M_1) with ~M_1 = r_3 at {15} in copy a
+
+new x: exponent creating x_2 at {18} in copy a
+
+out(c, ~M_4) with ~M_4 = bitG(g(x_2)) at {21} in copy a
+
+in(c, ~M) with ~M = i_3 at {58} in copy a_1
+
+in(c, ~M_4) with ~M_4 = bitG(g(x_2)) at {61} in copy a_1
+
+new y: exponent creating y_2 at {63} in copy a_1
+
+event responderSendsLastMessageToInitiator(bitG(g(x_2)),(bitG(g(y_2)),enc(sign((g(y_2),g(x_2)),skr_2),GtoSymK(exp(g(x_2),y_2))))) at {67} in copy a_1
+
+out(c, (~M_5,~M_6)) with ~M_5 = bitG(g(y_2)), ~M_6 = enc(sign((g(y_2),g(x_2)),skr_2),GtoSymK(exp(g(x_2),y_2))) at {68} in copy a_1
+
+in(c, (~M_5,~M_6)) with ~M_5 = bitG(g(y_2)), ~M_6 = enc(sign((g(y_2),g(x_2)),skr_2),GtoSymK(exp(g(x_2),y_2))) at {22} in copy a
+
+event initiatorSendsLastMessageToResponder(bitG(g(x_2)),(bitG(g(y_2)),enc(sign((g(y_2),g(x_2)),skr_2),GtoSymK(exp(g(x_2),y_2)))),enc(sign((g(x_2),g(y_2)),ski_2),GtoSymK(exp(g(y_2),x_2)))) at {28} in copy a
+
+out(c, ~M_7) with ~M_7 = enc(sign((g(x_2),g(y_2)),ski_2),GtoSymK(exp(g(y_2),x_2))) at {29} in copy a
+
+out(c, ~M_8) with ~M_8 = check_reach_initiator at {31} in copy a
+
+event initiatorCompletesProtocol(bitG(g(x_2)),(bitG(g(y_2)),enc(sign((g(y_2),g(x_2)),skr_2),GtoSymK(exp(g(x_2),y_2))))) at {32} in copy a
+
+in(c, ~M_7) with ~M_7 = enc(sign((g(x_2),g(y_2)),ski_2),GtoSymK(exp(g(x_2),y_2))) at {69} in copy a_1
+
+out(c, ~M_9) with ~M_9 = check_reach_responder at {72} in copy a_1
+
+event responderCompletesProtocol(bitG(g(x_2)),(bitG(g(y_2)),enc(sign((g(y_2),g(x_2)),skr_2),GtoSymK(exp(g(x_2),y_2)))),enc(sign((g(x_2),g(y_2)),ski_2),GtoSymK(exp(g(x_2),y_2)))) at {73} in copy a_1
+
+The attacker has the message ~M_9 = check_reach_responder.
+A trace has been found.
+RESULT not attacker(check_reach_responder[]) is false.
+-- Query not attacker(free_k[]) in process 1.
+Translating the process into Horn clauses...
+select attacker(bitG(gx_4))/-5000
+Completing...
+Termination warning: attacker(bitG(elem)) -> attacker(elem)
+Selecting 0
+200 rules inserted. Base: 130 rules (56 with conclusion selected). Queue: 59 rules.
+400 rules inserted. Base: 225 rules (78 with conclusion selected). Queue: 23 rules.
+Starting query not attacker(free_k[])
+RESULT not attacker(free_k[]) is true.
+-- Query inj-event(initiatorCompletesProtocol(m_12,m_13)) ==> inj-event(responderSendsLastMessageToInitiator(m_12,m_13)) in process 1.
+Translating the process into Horn clauses...
+select attacker(bitG(g(x_2)))/-5000
+select attacker(bitG(gx_4))/-5000
+Completing...
+Termination warning: attacker(bitG(elem)) -> attacker(elem)
+Selecting 0
+200 rules inserted. Base: 124 rules (51 with conclusion selected). Queue: 93 rules.
+400 rules inserted. Base: 209 rules (74 with conclusion selected). Queue: 73 rules.
+600 rules inserted. Base: 286 rules (80 with conclusion selected). Queue: 35 rules.
+Starting query inj-event(initiatorCompletesProtocol(m_12,m_13)) ==> inj-event(responderSendsLastMessageToInitiator(m_12,m_13))
+goal reachable: e_2 Ôëá i[] && begin(responderSendsLastMessageToInitiator(bitG(g(x_2)),(bitG(g(y_2)),enc(sign((g(y_2),g(x_2)),skr[]),GtoSymK(exp(g(x_2),y_2))))),@occ83_1) && attacker(pke_2) && attacker(e_2) -> end(@occ32_1,initiatorCompletesProtocol(bitG(g(x_2)),(bitG(g(y_2)),enc(sign((g(y_2),g(x_2)),skr[]),GtoSymK(exp(g(x_2),y_2))))))
+The 1st hypothesis occurs strictly before the conclusion.
+The 2nd, 3rd hypotheses occur before the conclusion.
+Abbreviations:
+x_2 = x[e = r[],!1 = @sid]
+y_2 = y_1[m_9 = bitG(g(x_2)),pke_1 = pke_2,e_1 = e_2,!1 = @sid_1]
+@occ32_1 = @occ32[m_2 = (bitG(g(y_2)),enc(sign((g(y_2),g(x_2)),skr[]),GtoSymK(exp(g(x_2),y_2)))),e = r[],!1 = @sid]
+@occ83_1 = @occ83[m_9 = bitG(g(x_2)),pke_1 = pke_2,e_1 = e_2,!1 = @sid_1]
+goal reachable: begin(responderSendsLastMessageToInitiator(bitG(g(x_2)),(bitG(g(y_2)),enc(sign((g(y_2),g(x_2)),skr[]),GtoSymK(exp(g(x_2),y_2))))),@occ67_1) -> end(@occ32_1,initiatorCompletesProtocol(bitG(g(x_2)),(bitG(g(y_2)),enc(sign((g(y_2),g(x_2)),skr[]),GtoSymK(exp(g(x_2),y_2))))))
+The hypothesis occurs strictly before the conclusion.
+Abbreviations:
+x_2 = x[e = r[],!1 = @sid]
+y_2 = y[m_6 = bitG(g(x_2)),e_1 = i[],!1 = @sid_1]
+@occ32_1 = @occ32[m_2 = (bitG(g(y_2)),enc(sign((g(y_2),g(x_2)),skr[]),GtoSymK(exp(g(x_2),y_2)))),e = r[],!1 = @sid]
+@occ67_1 = @occ67[m_6 = bitG(g(x_2)),e_1 = i[],!1 = @sid_1]
+RESULT inj-event(initiatorCompletesProtocol(m_12,m_13)) ==> inj-event(responderSendsLastMessageToInitiator(m_12,m_13)) is true.
+-- Query inj-event(responderCompletesProtocol(m_12,m_13,m_14)) ==> inj-event(initiatorSendsLastMessageToResponder(m_12,m_13,m_14)) in process 1.
+Translating the process into Horn clauses...
+select attacker(bitG(gx_4))/-5000
+Completing...
+Termination warning: attacker(bitG(elem)) -> attacker(elem)
+Selecting 0
+200 rules inserted. Base: 140 rules (52 with conclusion selected). Queue: 83 rules.
+400 rules inserted. Base: 227 rules (71 with conclusion selected). Queue: 38 rules.
+600 rules inserted. Base: 348 rules (92 with conclusion selected). Queue: 10 rules.
+Starting query inj-event(responderCompletesProtocol(m_12,m_13,m_14)) ==> inj-event(initiatorSendsLastMessageToResponder(m_12,m_13,m_14))
+goal reachable: e_2 Ôëá r[] && begin(initiatorSendsLastMessageToResponder(bitG(g(x_2)),(bitG(g(y_2)),enc(sign((g(y_2),g(x_2)),skr[]),GtoSymK(exp(g(y_2),x_2)))),enc(sign((g(x_2),g(y_2)),ski[]),GtoSymK(exp(g(y_2),x_2)))),@occ46_1) && attacker(e_2) -> end(@occ73_1,responderCompletesProtocol(bitG(g(x_2)),(bitG(g(y_2)),enc(sign((g(y_2),g(x_2)),skr[]),GtoSymK(exp(g(y_2),x_2)))),enc(sign((g(x_2),g(y_2)),ski[]),GtoSymK(exp(g(y_2),x_2)))))
+The 1st hypothesis occurs strictly before the conclusion.
+The 2nd hypothesis occurs before the conclusion.
+Abbreviations:
+x_2 = x_1[pke = pk(skr[]),e = e_2,!1 = @sid]
+y_2 = y[m_6 = bitG(g(x_2)),e_1 = i[],!1 = @sid_1]
+@occ73_1 = @occ73[m_8 = enc(sign((g(x_2),g(y_2)),ski[]),GtoSymK(exp(g(y_2),x_2))),m_6 = bitG(g(x_2)),e_1 = i[],!1 = @sid_1]
+@occ46_1 = @occ46[m_4 = (bitG(g(y_2)),enc(sign((g(y_2),g(x_2)),skr[]),GtoSymK(exp(g(y_2),x_2)))),pke = pk(skr[]),e = e_2,!1 = @sid]
+goal reachable: begin(initiatorSendsLastMessageToResponder(bitG(g(x_2)),(bitG(g(y_2)),enc(sign((g(y_2),g(x_2)),skr[]),GtoSymK(exp(g(y_2),x_2)))),enc(sign((g(x_2),g(y_2)),ski[]),GtoSymK(exp(g(y_2),x_2)))),@occ28_1) -> end(@occ73_1,responderCompletesProtocol(bitG(g(x_2)),(bitG(g(y_2)),enc(sign((g(y_2),g(x_2)),skr[]),GtoSymK(exp(g(y_2),x_2)))),enc(sign((g(x_2),g(y_2)),ski[]),GtoSymK(exp(g(y_2),x_2)))))
+The hypothesis occurs strictly before the conclusion.
+Abbreviations:
+x_2 = x[e = r[],!1 = @sid]
+y_2 = y[m_6 = bitG(g(x_2)),e_1 = i[],!1 = @sid_1]
+@occ73_1 = @occ73[m_8 = enc(sign((g(x_2),g(y_2)),ski[]),GtoSymK(exp(g(y_2),x_2))),m_6 = bitG(g(x_2)),e_1 = i[],!1 = @sid_1]
+@occ28_1 = @occ28[m_2 = (bitG(g(y_2)),enc(sign((g(y_2),g(x_2)),skr[]),GtoSymK(exp(g(y_2),x_2)))),e = r[],!1 = @sid]
+RESULT inj-event(responderCompletesProtocol(m_12,m_13,m_14)) ==> inj-event(initiatorSendsLastMessageToResponder(m_12,m_13,m_14)) is true.
+
+--------------------------------------------------------------
+Verification summary:
+
+Query not attacker(check_reach_initiator[]) is false.
+
+Query not attacker(check_reach_responder[]) is false.
+
+Query not attacker(free_k[]) is true.
+
+Query inj-event(initiatorCompletesProtocol(m_12,m_13)) ==> inj-event(responderSendsLastMessageToInitiator(m_12,m_13)) is true.
+
+Query inj-event(responderCompletesProtocol(m_12,m_13,m_14)) ==> inj-event(initiatorSendsLastMessageToResponder(m_12,m_13,m_14)) is true.
+
+--------------------------------------------------------------
+
