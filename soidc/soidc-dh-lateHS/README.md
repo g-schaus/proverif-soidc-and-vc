@@ -1,4 +1,4 @@
-# SOIDC - With Diffie Hellman Key Exchange
+# SOIDC Late HS - With Diffie Hellman Key Exchange
 
 The model is based on the version found [here](/soidc/soidc-lateHS) and uses the HTTPS handshake using Diffie Hellman as explained [here](/https).
 
