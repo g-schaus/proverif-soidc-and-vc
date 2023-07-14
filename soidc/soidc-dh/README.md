@@ -4,7 +4,7 @@ The model is based on the version found [here](/soidc/soidc) and uses the HTTPS 
 
 # Results Without Fix
 
-| Property  | Holds in Simple | Holds in DH | Time | Note |
+| Property  | Holds in Simple | Holds in DH | Time of DH | Note on DH |
 | ------------- | ------------- | ------------- | ------------- | ------------- |
 | Finish App | Yes  | Yes | ... | The app finishes the protocol. |
 | Finish Browser | Yes  | Yes | ... | The browser finishes the protocol. |
