@@ -11,4 +11,4 @@ The model is based on the version found [here](/soidc/soidc) and uses the HTTPS 
 | Finish Issuer | Yes  | Yes | ... | The issuer finishes the protocol. |
 | Authentication App | Yes | Yes  | 1h15 | The app is able to authenticate the browser and the issuer. |
 | Authentication Browser | Yes | Yes | 1h15 | The browser is able to authenticate the app and the issuer. |
-| Authentication Issuer  | No | ? | 2h30 | Fatal Error: out of memory. |
+| Authentication Issuer  | No | ? | 2h30 | Fatal Error: out of memory, 2.553 rules left |
