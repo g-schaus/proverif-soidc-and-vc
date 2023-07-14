@@ -2,7 +2,7 @@
 
 The model is based on the version found [here](/soidc/soidc) and uses the HTTPS handshake using Diffie Hellman as explained [here](/https).
 
-# Results Without Fix
+# DH Results Compared To Simple
 
 | Property  | Holds in Simple | Holds in DH | Time of DH | Note on DH |
 | ------------- | ------------- | ------------- | ------------- | ------------- |
@@ -13,7 +13,7 @@ The model is based on the version found [here](/soidc/soidc) and uses the HTTPS 
 | Authentication Browser | Yes | Yes | 1h15 | The browser is able to authenticate the app and the issuer. |
 | Authentication Issuer  | No | ? | 2h30 | Fatal Error: out of memory, 2.553 rules left |
 
-# Results With Fix
+# DH Results With Fix (No PKCE) Compared To Simple
 
 | Property  | Holds in Simple | Holds in DH | Time of DH | Note on DH |
 | ------------- | ------------- | ------------- | ------------- | ------------- |
