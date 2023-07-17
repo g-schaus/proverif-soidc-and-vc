@@ -1,0 +1,32 @@
+%\makebox[\textwidth][c] {
+
+\begin{msc}[environment distance = 3cm]{Solid Open ID Connect - Late HS}
+
+\declinst[instance width = 4cm]{app}{$sk_{A}$, pk($sk_I$)}{App}
+\declinst[instance width = 4cm]{browser}{pk($sk_A$), pk($sk_I$), password}{Browser}
+\declinst[instance width = 4cm]{issuer}{$sk_I$, password}{Issuer}
+
+\action*{\small{fresh pkce: nonce}}{app}
+\nextlevel[3]
+\mess{\small{$appID,h(pkce),scope$}}{app}{browser}
+\nextlevel[1]
+\condition*{\small{$k_2$ = HTTPS Connect ($\rightarrow$)}}{issuer,browser}
+\nextlevel[3]
+\mess{\small{$\{appID,h(pkce),scope,browserID,password\}_{k_2}$}}{browser}{issuer}
+\nextlevel[1]
+\action*{\small{fresh code: nonce}}{issuer}
+\nextlevel[2]
+\mess{\small{$\{code\}_{k_2}$}}{issuer}{browser}
+\nextlevel[2]
+\condition*{\small{($\leftarrow$) $k_1$ = HTTPS Connect}}{app,browser}
+\nextlevel[3]
+\mess{\small{$\{code\}_{k_1}$}}{browser}{app}
+\nextlevel[1]
+\stop*{browser}
+\nextlevel[1]
+\condition*{\small{...}}{app,issuer}
+\nextlevel[2]
+
+\end{msc}
+
+%}

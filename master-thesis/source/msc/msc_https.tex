@@ -1,0 +1,23 @@
+%\makebox[\textwidth][c]{
+
+\begin{msc}[instance distance=6cm]{HTTPS Connect}
+
+\declinst[instance width = 3cm]{initiator}{$pk(sk_r)$}{Initiator}
+\declinst[instance width = 3cm]{responder}{$sk_r$}{Responder}
+
+\action*{\small{new n: nonce}}{initiator}
+\action*{\small{new symk: SymmetricKey}}{responder}
+\nextlevel[2]
+\action*{\small{new $sk_i$: SecretKey}}{initiator}
+\nextlevel[2]
+\mess{\small{$\{ n,pk(sk_i) \} pk(sk_r)$}}{initiator}{responder}
+\nextlevel[2]
+\mess{\small{$\{ n,symk \} pk(sk_i)$}}{responder}{initiator}
+\nextlevel[1]
+\condition*{\small{Auth. Responder}}{initiator}
+\ncondition*{\small{Auth. Initiator}}{responder}
+\nextlevel[1]
+
+\end{msc}
+
+%}

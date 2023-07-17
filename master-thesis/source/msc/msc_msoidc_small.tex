@@ -1,0 +1,51 @@
+
+
+%\makebox[\textwidth][c]{
+
+\begin{msc}[instance distance=1.6cm]{VC Issuance and Use}
+
+\declinst[instance width = 3cm]{issuer}{$ski$, $pki$, $pku$, password}{Issuer}
+\declinst[instance width = 3cm]{user}{$sku$, $pku$, $pka$, solid}{User}
+\declinst[instance width = 3cm]{pod}{$skp$, $pkp$, $pka$}{Pod}
+
+
+\condition*{\small{$k_1$ = STS Key Exchange}}{user,issuer}
+\nextlevel[3]
+\mess{\small{$\{u, attr, password\}_{k_1}$}}{user}{issuer}
+\nextlevel[1]
+\condition*{\small{if u / attr / pw valid}}{issuer}
+\nextlevel[2]
+\action*{\small{claims = ($u,i,attr$)}}{issuer}
+\nextlevel[2]
+\action*{\small{$VC = (claims, sig(claims, ski)$}}{issuer}
+\nextlevel[3]
+\mess{\small{$\{sig((VC),ski)\}_{k_1}$}}{issuer}{user}
+
+
+\nextlevel[2]
+%\msccomment[msccomment distance = 14cm]{sovereignity line}{issuer}
+\settimer[]{sovereignity line}{issuer}
+\order[pos = 2]{pod}{user}
+\order[pos = 2]{user}{issuer}
+\nextlevel[1]
+
+
+\condition*{\small{$k_2$ = STS Key Exchange}}{user,pod}
+\nextlevel[2]
+\action*{\small{N = (VC, scope, solid)}}{user}
+\nextlevel[2]
+\action*{\small{PT = sig(N,sku)}}{user}
+\nextlevel[2]
+\mess{\small{$\{uri\}_{k_2}$}}{user}{pod}
+\nextlevel[2]
+\mess{\small{$\{rule\}_{k_2}$}}{pod}{user}
+\nextlevel[2]
+\mess{\small{$\{PT\}_{k_2}$}}{user}{pod}
+\nextlevel[2]
+\mess{\small{$\{sig((accesstoken), skp)\}_{k_3}$}}{pod}{user}
+\nextlevel[2]
+
+
+\end{msc}
+
+%}

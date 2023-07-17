@@ -1,0 +1,634 @@
+\documentclass[11pt,twoside,a4paper,openright]{book}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+
+\usepackage{graphicx}
+\usepackage{msc}
+\usepackage[]{mdframed}
+\usepackage{hyperref}
+\usepackage{appendix}
+\usepackage{fancyvrb}
+\usepackage{amsmath}
+\usepackage{xcolor}
+\usepackage{float}
+\usepackage{parskip}
+
+\usepackage[margin=2.9cm,inner=3.4cm]{geometry} 
+
+\begin{document}
+
+\frontmatter
+
+\input{frontmatter/titlepage.tex}
+
+% -----------------------------------------------------------------------------
+% -----------------------------------------------------------------------------
+% -----------------------------------------------------------------------------
+
+\chapter*{Abstract}
+
+This paper aims at analysing and verifying Solid Open ID Connect, a recent addition to the third party authentication protocols. During the analysis, it becomes clear that some aspects of this new protocol are not working as intended, giving attackers the opportunity to execute different forms of mixup attacks, resulting in possible access of private resources. After giving a potential fix and therefore mitigating the threat, this paper is going a step further and develops a new protocol providing third party authentication by relying on the concept of verifiable credentials. At the end, the key concepts of the new protocol are verified and constitute a solid base for further development.
+
+\newpage
+
+% -----------------------------------------------------------------------------
+
+\tableofcontents
+\newpage
+
+% -----------------------------------------------------------------------------
+
+\listoffigures
+\newpage
+
+% -----------------------------------------------------------------------------
+% -----------------------------------------------------------------------------
+% -----------------------------------------------------------------------------
+
+\mainmatter
+
+% -----------------------------------------------------------------------------
+% -----------------------------------------------------------------------------
+% -----------------------------------------------------------------------------
+
+\chapter{Introduction} 
+\label{introduction}
+
+In 1989, Tim Berners-Lee proposed an information management system and implemented the first successful communication between an HTTP client and server, making him the inventor of the World Wide Web (WWW). Now working as director of the World Wide Web Consortium (W3C), he is still shaping the web by creating and improving standards on an international scale. One of his projects is the Solid project, which aims at extending the web to include identity management and thus better access control for resources. The method used to achieve this feat is clear data separation by introducing Solid Pods like depicted in image \ref{fig:solidImage}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{images/solid.png}
+    \caption{Solid Framework \cite{solidImage}}
+    \label{fig:solidImage}
+\end{figure}
+
+These pods are personal data stores that provide a place for both user and service provider to access and update data. This data can also be shared by the user with third party clients by granting them the necessary permission using the proposed third party authentication protocol called Solid OpenID Connect \cite{solidWebsite}. In short, this protocol uses the users consent to allow the service provider the distribution of a dpop token to a third party client, which grants access to private resources on the pod. However, a previous paper by Fett et al \cite{fett2016comprehensive} already discovered a potential mixup attack on OpenID Connect. As Solid OpenID Connect is based on OpenID Connect, the first goal of this paper is the search for a similar or even the same vulnerability in Solid OpenID Connect by creating a tool verifiable model.
+
+\begin{mdframed}
+1. The creation and verification of a model depicting Solid Open ID Connect. The criterion of the model was it to be sufficiently rich to demonstrate the presence of a suspected mixup attack.
+\end{mdframed}
+
+The second goal of the paper follows-up on the first goal: during the development of the model and its verification, two different attacks have been discovered. To prevent the attacks from being exploitable, a potential fix is modelled and verified. The resulting protocol is then proposed as a new version of SOIDC.
+
+\begin{mdframed}
+2. Proposition for a fixed version of SOIDC, nullifying the previously discovered attacks.
+\end{mdframed}
+
+The third and last goal of the paper addresses a common problem shared by third party authentication protocols: based on their particular architecture, the identity provider needs to learn about the resource being accessed before generating an access token. This allows them to track user behaviour and create profiles, which may be used to generate commercial profit. With the aim to increase the privacy of the user, this paper proposes a new form of protocol using verifiable credentials, leading to the identity provider losing the ability to track user behaviour and therefore increasing user privacy.
+
+\begin{mdframed}
+3. The creation and verification of a new protocol providing third party authentication using verifiable credentials.
+\end{mdframed}
+
+This paper is divided into the following parts: chapter \ref{proverif} presents the tool used in this paper to acquire proof for its security statements. Chapter \ref{soidc} takes a closer look at Solid Open ID Connect (SOIDC), a specification allowing users to grant access to third party services to private information stored on supervised servers. Chapter \ref{msoidc} is taking the main idea of SOIDC and mixing it with the idea of verifiable credentials to create a new protocol that provides more privacy for the user and protects their information from being tracked by the identity provider. Chapter \ref{limitations_work} addresses the limitations of this paper and gives some guidance for potential further work. Chapter \ref{summary} summarizes the most important aspects of the the paper. The appendix contains the models used to verify authentication properties, which were explained in the paper. These models may be used to recreate the verification proofs or as a starting point for future work.
+
+% -----------------------------------------------------------------------------
+% -----------------------------------------------------------------------------
+% -----------------------------------------------------------------------------
+
+\chapter{ProVerif}
+\label{proverif}
+
+In order to achieve the goals mentioned above, it is important to go beyond intuition and use a tool providing the capabilities needed to formally proof and disprove statements. The tool chosen for this paper is called ProVerif and was created by Bruno Blanchet et al. \cite{proverif}. It is a cryptographic protocol verifier using applied $\pi$-calculus to find solid evidence for different statements. It is capable of modelling many cryptographic primitives like both symmetric and asymmetric encryption, signatures and hash functions. Additionally, due to using well-chosen approximations, it is capable of handling an infinite number of sessions of the protocol, which may even run in parallel. These feats combined allow the verification of secrecy and authentication properties, which constitute the goal of this paper.
+
+In regard to its trustworthiness, ProVerif states in its manual that it is sound, but not complete. In other words, in case a property is satisfied in the eyes of ProVerif, then the model does guarantee the property in question. In contrast, in case ProVerif is not finding a proof for a given property, the model may nonetheless provide that property. Being sound but not complete makes ProVerif an adequate choice for achieving the goal of this paper, as each verification result can be trusted \cite{proverifManual}.
+
+ProVerif relies on the symbolic, Dolev-Yao model of cryptography. This means that is goes beyond a passive, eavesdropping attacker and assumes that the adversary is able to also read, modify, delay, delete and inject messages according to their current knowledge. Moreover, all models created in this paper are using an open network architecture, which makes it possible for the attacker to pose as any of the honest actors in each protocol. This mirrors the capabilities of attackers on the web, strengthening the models and their verification results even further. In the given models, each actor both has an identity, a secret and a matching public key, which may be used for asymmetric encryption and signatures. Identities and public keys are globally known, while the secret keys remain private. It is assumed that the attacker is not able to break any underlying cryptographic primitives like encryptions, reverse hashes or forge signatures.
+
+% -----------------------------------------------------------------------------
+
+\newpage
+\section{General Model Structure}
+
+The syntax of ProVerif is broad and provides a whole set of various operations, which may be used in many different ways. This makes it important to keep the models well structured to make grasping the underlying meaning as easy as possible. Therefore, all models in this paper are using a simple structure, which is briefly explained in the following. Complete models are also accessible in the appendix \ref{appendix}.
+
+\subsection{Definitions}
+
+Firstly, the model starts out with general definitions. As general cryptographic primitives are not immediately part of the syntax, they need to defined using functions and reductions. The following example illustrates the definition of symmetric encryption and decryption:
+
+\begin{Verbatim}[fontsize=\small]
+    fun enc(bitstring, SymmetricKey):bitstring.
+    reduc forall msg:bitstring,symk:SymmetricKey; dec(enc(msg,symk),symk)=msg.
+\end{Verbatim}
+
+After declaring all relevant cryptographic primitives, the model needs variables. Constants are global variables, which may be used by both the attacker and the honest actors. Free variables are used to check the attackers access on different values, which are subsequently used in secrecy claim evaluation. Events are used to save message sets, which are subsequently used in authentication claim evaluation:
+
+\begin{Verbatim}[fontsize=\small]
+    const tag1:bitstring.
+    free free_code: bitstring [private].
+    event appSendsLastMessageToIssuer(bitstring, bitstring, bitstring).
+\end{Verbatim}
+
+\subsection{Agent Macros}
+
+Right after the definitions come the actor declarations. Each actor participating in the protocol is listed here. This part may be seen as the core of the model, as it defines all messages being send from one actor to another. This implies that each message is appearing twice, as it must both be send as output by someone and read as input by someone else. The following example illustrates the message passing process between browser and app:
+
+\begin{Verbatim}[fontsize=\small]
+    (* Browser *)
+    new n:bitstring;
+    new sskI:SecretKey;
+    let m_1 = aenc((tag1, n, pk(sskI)), pka) in
+    out(c, m_1);
+
+    (* App *)
+    in(c, m_1:bitstring);
+    let (tag1':bitstring, n:bitstring, spkI:PublicKey) = adec(m_1, ska) in
+    if (tag1 = tag1') then
+\end{Verbatim}
+
+\subsection{Open Network}
+
+At the current state, the model is only checking properties in regard to an attacker, who may easily be distinguished from the honest actors. In order to give the attacker more control, the open network part of the model allows them to pose as any actor. This mimics the capabilities of a real attacker on the internet and gives the model additional importance when verifying its properties. The open network of for instance an app may be modelled like this:
+
+\begin{Verbatim}[fontsize=\small]
+    let open_app(c:channel, a:bitstring, ska:SecretKey, u:bitstring, 
+    pku:PublicKey, i:bitstring, pki:PublicKey) =
+      in(c, e1:bitstring);
+      in(c, e2:bitstring);
+      if (e1 = u) && (e2 = i) then
+        app(true, c, a, ska, u, pku, i, pki)
+      else
+      if (e1 <> u) && (e2 = i) then
+        in(c, pke1:PublicKey);
+        app(false, c, a, ska, e1, pke1, i, pki)
+      else
+      if (e1 = u) && (e2 <> i) then
+        in(c, pke2:PublicKey);
+        app(false, c, a, ska, u, pku, e2, pke2)
+      else
+      if (e1 <> u) && (e2 <> i) then
+        in(c, pke1:PublicKey);
+        in(c, pke2:PublicKey);
+        app(false, c, a, ska, e1, pke1, e2, pke2)
+      .
+\end{Verbatim}
+
+\subsection{Assumptions}
+
+This part of the model defines the properties, which are checked by ProVerif. The simplest property to verify is secrecy of different free variables. It is used to establish if a protocol managed to successfully complete or if some important variable like a password remains secret:
+
+\begin{Verbatim}[fontsize=\small]
+    query attacker(check_reach_app).
+    query attacker(free_password).
+\end{Verbatim}
+
+Furthermore, ProVerif is able to verify authentication claims using the previously explained event statements. In the following example, the claim states that an app may only complete its protocol when all messages it received match the messages send by the browser and issuer:
+
+\begin{Verbatim}[fontsize=\small]
+    query m_1:bitstring, m_2:bitstring, m_3:bitstring, m_8:bitstring, m_9:bitstring,
+    m_10:bitstring, m_11:bitstring, m_12:bitstring;
+        inj-event(appCompletesProtocol(m_1, m_2, m_3, m_8, m_9, m_10, m_11, m_12))
+        ==>
+        inj-event(browserSendsLastMessageToApp(m_1, m_2, m_3, m_8))
+        &&
+        inj-event(issuerSendsLastMessageToApp(m_9, m_10, m_11, m_12))
+        .
+\end{Verbatim}
+
+\subsection{Main}
+
+The main section of the model is the starting point of the ProVerif verification process. In this part, secret keys as well as public identities and keys are being created, before they are distributed to the different processes. The processes themselves are running in parallel and may be replicated any number of times. This mimics the attackers ability to start as many sessions as needed to find and exploit a vulnerability in the protocol:
+
+\begin{Verbatim}[fontsize=\small]
+    (* create identities *)
+    new a:bitstring;
+    new u:bitstring;
+    new i:bitstring;
+
+    (*advertise identities*)
+    out(c,a);
+    out(c,u);
+    out(c,i);
+
+    (*declare secret keys*)
+    new ska:SecretKey;
+    new sku:SecretKey;
+    new ski:SecretKey;
+
+    (*advertise public keys*)
+    out(c,pk(ska));
+    out(c,pk(sku));
+    out(c,pk(ski));
+
+    (*generate variables*)
+    new password:bitstring;
+
+    (*let agents dance*)
+    (
+        ! open_app      (c, a, ska, u, pk(sku), i, pk(ski))
+      | ! open_browser  (c, u, sku, a, pk(ska), i, pk(ski), password)
+      | ! open_issuer   (c, i, ski, a, pk(ska), u, pk(sku), password)
+    )
+\end{Verbatim}
+
+% -----------------------------------------------------------------------------
+
+\section{Encountered Problems}
+
+This part of the paper mentions some of the most dominant problems slowing down the progress of the model creation and verification. For each iterated problem, a possible solution is given to facilitate further development.
+
+\subsection{Bloating}
+\label{proverif_bloating}
+
+Unfortunately during the development of the model, an inherent weakness of ProVerif made the verification process slow and tedious. When verifying a protocol, it may occur that the existence of infinite loops prevent the process form finishing. These infinite loops may result from message structures of the following form:
+
+\begin{flushleft}
+    \hspace{2cm} $B \rightarrow A : s e n c (N_b, k )$ \\
+    \hspace{2cm} $A \rightarrow B : s e n c ( f (N_b ) , k )$
+\end{flushleft}
+
+In order to find out the value of the nonce $N_b$, the attacker could take the second message $f (N_b $) and use it as an input to restart the sequence again, obtaining $f ( f (Nb))$. This could again be sent as the input of the first message, resulting in an infinite loop. Preventing this behaviour can be done by adding tags to the use of each cryptograhic primitive, like so:
+
+\begin{flushleft}
+    \hspace{2cm} $B \rightarrow A : s e n c ( ( c_0 , N_b ) , k )$ \\
+    \hspace{2cm} $A \rightarrow B : s e n c ( ( c_1 , f (N_b ) ) , k )$
+\end{flushleft}
+
+With tags, the messages can't be mixed anymore, which enables the verification process to finish. However, when using tags in the verification process, they should also be used in the implementation of the protocol. The security of the tagged protocol does not imply the security of the untagged version \cite{proverifManual}.
+
+\subsection{Identical Messages}
+
+Another common problem which leads to unnecessary bloating during the verification process is the appearance of exactly the same messages in the same protocol. In this case, ProVerif is not able to reliably match the outputs with their corresponding inputs. Therefore, when having the requirement to use identical messages at different places in the model, it is advised to artificially change some part of them to support ProVerif in its verification process. This may be achieved by adding some constant or using some function, which is not changing anything essential to the protocol. Alternatively, if sending a tuple containing different types of terms, reordering them may also work and is good practice, as it prevents potential replay attacks.
+
+\subsection{Non-Bitstring Messages}
+
+During the development of the protocol, it appeared that using messages of any type other than bitstring leads to unforeseen behaviour, often resulting in ProVerif not being able to match outputs with corresponding inputs and therefore not being able to finish the verification of the protocol. One example of such an occurrence is the transmission of the first message in a Diffie Hellman key exchange. This message is an element of the group G raised by some exponent, resulting in another element of group G. Without first converting it to a bitstring using a custom function, ProVerif was not able to complete the protocol.
+
+% -----------------------------------------------------------------------------
+% -----------------------------------------------------------------------------
+% -----------------------------------------------------------------------------
+
+\chapter{Solid OpenID Connect}
+\label{soidc}
+
+Since the release of the OAuth 2.0 [RFC6749] and OpenID Connect Core 1.0 [OIDC.Core] web standards, they have quickly been adopted across the industry in various applications. These extended practical uses offered a lot of insight on their corresponding strengths through extensive real-world data and experience. However, with the growing importance of privacy and digital identities in our modernising world, an improvement was proposed. SOIDC aims at eliminating the previously necessary trust relationship between identity providers and resource servers including their corresponding authorisation servers \cite{solid}. This part of the paper analyses the message flow used to accomplish that goal by providing a verifiable model supporting the initial claims.
+
+When taking a look at the SOIDC message flow described in their primer \cite{solidPrimer}, it is clearly divided in two different parts: the first part called 'Authorization Code Grant' and takes care of the access token distribution, while the second part is called 'Request Flow' and takes care of the token and resource exchange. After finishing the modelling and verification process of the first part, it became apparent that it already showed signs of major vulnerabilities. Therefore, this paper focuses its analysis on the first part, gaining in-depth knowledge about these vulnerabilities and providing a possible fix. The second part of SOIDC is not included in this process and may be analysed in future work.
+
+% -----------------------------------------------------------------------------
+
+\section{HTTPS Handshake}
+
+\subsection{Simple vs Diffie Hellman}
+
+When beginning to model Solid Open ID Connect, the first step is to search for a way to model a secure connection on the web using HTTPS. This kind of connection is characterized through its uni-directional authentication, usually granted to important servers using certificates from trusted third parties to acknowledge their specific public keys. These certificates may then be verified by the connecting browser to guarantee communication with the chosen party and not some imposter. The main goal of such a connection process is the establishment of a symmetric session key, which may be used for any further communication. This results in forward secrecy, which means that even the compromise of the long-term keys cannot result in a loss of secrecy of older communication sessions. The connecting party usually authenticates later in the process through some sort of shared secret, like for instance a password. One possibility of modelling a protocol providing these properties is depicted in the msc \ref{fig:msc_https}. It intentionally forgoes authentication for the initiator, highlighting the fact that anyone is able to connect anonymously to a certified web server. This protocol is verified using ProVerif and provides exactly the anticipated security factors: both parties are able to finish execution of the handshake and sharing a symmetric key. Even though only the initiator is able to authenticate the responder, no attacker is able to compromise the symmetric session key. 
+
+\begin{figure}[H]
+    \centering
+    \input{msc/msc_https}
+    \caption{HTTPS Connect}
+    \label{fig:msc_https}
+\end{figure}
+
+Alternatively, a much stronger handshake mimicing HTTPS may be modelled by using a variation of the Diffie Hellman Key Exchange (DHKE) as depicted in the msc \ref{fig:msc_https_dh}. 
+
+\begin{figure}[H]
+    \centering
+    \input{msc/msc_https_dh}
+    \caption{HTTPS Connect Using Diffie Hellman}
+    \label{fig:msc_https_dh}
+\end{figure}
+
+As a standard DHKE is vulnerable to man in the middle attacks, the variation is using a signature to ensure the presence of the honest party and agreement on the same key material, preventing any attacker of inserting their own. Its strength comes from the fact that, in contrast to the previous protocol, both parties add partial information to a combined symmetric session key. This denies the capability of an attacker to pose as an honest party and to decide on the session key themselves. This protocol is verified using ProVerif and provides the exact same qualities as the previous handshake proposal. However, even tough this version is stronger, it puts a lot more strain on ProVerif when verifying the entire authorization code grant explained in the next section. 
+
+\subsection{Timing Results}
+
+Verifying the simple HTTPS variant is fast with verification times generally below 5 minutes. In contrast, verifying the Diffie Hellman variant harbours some bloating problems as explained in section \ref{proverif_bloating}. This leads to long verification times, even with the use of tags already mitigating the problem. The following tables show in detail the verification results of SOIDC using the simple version in comparison with the Diffie Hellman version:
+
+    \begin{table}[H]
+        \centering
+        \def\arraystretch{1.5}
+        \resizebox{0.9\textwidth}{!}{
+        \begin{tabular}{ | l | l | l | l | }
+             \hline
+             \multicolumn{4}{|l|}{Solid Open ID Connect}\\
+             \hline
+             Property & Holds in Simple & Holds in DH & Verification Time DH \\ 
+             \hline
+              Auth. App & Yes & Yes & 1h15 \\
+              Auth. Browser & Yes & Yes & 1h15 \\
+              Auth. Issuer & No & \color{purple}OOM\color{black} & 2h15 (2.553 rules) \\
+             \hline
+        \end{tabular}}
+    \end{table}
+
+    \begin{table}[H]
+        \centering
+        \def\arraystretch{1.5}
+        \resizebox{0.9\textwidth}{!}{
+        \begin{tabular}{ | l | l | l| l | }
+             \hline
+             \multicolumn{4}{|l|}{Solid Open ID Connect With Fix}\\
+             \hline
+             Property & Holds in Simple & Holds in DH & Verification Time DH \\ 
+             \hline
+              Auth. App & Yes & Yes & 0h30 \\
+              Auth. Browser & Yes & Yes & 0h30 \\
+              Auth. Issuer & Yes & Yes & 1h30 \\
+             \hline
+        \end{tabular}}
+    \end{table}
+
+As seen above, ProVerif is not capable of finding the issuer mixup attack when using the DH handshake, as it runs out of memory with 2.553 rules in queue. Even though this amount of rules is quite low, it can always happen that it bloats up again in the course of verification. The DH version with fix finished as expected. The following tables show in detail the verification results of SOIDC with a late handshake using the simple version in comparison with the Diffie Hellman version:
+
+    \begin{table}[H]
+        \centering
+        \def\arraystretch{1.5}
+        \resizebox{0.9\textwidth}{!}{
+        \begin{tabular}{ | l | l | l| l | }
+             \hline
+             \multicolumn{4}{|l|}{Solid Open ID Connect Late HS}\\
+             \hline
+             Property & Holds in Simple & Holds in DH & Verification Time DH \\ 
+             \hline 
+              Auth. App & No & \color{purple}OOM\color{black} & 0h45 (7.060 rules) \\
+              Auth. Browser & Yes & \color{purple}OOM\color{black} & 1h00 (29.496 rules) \\
+              Auth. Issuer & No & \color{purple}OOM\color{black} & 1h15 (12.763 rules) \\
+             \hline
+        \end{tabular}}
+    \end{table}
+
+    \begin{table}[H]
+        \centering
+        \def\arraystretch{1.5}
+        \resizebox{0.9\textwidth}{!}{
+        \begin{tabular}{ | l | l | l| l | }
+             \hline
+             \multicolumn{4}{|l|}{Solid Open ID Connect Late HS With Fix}\\
+             \hline
+             Property & Holds in Simple & Holds in DH & Verification Time DH \\ 
+             \hline
+              Auth. App & Yes & Yes & 0h10 \\
+              Auth. Browser & Yes & Yes & 0h10 \\
+              Auth. Issuer & Yes & Yes & 0h10 \\
+             \hline
+        \end{tabular}}
+    \end{table}
+
+As seen above, Proverif is again not capable of finding the attack when using the DH handshake, as it runs out of memory with thousands of rules in queue. However, the fixed version is verified and running fast with a verification time of 10 minutes. Without ProVerif being able to identify the attacks on SOIDC using the Diffie Hellman handshake, this paper uses the previously explained simpler but weaker version in the following analysis.
+
+% -----------------------------------------------------------------------------
+
+\section{Authorization Code Grant Protocol}
+
+As mentioned before, the authorization code grant protocol is taking care of app authentication and the following access token distribution. The model of the protocol in question is based on the message flow provided in the official Solid OIDC Primer \cite{solidPrimer} and is depicted in the msc \ref{fig:msc_soidc}. Some of the major model design choices are explained in the following, starting with its actors:
+
+\textbf{App} - The App constitutes the relying party (RP) in the process, needing permission of the Resource Owner (RO) to access private information. 
+
+\textbf{Browser} - The Browser of the RO is used to connect both App and Issuer, allowing them to talk via HTTPS requests. It also allows the RO to provide the needed password for the OpenID Provider (OP).
+
+\textbf{Issuer} - The Issuer is the OP, providing the RP with the needed access token for the private resource if authentication succeeds.
+
+After having declared the actors and their corresponding roles, the model skips the first few steps enumerated in the primer and supposes them to already be done. These steps include the 'Retrieve Profile' and the 'Retrieve OP Configuration' step, which are mainly used to setup communication between RP and OP. Additionally, the 'Fetch Client ID Document' step is skipped, as we suppose the OP already knows everything it needs without an attacker being able to interfere in this request.
+
+Before starting communication and sending any message, the two actors in question are always using an HTTPS handshake to establish a connection. As previously mentioned, these handshakes are fashioned in a special way to only grant uni-lateral authentication. The little arrow in the msc \ref{fig:msc_soidc} indicates which party is actually authenticated. Using the HTTPS handshake before every communication between two parties also mimics the use of callbacks to communicate, as the generated session keys tightly bind messages together.
+
+\begin{figure}[H]
+    \centering
+    \input{msc/msc_soidc}
+    \caption{SOIDC}
+    \label{fig:msc_soidc}
+\end{figure}
+
+The first message actually being send is the authorisation request containing the appID, hashed pkce and scope. The appID is like the two other IDs a unique identifier for the app, the browser and the issuer respectively. Pkce is a generated code used by the app, which has the purpose to later guarantee the issuer that it is talking to the right app. The scope is related to the resource which is to be requested. Following the path over the browser, the RO is able to check on the values provided and login in case everything is valid. After receiving the values and checking them, the OP is generating a code which is send via the browser to the RP. This mimics SOIDCs send code to redirect uri step. Afterwards, the RP is using the code to request a dpop token, which can later be used for resource access. The request is mainly secured by a signature with a fresh generated key, as well as the pkce and the code from before. After checking the given information, the OP is issuing the requested token to the RP.
+
+Verifying the model in ProVerif revealed that not every aspect of the model is secure. While the password stays secret throughout the entire protocol, the code is leaked to the attacker at some point. Further investigations revealed that not all parties are being authenticated correctly. The issuer in this case is not able to authenticate the app and the browser, meaning that there is a way the issuer finishes the protocol while talking to some entity pretending to either be app and / or browser. As this constitutes a serious vulnerability, the attack is explored in-depth in the next section of the paper. This completes the first goal of the paper as described in chapter \ref{introduction}.
+
+\subsection{Mixup Attack for OpenID Provider}
+
+\begin{figure}[H]
+    \centering
+    \input{msc/msc_soidc_attack}
+    \caption{SOIDC Attack On Issuer Authentication}
+    \label{fig:msc_soidc_attack}
+\end{figure}
+
+In general, a mixup attack is a form of attack on a protocol, where the attacker Eve poses as one or more different agents to trick an honest party in sending sensitive information to them. This information may subsequently be used by Eve to perform usually restricted actions or get access to private information. Searching for such an attack in the model illustrating the authorisation code grant message flow, ProVerif revealed the attack depicted in the msc \ref{fig:msc_soidc_attack}. The complete model of this protocol is available in the appendix \ref{appendix_issuer_mixup}.
+
+In the first steps of the attack, Eve is not acting at all and lets the app receive the the issuer generated code following the usual protocol. However, Eve then poses as a fake issuer in such a way, that the app starts performing the HTTPS handshake with them. Halfway through the handshake, Eve then connects to the real issuer, posing as the honest app. By cleverly mixing the handshakes, Eve is able to generate the same session key $k_3$ for both communication channels. After receiving the token request with code and code verifier from the honest app, Eve proceeds to forward this message to the honest issuer. This leads to the issuer assuming that Eve must be the honest app and proceeding to send them the access token, giving her access to private resources. The occurrence of such an attack may be tracked down to the simple fact that the app is not aware of the issuerID corresponding to the honest issuer. This problem is later addressed in the section \ref{fix_short}.
+
+% -----------------------------------------------------------------------------
+
+\subsection{Cross-Site Request Forgery}
+
+In general, Cross-Site Request Forgeries (CSRF) aim at inducing users to perform actions they don't intend to perform. This includes actions like changing the password, changing their email address or sending money to somebody else. CSRF attacks only work if there is a relevant action to perform by the victim (like a password change), matching messages to the right session is handled by cookies and the hyperlink in question includes no parameter which is unknown to the attacker \cite{csrf}. Figure \ref{fig:csrf} depicts the general structure of such an attack.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{images/csrf.png}
+    \caption{CSRF \cite{csrfImage}}
+    \label{fig:csrf}
+\end{figure}
+
+Even though the original model illustrating the authorisation code grant message flow does not allow for this kind of attack, it is important to note that implementation errors may occur. Such errors may lead to delayed authentication, which may be modelled by shifting the handshakes like depicted in msc \ref{fig:msc_soidc_lateHS}, giving the attacker control over the initial authorisation request and allowing them to freely choose the values appID, pkce and scope. The complete model of this protocol is available in the appendix \ref{appendix_csrf}.
+
+\begin{figure}[H]
+    \centering
+    \input{msc/msc_soidc_lateHS}
+    \caption{SOIDC Late Handshake}
+    \label{fig:msc_soidc_lateHS}
+\end{figure}
+
+Running a ProVerif verification on this model reveals the now existing CRSF attack, which emerged as the app is no longer authenticating browser and issuer. This leads again to the code to be leaked to the attacker, which in combination with the ability of choosing the authorisation request themselves, gives them free hand in using it with an honest issuer and acquiring an access token. This attack is depicted in msc \ref{fig:msc_soidc_lateHS_attack}.
+
+\begin{figure}[H]
+    \centering
+    \input{msc/msc_soidc_lateHS_attack}
+    \caption{SOIDC CSRF Attack On Late Handshake}
+    \label{fig:msc_soidc_lateHS_attack}
+\end{figure}
+
+% -----------------------------------------------------------------------------
+
+\subsection{Providing a Fix}
+\label{fix_short}
+
+Being prone to such devastating attacks is indeed troublesome, but luckily both attacks rely on the same vulnerability and may be fixed easily. While the browser is talking to the issuer, the app has no way of knowing which issuer the browser is actually talking to. This may lead to misunderstandings, which may be exploited by malicious parties. However, by adding the issuerID to the code like shown in the msc \ref{fig:msc_soidc_fix_small}, the app learns about the identity of the conversing issuer. In case the identity is not matching with the apps expectation, the protocol can now be stopped, preventing sensitive information from leaking.
+
+\begin{figure}[H]
+    \centering
+    \input{msc/msc_soidc_fix_small}
+    \caption{SOIDC Proposed Fix}
+    \label{fig:msc_soidc_fix_small}
+\end{figure}
+
+Using ProVerif to verify the fix, it is proven that authentication now holds for all parties. This was tested for both the normal version and the version including the implementation error with the late handshake. Additionally, the code stays now secret throughout the entire run of the protocol. This denies both of the attacks mentioned beforehand. The following short snippet of ProVerif code illustrates the simplicity of the fix, as only two messages needed to be changed:
+
+\begin{Verbatim}[fontsize=\small]
+    (* ---------- Issuer ---------- *)
+    (* Message 7 *)
+    new code:bitstring;
+    let m_7 = enc((tag7, code, i), k2) in
+    event issuerSendsLastMessageToUser(m_4, m_5, m_6, m_7);
+    out(c, m_7);
+
+    (* ---------- User ---------- *)
+    (* Message 7 *)
+    in(c, m_7:bitstring);
+    let (tag7':bitstring, code:bitstring, i':bitstring) = dec(m_7, k2) in
+    if (tag7 = tag7') then
+    if (i = i') then
+
+    (* Message 8 *)
+    let m_8 = enc((tag8, code, i), k1) in
+    event browserSendsLastMessageToApp(m_1, m_2, m_3, m_8);
+    out(c, m_8);
+
+    (* ---------- App ---------- *)
+    (* Message 8 *)
+    in(c, m_8:bitstring);
+    let (tag8':bitstring, code:bitstring, i':bitstring) = dec(m_8, k1) in
+    if (tag8 = tag8') then
+    if (i = i') then
+\end{Verbatim}
+
+Furthermore, applying the fix also allows for the pkce to be completely be omitted without losing security, as it is no longer the sole responsible for issuer authentication. 
+
+% -----------------------------------------------------------------------------
+
+\subsection{Proposed Version Of SOIDC}
+
+A new and improved version of the SOIDC authorisation code grant protocol is proposed in the following and depicted in the msc \ref{fig:msc_soidc_fix}. It utilizes the fix proposed in section \ref{fix_short} and has had the code verifier pkce removed as it became obsolete in the process. Running the verification process of ProVerif on this model proved that authentication now holds for each party. Additionally, the code stays secret throughout the entire protocol. This completes the second goal of the paper as described in chapter \ref{introduction}.
+
+\begin{figure}[H]
+    \centering
+    \input{msc/msc_soidc_fix}
+    \caption{SOIDC Proposed Fixed Version}
+    \label{fig:msc_soidc_fix}
+\end{figure}
+
+% -----------------------------------------------------------------------------
+% -----------------------------------------------------------------------------
+% -----------------------------------------------------------------------------
+
+\chapter{New VC-Based Third Party Authentication Protocol}
+\label{msoidc}
+
+After having analysed and modelled the inner workings of Solid Open ID Connect, it becomes clear that relying on HTTPS connection protocols is not enough for the creation of secure communication channels. The existence of the previously discovered mixup and CSRF attacks prove the lack of control over the participants of the protocol. In order to regain control, the use of a bi-directional authenticating protocol is therefore proposed and modelled in the following. This should order the chaotic message flow jumping between all actors and provide less opportunities for a malicious party to infiltrate the system. 
+
+Additionally, the protocol flow of Solid Open ID Connect implies that the issuer contacted every time a user grants a third party access to private resources. The third party in question is therefore transmitted to the issuer, allowing them to create profiles and track user behaviour based on that information. Reclaiming that privacy may be achieved by circumventing the need for the issuer to know the third party. To achieve this feat, the concept of Verifiable Credentials (VC) is introduced in the following. In general, VCs are official documents issued by an authority, proving that an entity is indeed fulfilling some sort of requirement. They are the digital counterpart of for instance a passport or identity card, which are issued by the government and proving the holder's name, age etc. By transferring this system to a third party authentication protocol, it becomes possible for any user to provide trustworthy evidence to a third party, which allows them to access sensitive information on their behalf. By adding an expiry date, these credentials may be used multiple times before they need to be refreshed by issuer \cite{credentials}.
+
+% -----------------------------------------------------------------------------
+
+\section{STS Handshake}
+
+Similar to the HTTPS connection protocol mentioned in chapter \ref{soidc}, the Station To Station (STS) Protocol \cite{o1987encryption} aims at establishing a symmetric session key, which may be used for communication while providing forward secrecy. It is based on a Diffie Hellman Key Exchange operating in a previously fixed group G. Both parties start by exchanging a group element, which is raised by individually created secret exponents. As only the result is transferred, no attacker is able to identify the secret exponent. By raising the received group element again by their individual exponents, both parties now obtain the same group element, which may be used as a symmetric key for future communication. 
+
+\begin{figure}[H]
+    \centering
+    \input{msc/msc_sts}
+    \caption{STS Connect}
+    \label{fig:msc_sts}
+\end{figure}
+
+In general, this process is prone to a man in the middle attack. However, this is prevented by using signatures from both communicating parties to agree on the key material, also binding the generated symmetric key to their session. This process is illustrated in msc \ref{fig:msc_sts}. Verifying the protocol with ProVerif reveals that both parties are authenticating each other like anticipated. Additionally, the generated symmetric key stays secret throughout the entire protocol. 
+
+% -----------------------------------------------------------------------------
+
+\section{VC Issuance and Use}
+
+By cooperating with Christoph Braun from the Karlsruhe Institute of Technology (KIT), a first version of a VC-based third party authentication protocol has been created. All of his work on this topic is accessible in the corresponding GitHub repository \cite{githubChristoph}, while this paper shows a slightly modified version based on the result of our collaboration. The main difference is the use of expanded attacker capabilities by using the open network model as explained in chapter \ref{proverif}, as it allows the attacker to pose as any party involved in the communication process. The protocol is divided into two different parts: The issuance of the VC by the issuer and its use to access private resources in a pod. Both parts are divided by a fictive sovereignty line, depicting the breaking point at which the issuer loses sight of the users targeted pod, thus increasing their privacy. The entire protocol is depicted in msc \ref{fig:msc_msoidc_small}, while both individual parts are explained in further detail in the following. The complete model of this protocol is available in the appendix \ref{appendix_msoidc}.
+
+\begin{figure}[H]
+    \centering
+    \input{msc/msc_msoidc_small}
+    \caption{VC Issuance and Use}
+    \label{fig:msc_msoidc_small}
+\end{figure}
+
+The first part of the proposed protocol consists in acquiring a verifiable credential from an official issuer. After connecting to the issuer in question, the user is sending their identifier u, some sort of attribute they want to be certified and a previously established password. The methods used to agree an a password are not included in this model. Each of the previously send terms fulfills a different role: The user identifier determines whose attribute should be approved by the issuer. The attribute determines what should be approved, like for instance a university degree or similar. The password is authenticating the user. After verifying the given information, the issuer creates a verifiable credential (VC) by signing the user identifier, their own identifier and the attribute in question. This provides solid proof that the claim has been seen, verified and accorded by the issuer.
+
+The second part of the proposed protocol starts below the sovereignty line and consists in the creation and use of the presentation token (PT) to get access to a specific resource. Transforming the VC to a PT by signing it is only possible for the user and is an important step as the holder of a VC is able to grant third party access to resources. Transferring the raw VC to any other party allows them to distribute access to private resources and thus should be avoided at all cost. In contrast, the possession of the PT only grants access to the resource specified in the scope and does not allow further distribution as it is already signed by the user. The next step consists in sending the resource access request uri to the pod. After receiving the request, the permission server is exposing the rule needed to fulfill in order to access the resource in question. The rule could for instance be the requirement of being registered on a specific website. With the matching PT, the app is able to provide proof of respecting the rule. Afterwards, the app receives an access token, which may be used to access the resource initially requested, completing the protocol.
+
+The protocol was modelled and verified in ProVerif. The verification confirms that each party is able to complete the protocol and that both symmetric communication keys and the password stay secret during that time. Additionally, each actor is able to authenticate each other actor, meaning that no mixup attacks are possible in this scenario. This completes the third goal of the paper as described in chapter \ref{introduction}.
+
+% -----------------------------------------------------------------------------
+% -----------------------------------------------------------------------------
+% -----------------------------------------------------------------------------
+
+\chapter{Limitations / Further Work}
+\label{limitations_work}
+
+Even though the models provided in this paper are as detailed as possible, it is important to make a note on the natural limitations of a model. These limitations emerge a model is in general not able to represent reality in its entirety. They usually use a set of assumptions, which aim at reducing the cheer amount of possibilities occurring in real life. If not chosen carefully, it may happen that some important aspects are abstracted away, hiding the potential existence of other attacks. That said, models are still a strong tool and should be used as much as possible during the creation process of any protocol. Each time a model is finding an attack, the discovered attack may be prevented before any malicious party is capable of exploiting it. This already protects user data even during development of a new protocol. Additionally, providing models and verification as proof for attacks or security properties is a guarantee for their existence.
+
+When continuing the work on verifying Solid OpenID Connect, the next step would be to create a model illustrating its second part called 'Request Flow' as described in the official Solid Primer \cite{solidPrimer}, which is describing the usage of the generated access token to receive the requested resource. Such a model could use the same general structure and HTTPS handshake as described in this paper, which would facilitate its development. Furthermore, checking for other properties than only secrecy and authentication could reveal new knowledge of potential vulnerabilities in either part.
+
+% -----------------------------------------------------------------------------
+% -----------------------------------------------------------------------------
+% -----------------------------------------------------------------------------
+
+\chapter{Summary}
+\label{summary}
+
+This paper has created its own ProVerif model depicting authorisation grant flow of Solid OpenID Connect. It uses a simple protocol mimicking the properties of a standard HTTPS structure to allow the different actors to connect. The resulting session key is then used to tightly bind all messages passed between two communicating agents, creating the notion of hyperlink requests and callbacks. The messages transfer the same content as described in the SOIDC Primer \cite{solidPrimer}, which makes the model an accurate replication of the message flow in question. The discovery of two potential attacks even confirm the initial suspicions. This completes the first goal of the paper as stated in chapter \ref{introduction}.
+
+Verifying the previously described model resulted in the discovery of a mixup and a cross-site request forgery attack. These attacks make it possible for a malicious party to access private resources, resulting in consequences of unforeseen severity. The simple solution of adding the issuer identity to the code transfer binds the generated code to the issuer and hereby prevents both attacks from being executed, as the attacker is no longer able use the code in sessions with different actors. A model containing the fix has been created and verified using ProVerif. This completes the second goal of the paper as stated in chapter \ref{introduction}. 
+
+Afterwards, this paper has presented a new protocol, which could be used to grant third party access to private resources. In contrast to already existing protocols, the new version uses verifiable credentials to limit the possibility for any issuer to track user behaviour. This increases user privacy by preventing the issuer to create user profiles with detailed information. The protocol has been modeled and verified with ProVerif. The results show that secrecy and authentication hold for the involved parties, which constitutes a solid starting point for further work on this protocol. This completes the third goal and last of the paper as stated in chapter \ref{introduction}.
+
+% -----------------------------------------------------------------------------
+% -----------------------------------------------------------------------------
+% -----------------------------------------------------------------------------
+
+\backmatter
+
+% -----------------------------------------------------------------------------
+% -----------------------------------------------------------------------------
+% -----------------------------------------------------------------------------
+
+\newpage
+\bibliographystyle{ieeetr}
+\bibliography{citations}
+
+% -----------------------------------------------------------------------------
+% -----------------------------------------------------------------------------
+% -----------------------------------------------------------------------------
+
+\appendix
+\label{appendix}
+
+\chapter{Appendix: ProVerif Models}
+
+The appendix contains ProVerif models of the most important protocols presented in this paper. These protocols include the two different attacks on SOIDC as well as the newly proposed VC-based third party authentication protocol. All of the models presented here, together with their log files containing attack descriptions and traces, are also available at the following GitHub repository \cite{githubGilles}.
+
+% -----------------------------------------------------------------------------
+
+\section{General Definitions}
+
+The definitions of the cryptographic primitives are part of each ProVerif model of this paper and are therefore only listed once to save space. Forgetting to include them when copying the models will result in various error messages, preventing ProVerif from running the verifiaction process.
+
+\input{models/definitions}
+
+% -----------------------------------------------------------------------------
+
+\section{SOIDC - Issuer Mixup Attack}
+\label{appendix_issuer_mixup}
+
+This model depicts the mixup attack as described in the msc \ref{fig:msc_soidc_attack}. Note that ProVerif recognizes the issuer's inability of authenticating the other actors, leading to the vulnerability.
+
+\input{models/soidc_issuer_mixup}
+
+% -----------------------------------------------------------------------------
+
+\section{SOIDC - CSRF}
+\label{appendix_csrf}
+
+This model depicts the mixup attack as described in the msc \ref{fig:msc_soidc_lateHS_attack}. Note that ProVerif recognizes the app's inability of authenticating the other actors, leading to the vulnerability.
+
+\input{models/soidc_csrf}
+
+% -----------------------------------------------------------------------------
+
+\section{VC-Based Third Party Authentication Protocol}
+\label{appendix_msoidc}
+
+This model depicts the newly proposed alternative granting third party authentication using verifiable credentials as described in the msc \ref{fig:msc_msoidc_small}.
+
+\input{models/vc_based}
+
+% -----------------------------------------------------------------------------
+
+\end{document}

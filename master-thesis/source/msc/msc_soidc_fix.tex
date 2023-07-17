@@ -1,0 +1,42 @@
+%\makebox[\textwidth][c] {
+
+\begin{msc}[environment distance = 3cm]{Solid Open ID Connect - Authorization Code Grant Proposed Fix}
+
+\declinst[instance width = 4cm]{app}{$sk_{A}$, pk($sk_I$)}{App}
+\declinst[instance width = 4cm]{browser}{pk($sk_A$), pk($sk_I$), password}{Browser}
+\declinst[instance width = 4cm]{issuer}{$sk_I$, password}{Issuer}
+
+\condition*{\small{($\leftarrow$) $k_1$ = HTTPS Connect}}{app,browser}
+\nextlevel[3]
+\mess{\small{$\{appID, scope\}_{k_1}$}}{app}{browser}
+\nextlevel[1]
+\condition*{\small{$k_2$ = HTTPS Connect ($\rightarrow$)}}{issuer,browser}
+\nextlevel[3]
+\mess{\small{$\{appID,scope,browserID,password\}_{k_2}$}}{browser}{issuer}
+\nextlevel[1]
+\action*{\small{fresh code: nonce}}{issuer}
+\nextlevel[3]
+\mess{\small{$\{code, issuerID\}_{k_2}$}}{issuer}{browser}
+\nextlevel[2]
+\mess{\small{$\{code, issuerID\}_{k_1}$}}{browser}{app}
+\nextlevel[1]
+\stop*{browser}
+\nextlevel[1]
+\condition*{\small{$k_3$ = HTTPS Connect ($\rightarrow$)}}{app,issuer}
+\nextlevel[2]
+\action*{\small{fresh sks: SecretKey, jti: nonce}}{app}
+\nextlevel[3]
+%\action*{\small{$T_2 = (appID, jti, code)$}}{app}
+%\nextlevel[3]
+\mess{\small{$\{pk(sks), sign((appID, jti, code), sks)\}_{k_3}$}}{app}{issuer}
+\nextlevel[1]
+\action*{\small{jtk = h(pk(sks))}}{issuer}
+\nextlevel[3]
+%\action*{\small{M = (jtk,jti,scope,appID,issuerID,browserID)}}{issuer}
+%\nextlevel[3]
+\mess{\small{$\{sign((jtk,jti,scope,appID,issuerID,browserID), skI)\}_{k_3}$}}{issuer}{app}
+\nextlevel[1]
+
+\end{msc}
+
+%}

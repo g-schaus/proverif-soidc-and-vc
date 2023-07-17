@@ -1,0 +1,30 @@
+% HTTPS is used to establish a session key, providing forward secrecy
+
+%\makebox[\textwidth][c]{
+
+\begin{msc}[instance distance=6cm]{HTTPS Connect Using Diffie Hellman}
+
+\declinst[instance width = 3cm]{initiator}{$sk_I$, $pk(sk_R)$}{Initiator}
+\declinst[instance width = 3cm]{responder}{$sk_R$, $pk(sk_I)$}{Responder}
+
+\action*{\small{new x: exponent}}{initiator}
+\action*{\small{new y: exponent}}{responder}
+\nextlevel[2]
+\action*{\small{$gx = g^x$}}{initiator}
+\action*{\small{$gy = g^y$}}{responder}
+\nextlevel[2]
+\mess{\small{gx}}{initiator}{responder}
+\nextlevel[2]
+\mess{\small{gy, $\{sign((gy,gx),sk_R)\}_k$}}{responder}{initiator}
+\nextlevel[1]
+\action*{\small{k = $(gx)^{y}$}}{responder}
+\action*{\small{k = $(gy)^{x}$}}{initiator}
+\nextlevel[2]
+\condition*{\small{Auth. Responder}}{initiator}
+\ncondition*{\small{Auth. Initiator}}{responder}
+\nextlevel[1]
+
+
+\end{msc}
+
+%}

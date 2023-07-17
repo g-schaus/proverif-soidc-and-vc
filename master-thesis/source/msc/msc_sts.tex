@@ -1,0 +1,26 @@
+\begin{msc}[instance distance=6cm]{STS Key Exchange}
+
+\declinst[instance width = 3cm]{initiator}{$sk_I$, $pk(sk_R)$}{Initiator}
+\declinst[instance width = 3cm]{responder}{$sk_R$, $pk(sk_I)$}{Responder}
+
+
+\action*{\small{new x: exponent}}{initiator}
+\action*{\small{new y: exponent}}{responder}
+\nextlevel[2]
+\action*{\small{$gx = g^x$}}{initiator}
+\action*{\small{$gy = g^y$}}{responder}
+\nextlevel[2]
+\mess{\small{gx}}{initiator}{responder}
+\nextlevel[2]
+\mess{\small{gy, {sign((gy,gx),$sk_R$)}}}{responder}{initiator}
+\nextlevel[2]
+\mess{\small{sign((gx,gy),$sk_I$)}}{initiator}{responder}
+\nextlevel[2]
+\action*{\small{k = $(gx)^{y}$}}{responder}
+\action*{\small{k = $(gy)^{x}$}}{initiator}
+\nextlevel[2]
+\condition*{Auth. Responder}{initiator}
+\condition*{Auth. Initiator}{responder}
+\nextlevel[2]
+
+\end{msc}

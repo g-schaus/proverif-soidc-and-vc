@@ -1,0 +1,23 @@
+%\makebox[\textwidth][c] {
+
+\begin{msc}[environment distance = 3cm]{Solid Open ID Connect - Mixup Fix Proposal}
+
+\declinst[instance width = 4cm]{app}{$sk_{A}$, pk($sk_I$)}{App}
+\declinst[instance width = 4cm]{browser}{password}{Browser}
+\declinst[instance width = 4cm]{issuer}{$sk_I$, pk($sk_{A}$), password}{Issuer}
+
+\condition*{\small{...}}{app,browser,issuer}
+\nextlevel[2]
+\action*{\small{fresh code: nonce}}{issuer}
+\nextlevel[3]
+\mess{\small{$\{code, \color{purple}issuerID\color{black}\}_{k_2}$}}{issuer}{browser}
+\nextlevel[1]
+\mess{\small{$\{code, \color{purple}issuerID\color{black}\}_{k_1}$}}{browser}{app}
+%\mess{\small{$code$, \color{purple}issuerID\color{black}}}{browser}{app}
+\nextlevel[1]
+\condition*{\small{...}}{app,browser,issuer}
+\nextlevel[1]
+
+\end{msc}
+
+%}

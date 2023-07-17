@@ -1,0 +1,46 @@
+%\makebox[\textwidth][c] {
+
+\begin{msc}[environment distance = 3cm]{Solid Open ID Connect - Attack on Issuer Authentication}
+
+\declinst[instance width = 3cm]{app}{$sk_{A}$, pk($sk_E$)}{App}
+\declinst[instance width = 3cm]{browser}{pk($sk_A$), pk($sk_I$), password}{Browser}
+\dummyinst[instance width = 3cm]{eve}
+\declinst[instance width = 3cm]{issuer}{$sk_I$, password}{Issuer}
+
+\mess{\small{$\{n, pk(sskI)\}_{pk(ska)}$}}{browser}{app}
+\nextlevel[2]
+\mess{\small{$\{n, k_1\}_{pk(sskI)}$}}{app}{browser}
+\nextlevel[2]
+\mess{\small{$\{appID,h(pkce),scope\}_{k_1}$}}{app}{browser}
+\nextlevel[1]
+\mess{\small{$\{n_2, pk(sskI_2)\}_{pk(ski)}$}}{browser}{issuer}
+\nextlevel[2]
+\mess{\small{$\{n_2, k_2\}_{pk(sskI_2)}$}}{issuer}{browser}
+\nextlevel[2]
+\mess{\small{$\{appID,h(pkce),scope,browserID,password\}_{k_2}$}}{browser}{issuer}
+\nextlevel[2]
+\mess{\small{$\{code\}_{k_2}$}}{issuer}{browser}
+\nextlevel[1]
+\mess{\small{$\{code\}_{k_1}$}}{browser}{app}
+\nextlevel[1]
+\stop*{browser}
+\nextlevel[1]
+\startinst{eve}{$sk_{E}$, pk($sk_I$)}{Eve as Issuer / App}
+\nextlevel[2]
+\mess{\small{$\{n_3, pk(sskI3)\}_{pk(sk_{E})}$}}{app}{eve}
+\nextlevel[2]
+\mess{\small{$\{n_4, pk(sk_2)\}_{pk(ski)}$}}{eve}{issuer}
+\nextlevel[2]
+\mess{\small{$\{n_4, k_3\}_{pk(sk_2)}$}}{issuer}{eve}
+\nextlevel[1]
+\mess{\small{$\{n_3, k_3\}_{pk(sskI3)}$}}{eve}{app}
+\nextlevel[2]
+\mess{\small{$\{pk(sks), sign((appID, jti, code, pkce), sks)\}_{k_3}$}}{app}{eve}
+\mess*{}{eve}{issuer}
+\nextlevel[2]
+\mess{\small{$\{sign((jtk,jti,scope,appID,issuerID,browserID), skI)\}_{k_3}$}}{issuer}{eve}
+\nextlevel[1]
+
+\end{msc}
+
+%}

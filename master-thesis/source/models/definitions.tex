@@ -1,0 +1,51 @@
+\begin{Verbatim}[fontsize=\small]
+(* START keys *)
+type SymmetricKey.
+type SecretKey.
+type PublicKey.
+fun pk(SecretKey):PublicKey.
+(* END keys *)
+
+(* START group *)
+type G.
+type exponent.
+fun exp(G, exponent): G.
+fun g(exponent): G.
+equation forall x: exponent, y: exponent; exp(g(x),y) = exp(g(y),x).
+fun GtoSymK(G): SymmetricKey.
+fun bitG(G):bitstring.
+reduc forall elem:G; unbitG(bitG(elem))=elem.
+(* END group *)
+
+(* START hash *)
+fun hash(bitstring): bitstring.
+fun hash_pk(PublicKey): bitstring.
+(* End hash *)
+
+(* START symmetric encryption *)
+fun enc(bitstring(*the message*), SymmetricKey):bitstring (*symmetric encrypt input msg*).
+reduc forall msg:bitstring,symk:SymmetricKey; dec(enc(msg,symk),symk)=msg (*symmetric decrypt*).
+
+fun symk_to_bit(SymmetricKey): bitstring.
+reduc forall symk:SymmetricKey; bit_to_symk(symk_to_bit(symk)) = symk.
+(* END symmetric encryption *)
+
+(* START asymmetric encryption *)
+fun aenc(bitstring(*the message*), PublicKey):bitstring (*asymmetric encrypt input msg*).
+reduc forall msg:bitstring,sk:SecretKey; adec(aenc(msg,pk(sk)),sk)=msg (*asymmetric decrypt*).
+(* END Asymmetric encryption *)
+
+(* START digital signature *)
+fun sign(bitstring(*the message*), SecretKey):bitstring (*sign the input msg*).
+reduc forall msg:bitstring,sk:SecretKey; check(sign(msg,sk),pk(sk))=msg (*check signature, and get msg*).
+reduc forall msg:bitstring,sk:SecretKey; getMsg(sign(msg,sk))=msg (*just get msg*).
+(* END digital signature *)
+
+(* START tags *)
+const tag1:bitstring.
+const tag2:bitstring.
+const tag3:bitstring.
+(* ... *)
+(* END tags *)
+
+\end{Verbatim}
